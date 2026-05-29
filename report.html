@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en-IE">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aderrig Green Vote Report</title><link rel="stylesheet" href="styles.css"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head>
+<body>
+<header class="topbar"><div class="wrap topbar__inner"><div><div class="brand">Aderrig Green</div><div class="subbrand">Vote Report</div></div><div class="topActions"><a class="toplink" id="csvLink" href="#">Export CSV</a><button class="resetLink" id="resetBtn" type="button">Reset All Votes</button></div></div></header>
+<main class="wrap">
+<section class="card"><div class="eyebrow">Admin Report</div><h1>Car Parking Policy Vote Results</h1><div class="grid2"><label>Admin PIN<input id="pin" type="password" placeholder="Enter PIN"></label><div style="align-self:end"><button class="btn" id="loadBtn">Load report</button></div></div><p class="message" id="msg"></p></section>
+<section class="card hidden" id="results"><div class="stats"><div><b id="total">0</b><span>Total votes</span></div><div><b id="agree">0</b><span>Agree</span></div><div><b id="disagree">0</b><span>Do Not Agree</span></div></div><div class="chartBox"><canvas id="chart"></canvas></div><div class="tableWrap"><table><thead><tr><th>Internal Order</th><th>Reference ID</th><th>Date/Time</th><th>Eircode</th><th>Email</th><th>Vote</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<section class="card hidden" id="resetPanel">
+  <div class="eyebrow">Test Tool</div>
+  <h2>Reset All Votes</h2>
+  <p class="small">Use this only during testing. This permanently removes all recorded votes, Eircodes, Reference IDs and statistics.</p>
+  <label>Type RESET ALL VOTES<input id="resetConfirm" type="text" placeholder="RESET ALL VOTES"></label>
+  <div class="actions"><button class="btn secondary" id="cancelReset" type="button">Cancel</button><button class="btn danger" id="confirmReset" type="button">Confirm Reset</button></div>
+  <p class="message" id="resetMsg"></p>
+</section>
+</main>
+<style>.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}.stats div{border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--soft)}.stats b{display:block;font-size:34px;color:var(--green)}.stats span{color:var(--muted);font-weight:800}.chartBox{max-width:420px;margin:24px auto}.tableWrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--green)}@media(max-width:760px){.stats{grid-template-columns:1fr}}</style>
+<script>
+let chart;
+const $=id=>document.getElementById(id);
+async function loadReport(){const pin=$('pin').value.trim();$('msg').textContent='';try{const r=await fetch('/.netlify/functions/list-votes?pin='+encodeURIComponent(pin));const data=await r.json();if(!r.ok) throw new Error(data.message||'Unable to load report.');$('results').classList.remove('hidden');$('total').textContent=data.totals.total;$('agree').textContent=data.totals.agree;$('disagree').textContent=data.totals.disagree;$('rows').innerHTML=data.votes.map(v=>`<tr><td>${v.internalOrder}</td><td>${v.publicReferenceId||''}</td><td>${v.submittedAtIreland||v.submittedAt}</td><td>${v.eircode}</td><td>${v.email}</td><td>${v.vote}</td></tr>`).join('');$('csvLink').href='/.netlify/functions/export-csv?pin='+encodeURIComponent(pin);if(chart) chart.destroy();chart=new Chart($('chart'),{type:'doughnut',data:{labels:['Agree','Do Not Agree'],datasets:[{data:[data.totals.agree,data.totals.disagree]}]},options:{plugins:{legend:{position:'bottom'}}}});}catch(e){$('msg').textContent=e.message;}}
+$('loadBtn').onclick=loadReport;
+$('resetBtn').onclick=()=>{$('resetPanel').classList.remove('hidden');$('resetMsg').textContent='';$('resetConfirm').value='';window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});};
+$('cancelReset').onclick=()=>{$('resetPanel').classList.add('hidden');};
+$('confirmReset').onclick=async()=>{const pin=$('pin').value.trim();const confirm=$('resetConfirm').value.trim();$('resetMsg').textContent='Resetting...';try{const r=await fetch('/.netlify/functions/reset-votes',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pin,confirm})});const data=await r.json();if(!r.ok) throw new Error(data.message||'Unable to reset votes.');$('resetMsg').textContent=data.message;$('resetPanel').classList.add('hidden');await loadReport();}catch(e){$('resetMsg').textContent=e.message;}};
+</script>
+</body></html>

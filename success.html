@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Vote Successfully Recorded</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="wrap successWrap">
+    <section class="card successCard">
+      <p class="successTick">✓</p>
+      <h1>Vote Successfully Recorded</h1>
+      <p class="lead">Your vote has been securely registered.</p>
+      <p>Thank you for participating in the Aderrig Green resident consultation.</p>
+      <p class="referenceLine"><strong>Reference ID:</strong> <span id="referenceId">AG-2026-XXXX-XXXX</span></p>
+      <button class="btn" id="closeBtn" type="button">Close</button>
+    </section>
+  </main>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const ref = params.get('ref') || sessionStorage.getItem('agVoteReferenceId') || '';
+    if (ref) document.getElementById('referenceId').textContent = ref;
+    document.getElementById('closeBtn').addEventListener('click', () => window.close());
+  </script>
+</body>
+</html>
