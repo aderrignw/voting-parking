@@ -21,7 +21,9 @@
     const params = new URLSearchParams(location.search);
     const ref = params.get('ref') || sessionStorage.getItem('agVoteReferenceId') || '';
     if (ref) document.getElementById('referenceId').textContent = ref;
-    document.getElementById('closeBtn').addEventListener('click', () => window.close());
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      window.location.href = '/';
+    });
   </script>
 </body>
 </html>
