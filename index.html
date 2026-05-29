@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aderrig Green — Car Parking Policy</title>
+  <meta name="description" content="Resident approval process for the Aderrig Green Car Parking Policy proposal.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbarInner">
+      <div class="brand">
+        <span class="mark">✓</span>
+        <div>
+          <p class="brandName">Aderrig Green</p>
+          <p class="brandSub">Resident Approval Process</p>
+        </div>
+      </div>
+      <p class="secure">Secure consultation</p>
+    </div>
+  </header>
+
+  <main class="wrap page">
+    <section class="hero card">
+      <p class="eyebrow">Car Parking Policy Proposal</p>
+      <h1>Aderrig Green Car Parking Policy</h1>
+      <div class="shortText">
+        <p>The Directors of Aderrig Green present the proposed Car Parking Policy for resident approval.</p>
+        <p>Please review the proposal and submit your vote.</p>
+        <p><strong>One vote per residence (Eircode).</strong></p>
+        <p><strong>Your vote matters.</strong></p>
+      </div>
+    </section>
+
+    <section class="card verifyCard" id="verification" aria-labelledby="verifyTitle">
+      <div class="sectionHead">
+        <span class="step">Step 1 of 3</span>
+        <h2 id="verifyTitle">Resident Verification</h2>
+      </div>
+      <p class="muted">Enter your details to open the proposal.</p>
+
+      <form id="verifyForm" class="form" novalidate>
+        <div class="formGrid">
+          <label>Email
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          </label>
+          <label>My Eircode
+            <input id="eircode" name="eircode" type="text" inputmode="text" autocomplete="postal-code" placeholder="K78 XXXX" required>
+          </label>
+        </div>
+        <button type="submit" class="btn">Continue</button>
+        <p class="message" id="verifyMessage" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="card locked closed" id="proposalSection" aria-labelledby="proposalTitle">
+      <div class="sectionHead row">
+        <div>
+          <span class="step">Step 2 of 3</span>
+          <h2 id="proposalTitle">Policy Proposal</h2>
+        </div>
+        <span class="pill" id="verifiedBadge"></span>
+      </div>
+      <p class="muted">The proposal opens here after verification.</p>
+
+      <div class="proposalShell" id="proposalShell">
+        <div class="lockedBox" id="lockedNotice">Complete Step 1 to view the proposal.</div>
+        <iframe id="proposalFrame" data-src="assets/proposal.pdf#toolbar=0&navpanes=0&view=FitH" title="Aderrig Green Car Parking Policy Proposal"></iframe>
+      </div>
+      <div class="reviewGate" id="reviewGate" hidden>
+        <p id="reviewTimer">Please review the proposal. Voting will unlock shortly.</p>
+        <button type="button" class="btn secondary" id="reviewDone" disabled>I have reviewed the proposal</button>
+      </div>
+    </section>
+
+    <section class="card locked closed" id="voteSection" aria-labelledby="voteTitle">
+      <div class="sectionHead">
+        <span class="step">Step 3 of 3</span>
+        <h2 id="voteTitle">Submit Vote</h2>
+      </div>
+      <p class="muted" id="residentSummary">Complete Step 1 first.</p>
+
+      <form id="voteForm" name="aderrig-green-car-parking-vote" method="POST" action="/success.html" class="form" data-netlify="true" data-netlify-honeypot="bot-field" novalidate>
+        <input type="hidden" name="form-name" value="aderrig-green-car-parking-vote">
+        <p class="hidden" aria-hidden="true">
+          <label>Do not fill this field: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
+        </p>
+        <input type="hidden" id="voteEmail" name="email" value="">
+        <input type="hidden" id="voteEircode" name="eircode" value="">
+        <input type="hidden" id="voteSubmittedAtIreland" name="submitted_at_ireland" value="">
+        <fieldset class="voteOptions">
+          <legend>Your response</legend>
+          <label class="option"><input type="radio" name="vote" value="Agree" required> Agree</label>
+          <label class="option"><input type="radio" name="vote" value="Do Not Agree" required> Do Not Agree</label>
+        </fieldset>
+
+        <label class="confirm"><input type="checkbox" id="confirmed" name="confirmed" value="Yes" required> I confirm this is the only vote submitted for this residence (Eircode).</label>
+        <button type="submit" class="btn">Submit Vote</button>
+        <p class="message" id="voteMessage" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="wrap footer">Created by the Directors of Aderrig Green Management Company.</footer>
+  <script src="script.js"></script>
+</body>
+</html>
