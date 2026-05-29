@@ -26,7 +26,7 @@ function normaliseEircode(value = '') {
 function safeDate(value) {
   if (!value) return '';
   const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return value;
+  if (Number.isNaN(d.getTime())) return String(value);
   return d.toLocaleString('en-IE', {
     timeZone: 'Europe/Dublin',
     dateStyle: 'medium',
@@ -36,9 +36,7 @@ function safeDate(value) {
 
 function field(data, names) {
   for (const name of names) {
-    if (data && data[name] !== undefined && data[name] !== null && String(data[name]).trim() !== '') {
-      return data[name];
-    }
+    if (data && data[name] !== undefined && data[name] !== null && String(data[name]).trim() !== '') return data[name];
   }
   return '';
 }
@@ -75,14 +73,9 @@ function buildReport(submissions) {
     acc[row.eircode] = (acc[row.eircode] || 0) + 1;
     return acc;
   }, {});
-  const duplicateEircodes = Object.entries(eircodeCounts)
-    .filter(([, count]) => count > 1)
-    .map(([eircode, count]) => ({ eircode, count }));
+  const duplicateEircodes = Object.entries(eircodeCounts).filter(([, count]) => count > 1).map(([eircode, count]) => ({ eircode, count }));
   const uniqueEircodes = Object.keys(eircodeCounts).length;
-
-  const lastSubmission = rows
-    .slice()
-    .sort((a, b) => new Date(b.createdAt || b.submittedAtIreland) - new Date(a.createdAt || a.submittedAtIreland))[0] || null;
+  const lastSubmission = rows.slice().sort((a, b) => new Date(b.createdAt || b.submittedAtIreland) - new Date(a.createdAt || a.submittedAtIreland))[0] || null;
 
   const byDayMap = {};
   for (const row of rows) {
@@ -123,7 +116,7 @@ export const handler = async (event) => {
   const expectedPin = process.env.ADMIN_PIN || 'OMCDIRETORES2026';
   const providedPin = event.headers['x-admin-pin'] || event.headers['X-Admin-Pin'] || '';
   const directorEmail = String(event.headers['x-director-email'] || event.headers['X-Director-Email'] || '').trim().toLowerCase();
-  const defaultDirectorEmails = [
+  const allowedEmails = [
     'selerizzuti@gmail.com',
     'bahrikaran@gmail.com',
     'rohananeja@gmail.com',
@@ -132,34 +125,29 @@ export const handler = async (event) => {
     'claudiosantos1968@gmail.com'
   ];
 
-  const envDirectorEmails = String(process.env.DIRECTOR_EMAILS || '')
-    .split(',')
-    .map(email => email.trim().toLowerCase())
-    .filter(Boolean);
-
-  const allowedEmails = envDirectorEmails.length ? envDirectorEmails : defaultDirectorEmails;
-
   if (!directorEmail) return json(401, { ok: false, message: 'Please enter your director email.' });
-  if (allowedEmails.length && !allowedEmails.includes(directorEmail)) {
-    return json(403, { ok: false, message: 'This email is not authorised to access the directors dashboard.' });
-  }
+  if (!allowedEmails.includes(directorEmail)) return json(403, { ok: false, message: 'This email is not authorised to access the directors dashboard.' });
   if (String(providedPin) !== String(expectedPin)) return json(401, { ok: false, message: 'Invalid directors password.' });
 
-  const formId = process.env.NETLIFY_FORM_ID || '';
+  const formId = process.env.NETLIFY_FORM_ID || '6a19f4c677b40f0008c59273';
   const token = process.env.NETLIFY_AUTH_TOKEN || '';
-  if (!formId || !token) {
-    return json(500, { ok: false, message: 'NETLIFY_FORM_ID and NETLIFY_AUTH_TOKEN must be configured.' });
+  if (!token) {
+    return json(500, {
+      ok: false,
+      code: 'MISSING_NETLIFY_AUTH_TOKEN',
+      message: 'Live dashboard is not connected yet. Please configure NETLIFY_AUTH_TOKEN in Netlify Environment variables, or use Import CSV for now.'
+    });
   }
 
   const all = [];
   let page = 1;
   const perPage = 100;
-  while (page <= 20) {
+  while (page <= 30) {
     const url = `https://api.netlify.com/api/v1/forms/${encodeURIComponent(formId)}/submissions?page=${page}&per_page=${perPage}`;
     const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
     if (!response.ok) {
       const text = await response.text();
-      return json(response.status, { ok: false, message: 'Could not read Netlify Forms submissions.', detail: text.slice(0, 500) });
+      return json(response.status, { ok: false, message: 'Could not read Netlify Forms submissions. Please check NETLIFY_AUTH_TOKEN and NETLIFY_FORM_ID.', detail: text.slice(0, 500) });
     }
     const batch = await response.json();
     if (!Array.isArray(batch) || batch.length === 0) break;
