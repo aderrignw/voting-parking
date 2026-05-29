@@ -1,28 +1,92 @@
 <!doctype html>
 <html lang="en-IE">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aderrig Green Vote Report</title><link rel="stylesheet" href="styles.css"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Directors Dashboard | Resident Parking Vote</title>
+  <style>
+    :root{--bg:#f4f6f8;--card:#fff;--ink:#17212b;--muted:#667085;--line:#d7dde5;--dark:#20303f;--soft:#eef2f6;--good:#176b46;--bad:#9f2f2f;--warn:#a15c00}
+    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}
+    .wrap{max-width:1180px;margin:0 auto;padding:28px 18px 54px}.top{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:18px}.top h1{margin:0;font-size:30px}.top p{margin:7px 0 0;color:var(--muted)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 22px rgba(20,30,40,.06)}
+    .login{max-width:520px;margin:48px auto}.login h1{margin-top:0}.row{display:flex;gap:10px;flex-wrap:wrap} input,button,select{font:inherit;border-radius:10px;border:1px solid var(--line);padding:12px 13px}input{flex:1;min-width:220px;background:#fff}button{background:var(--dark);color:#fff;border-color:var(--dark);cursor:pointer;font-weight:700}button.secondary{background:#fff;color:var(--dark)}button:disabled{opacity:.55;cursor:not-allowed}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.metric{padding:16px}.metric .label{color:var(--muted);font-size:13px}.metric .value{font-size:32px;font-weight:800;margin-top:7px}.metric .note{font-size:12px;color:var(--muted);margin-top:6px}
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.chartBox{min-height:310px}.chartTitle{font-weight:800;margin-bottom:12px}.bar{height:30px;border-radius:999px;background:var(--soft);overflow:hidden;display:flex}.bar span{display:block}.agree{background:var(--good)}.disagree{background:var(--bad)}.unknown{background:#98a2b3}.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;color:var(--muted);font-size:13px}.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}.dot.good{background:var(--good)}.dot.bad{background:var(--bad)}.dot.unk{background:#98a2b3}
+    table{width:100%;border-collapse:collapse;font-size:14px}th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;background:#fafbfc;position:sticky;top:0}.tableWrap{max-height:520px;overflow:auto}.pill{display:inline-block;padding:4px 9px;border-radius:999px;font-weight:700;font-size:12px}.pill.good{background:#e8f5ee;color:var(--good)}.pill.bad{background:#fdecec;color:var(--bad)}.pill.warn{background:#fff2df;color:var(--warn)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.hidden{display:none!important}.error{background:#fff1f1;border:1px solid #ffd0d0;color:#7a1d1d;padding:12px;border-radius:12px;margin-top:12px}.notice{background:#eef6ff;border:1px solid #c7e1ff;color:#163b62;padding:12px;border-radius:12px;margin:12px 0}.small{font-size:12px;color:var(--muted)}
+    .footer{margin-top:20px;color:var(--muted);font-size:12px}@media(max-width:900px){.grid,.charts{grid-template-columns:1fr}.top{display:block}}
+    @media print{.login,.actions,.noPrint{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none}.tableWrap{max-height:none;overflow:visible}body{background:#fff}}
+  </style>
+</head>
 <body>
-<header class="topbar"><div class="wrap topbar__inner"><div><div class="brand">Aderrig Green</div><div class="subbrand">Vote Report</div></div><div class="topActions"><a class="toplink" id="csvLink" href="#">Export CSV</a><button class="resetLink" id="resetBtn" type="button">Reset All Votes</button></div></div></header>
-<main class="wrap">
-<section class="card"><div class="eyebrow">Admin Report</div><h1>Car Parking Policy Vote Results</h1><div class="grid2"><label>Admin PIN<input id="pin" type="password" placeholder="Enter PIN"></label><div style="align-self:end"><button class="btn" id="loadBtn">Load report</button></div></div><p class="message" id="msg"></p></section>
-<section class="card hidden" id="results"><div class="stats"><div><b id="total">0</b><span>Total votes</span></div><div><b id="agree">0</b><span>Agree</span></div><div><b id="disagree">0</b><span>Do Not Agree</span></div></div><div class="chartBox"><canvas id="chart"></canvas></div><div class="tableWrap"><table><thead><tr><th>Internal Order</th><th>Reference ID</th><th>Date/Time</th><th>Eircode</th><th>Email</th><th>Vote</th></tr></thead><tbody id="rows"></tbody></table></div></section>
-<section class="card hidden" id="resetPanel">
-  <div class="eyebrow">Test Tool</div>
-  <h2>Reset All Votes</h2>
-  <p class="small">Use this only during testing. This permanently removes all recorded votes, Eircodes, Reference IDs and statistics.</p>
-  <label>Type RESET ALL VOTES<input id="resetConfirm" type="text" placeholder="RESET ALL VOTES"></label>
-  <div class="actions"><button class="btn secondary" id="cancelReset" type="button">Cancel</button><button class="btn danger" id="confirmReset" type="button">Confirm Reset</button></div>
-  <p class="message" id="resetMsg"></p>
-</section>
-</main>
-<style>.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}.stats div{border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--soft)}.stats b{display:block;font-size:34px;color:var(--green)}.stats span{color:var(--muted);font-weight:800}.chartBox{max-width:420px;margin:24px auto}.tableWrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--green)}@media(max-width:760px){.stats{grid-template-columns:1fr}}</style>
+  <main class="wrap">
+    <section id="login" class="card login">
+      <h1>Directors Dashboard</h1>
+      <p class="small">Resident Parking Vote — restricted view for directors only.</p>
+      <div class="row" style="margin-top:16px">
+        <input id="directorEmail" type="email" placeholder="Director email" autocomplete="email">
+        <input id="pin" type="password" placeholder="Directors password" autocomplete="current-password">
+        <button id="loadBtn">Open Dashboard</button>
+      </div>
+      <div class="notice"><strong>Backup mode:</strong> if the live Netlify API is not configured yet, use “Import CSV” below after downloading submissions from Netlify Forms.</div>
+      <div class="row"><input id="csvFile" type="file" accept=".csv,text/csv"><button class="secondary" id="csvBtn">Import CSV</button></div>
+      <div id="loginError" class="error hidden"></div>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <div class="top">
+        <div><h1>Resident Parking Vote Dashboard</h1><p id="generatedAt">Management report</p></div>
+        <div class="actions noPrint"><button id="refreshBtn">Refresh</button><button class="secondary" id="downloadBtn">Export Dashboard CSV</button><button class="secondary" onclick="window.print()">Print / Save PDF</button></div>
+      </div>
+
+      <div class="grid">
+        <div class="card metric"><div class="label">Total votes</div><div class="value" id="totalVotes">0</div><div class="note">All recorded submissions</div></div>
+        <div class="card metric"><div class="label">Agree</div><div class="value" id="agreeVotes">0</div><div class="note" id="agreePercent">0%</div></div>
+        <div class="card metric"><div class="label">Do Not Agree</div><div class="value" id="disagreeVotes">0</div><div class="note" id="disagreePercent">0%</div></div>
+        <div class="card metric"><div class="label">Unique Eircodes</div><div class="value" id="uniqueEircodes">0</div><div class="note" id="duplicateNote">No duplicate Eircodes</div></div>
+      </div>
+
+      <div class="charts">
+        <div class="card chartBox"><div class="chartTitle">Result split</div><canvas id="pie" width="500" height="250"></canvas><div class="legend"><span><i class="dot good"></i>Agree</span><span><i class="dot bad"></i>Do Not Agree</span><span><i class="dot unk"></i>Unknown</span></div></div>
+        <div class="card chartBox"><div class="chartTitle">Vote percentage</div><div class="bar"><span id="agreeBar" class="agree"></span><span id="disagreeBar" class="disagree"></span><span id="unknownBar" class="unknown"></span></div><canvas id="timeline" width="500" height="210" style="margin-top:25px"></canvas></div>
+      </div>
+
+      <div id="duplicatesBox" class="card hidden" style="margin-bottom:14px"><h2 style="margin-top:0">Duplicate Eircode check</h2><p class="small">These Eircodes appear more than once and should be reviewed before final certification.</p><div id="duplicatesList"></div></div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px"><h2 style="margin:0">Submissions</h2><input id="search" type="search" placeholder="Search email, Eircode, vote or reference"></div>
+        <div class="tableWrap"><table><thead><tr><th>#</th><th>Submitted</th><th>Vote</th><th>Eircode</th><th>Email</th><th>Reference</th><th>Confirmed</th></tr></thead><tbody id="tbody"></tbody></table></div>
+      </div>
+      <p class="footer">This dashboard is for internal review by directors. Final results should be certified after checking duplicates and any invalid submissions.</p>
+    </section>
+  </main>
+
 <script>
-let chart;
+let currentRows=[]; let lastPayload=null;
 const $=id=>document.getElementById(id);
-async function loadReport(){const pin=$('pin').value.trim();$('msg').textContent='';try{const r=await fetch('/.netlify/functions/list-votes?pin='+encodeURIComponent(pin));const data=await r.json();if(!r.ok) throw new Error(data.message||'Unable to load report.');$('results').classList.remove('hidden');$('total').textContent=data.totals.total;$('agree').textContent=data.totals.agree;$('disagree').textContent=data.totals.disagree;$('rows').innerHTML=data.votes.map(v=>`<tr><td>${v.internalOrder}</td><td>${v.publicReferenceId||''}</td><td>${v.submittedAtIreland||v.submittedAt}</td><td>${v.eircode}</td><td>${v.email}</td><td>${v.vote}</td></tr>`).join('');$('csvLink').href='/.netlify/functions/export-csv?pin='+encodeURIComponent(pin);if(chart) chart.destroy();chart=new Chart($('chart'),{type:'doughnut',data:{labels:['Agree','Do Not Agree'],datasets:[{data:[data.totals.agree,data.totals.disagree]}]},options:{plugins:{legend:{position:'bottom'}}}});}catch(e){$('msg').textContent=e.message;}}
-$('loadBtn').onclick=loadReport;
-$('resetBtn').onclick=()=>{$('resetPanel').classList.remove('hidden');$('resetMsg').textContent='';$('resetConfirm').value='';window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});};
-$('cancelReset').onclick=()=>{$('resetPanel').classList.add('hidden');};
-$('confirmReset').onclick=async()=>{const pin=$('pin').value.trim();const confirm=$('resetConfirm').value.trim();$('resetMsg').textContent='Resetting...';try{const r=await fetch('/.netlify/functions/reset-votes',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pin,confirm})});const data=await r.json();if(!r.ok) throw new Error(data.message||'Unable to reset votes.');$('resetMsg').textContent=data.message;$('resetPanel').classList.add('hidden');await loadReport();}catch(e){$('resetMsg').textContent=e.message;}};
+function showError(msg){$('loginError').textContent=msg;$('loginError').classList.remove('hidden')}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function normaliseVote(v){v=String(v||'').trim().toLowerCase(); if(['agree','approved','approve','yes','sim','aprovado'].includes(v))return'Agree'; if(['do not agree','disagree','not agree','no','não','nao','rejected','reject'].includes(v))return'Do Not Agree'; return v?String(v):'Unknown'}
+function normaliseEircode(v){v=String(v||'').toUpperCase().replace(/\s+/g,''); return v.length>3?v.slice(0,3)+' '+v.slice(3):v}
+async function loadLive(){
+ const email=$('directorEmail').value.trim().toLowerCase(); const pin=$('pin').value.trim();
+ if(!email){showError('Please enter your director email.');return}
+ if(!pin){showError('Please enter the directors password.');return}
+ $('loadBtn').disabled=true;$('loginError').classList.add('hidden');
+ try{const res=await fetch('/.netlify/functions/admin-report',{headers:{'X-Director-Email':email,'X-Admin-Pin':pin}}); const data=await res.json(); if(!res.ok||!data.ok) throw new Error(data.message||'Could not load dashboard.'); render(data)}
+ catch(e){showError(e.message)} finally{$('loadBtn').disabled=false}
+}
+function parseCsvLine(line){const out=[];let cur='',q=false;for(let i=0;i<line.length;i++){const c=line[i],n=line[i+1];if(c==='"'&&q&&n==='"'){cur+='"';i++}else if(c==='"'){q=!q}else if(c===','&&!q){out.push(cur);cur=''}else cur+=c}out.push(cur);return out}
+function parseCsv(text){const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim()); const headers=parseCsvLine(lines.shift()).map(h=>h.trim()); return lines.map((line,i)=>{const vals=parseCsvLine(line); const o={}; headers.forEach((h,j)=>o[h]=vals[j]||''); return {number:i+1,email:o.email||o.Email||'',eircode:normaliseEircode(o.eircode||o.Eircode||''),vote:normaliseVote(o.vote||o.Vote||''),confirmed:o.confirmed||'',referenceId:o.referenceId||o.ref||'',submittedAtIreland:o.submitted_at_ireland||o.submittedAtIreland||o.created_at||'',createdAt:o.created_at||'',ip:o.ip||'',userAgent:o.user_agent||'',referrer:o.referrer||''}})}
+function buildFromRows(rows){const total=rows.length, agree=rows.filter(r=>r.vote==='Agree').length, doNotAgree=rows.filter(r=>r.vote==='Do Not Agree').length, unknown=total-agree-doNotAgree; const counts={}; rows.forEach(r=>{if(r.eircode)counts[r.eircode]=(counts[r.eircode]||0)+1}); const dup=Object.entries(counts).filter(x=>x[1]>1).map(([eircode,count])=>({eircode,count})); const by={}; rows.forEach(r=>{const d=new Date(r.createdAt||r.submittedAtIreland); const k=isNaN(d)?(r.submittedAtIreland||'Unknown').slice(0,10):d.toISOString().slice(0,10); by[k]=by[k]||{date:k,total:0,agree:0,doNotAgree:0,unknown:0}; by[k].total++; if(r.vote==='Agree')by[k].agree++; else if(r.vote==='Do Not Agree')by[k].doNotAgree++; else by[k].unknown++}); return {ok:true,generatedAtIreland:new Date().toLocaleString('en-IE',{timeZone:'Europe/Dublin',dateStyle:'medium',timeStyle:'short'}),summary:{totalVotes:total,agree,doNotAgree,unknown,agreePercent:total?+(agree*100/total).toFixed(1):0,doNotAgreePercent:total?+(doNotAgree*100/total).toFixed(1):0,unknownPercent:total?+(unknown*100/total).toFixed(1):0,uniqueEircodes:Object.keys(counts).length,duplicateEircodesCount:dup.length,lastSubmission:rows[rows.length-1]||null},duplicateEircodes:dup,byDay:Object.values(by).sort((a,b)=>a.date.localeCompare(b.date)),rows}}
+async function importCsv(){const email=$('directorEmail').value.trim().toLowerCase(); const pin=$('pin').value.trim(); if(!email){showError('Please enter your director email before importing CSV.');return} if(pin!=='OMCDIRETORES2026'){showError('Invalid directors password.');return} const f=$('csvFile').files[0]; if(!f){showError('Choose the CSV downloaded from Netlify Forms.');return} const text=await f.text(); render(buildFromRows(parseCsv(text)))}
+function render(data){lastPayload=data; currentRows=data.rows||[]; $('login').classList.add('hidden');$('dashboard').classList.remove('hidden'); const s=data.summary; $('generatedAt').textContent='Generated: '+(data.generatedAtIreland||'now'); $('totalVotes').textContent=s.totalVotes; $('agreeVotes').textContent=s.agree; $('disagreeVotes').textContent=s.doNotAgree; $('agreePercent').textContent=s.agreePercent+'% of votes'; $('disagreePercent').textContent=s.doNotAgreePercent+'% of votes'; $('uniqueEircodes').textContent=s.uniqueEircodes; $('duplicateNote').textContent=s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'; $('agreeBar').style.width=s.agreePercent+'%'; $('disagreeBar').style.width=s.doNotAgreePercent+'%'; $('unknownBar').style.width=s.unknownPercent+'%'; drawPie(s); drawTimeline(data.byDay||[]); renderDuplicates(data.duplicateEircodes||[]); renderTable(currentRows)}
+function renderDuplicates(list){if(!list.length){$('duplicatesBox').classList.add('hidden');return} $('duplicatesBox').classList.remove('hidden'); $('duplicatesList').innerHTML=list.map(x=>`<span class="pill warn">${escapeHtml(x.eircode)} — ${x.count} submissions</span>`).join(' ')}
+function renderTable(rows){const q=($('search').value||'').toLowerCase(); rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q)); $('tbody').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.submittedAtIreland||r.createdAt)}</td><td><span class="pill ${r.vote==='Agree'?'good':r.vote==='Do Not Agree'?'bad':'warn'}">${escapeHtml(r.vote)}</span></td><td>${escapeHtml(r.eircode)}</td><td>${escapeHtml(r.email)}</td><td>${escapeHtml(r.referenceId)}</td><td>${escapeHtml(r.confirmed)}</td></tr>`).join('')}
+function drawPie(s){const c=$('pie'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);const vals=[s.agree,s.doNotAgree,s.unknown],cols=['#176b46','#9f2f2f','#98a2b3'];let total=vals.reduce((a,b)=>a+b,0)||1,st=-Math.PI/2; vals.forEach((v,i)=>{const a=v/total*Math.PI*2;ctx.beginPath();ctx.moveTo(145,125);ctx.arc(145,125,90,st,st+a);ctx.closePath();ctx.fillStyle=cols[i];ctx.fill();st+=a});ctx.fillStyle='#17212b';ctx.font='bold 28px Arial';ctx.fillText((s.agreePercent||0)+'%',300,110);ctx.font='14px Arial';ctx.fillText('Agree',300,135)}
+function drawTimeline(days){const c=$('timeline'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#667085';ctx.font='13px Arial';ctx.fillText('Votes by day',10,18); if(!days.length){ctx.fillText('No data yet',10,55);return} const max=Math.max(...days.map(d=>d.total),1); const w=(c.width-40)/days.length; days.forEach((d,i)=>{const h=(d.total/max)*140;ctx.fillStyle='#20303f';ctx.fillRect(20+i*w,180-h,Math.max(10,w-8),h);ctx.fillStyle='#667085';ctx.font='11px Arial';ctx.fillText(d.total,22+i*w,175-h)})}
+function downloadCsv(){const headers=['submittedAtIreland','vote','eircode','email','referenceId','confirmed']; const rows=currentRows.map(r=>headers.map(h=>'"'+String(r[h]??'').replace(/"/g,'""')+'"').join(',')); const blob=new Blob([headers.join(',')+'\n'+rows.join('\n')],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-dashboard.csv';a.click();URL.revokeObjectURL(a.href)}
+$('loadBtn').addEventListener('click',loadLive);$('directorEmail').addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()});$('pin').addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()});$('refreshBtn').addEventListener('click',loadLive);$('csvBtn').addEventListener('click',importCsv);$('search').addEventListener('input',()=>renderTable(currentRows));$('downloadBtn').addEventListener('click',downloadCsv);
 </script>
-</body></html>
+</body>
+</html>
