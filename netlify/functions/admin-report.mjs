@@ -58,6 +58,24 @@ function field(data, names) {
   return '';
 }
 
+function submissionReference(item, data) {
+  return field(data, [
+    'referenceId',
+    'reference_id',
+    'reference',
+    'Reference',
+    'Reference ID',
+    'referenceNumber',
+    'reference_number',
+    'voteReference',
+    'vote_reference',
+    'submissionId',
+    'submission_id',
+    'id'
+  ]) || item.id || item.number || '';
+}
+
+
 function pct(part, total) {
   return total ? Number(((part / total) * 100).toFixed(1)) : 0;
 }
@@ -105,7 +123,7 @@ function buildReport(submissions, includeRows = false) {
       eircode,
       vote,
       confirmed: field(data, ['confirmed', 'Confirmed']) || '',
-      referenceId: field(data, ['referenceId', 'reference_id', 'ref', 'Reference ID']) || '',
+      referenceId: submissionReference(item, data),
       submittedAtIreland: field(data, ['submitted_at_ireland', 'submittedAtIreland']) || safeDate(createdAt),
       createdAt: createdAt || '',
       ip: item.ip || data.ip || '',
