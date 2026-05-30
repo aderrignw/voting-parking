@@ -5,27 +5,143 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Directors Dashboard | Resident Parking Vote</title>
   <style>
-    :root{
-      --green:#06451f;--green2:#0b5a2c;--deep:#052e16;--cream:#f5f8f2;--card:#ffffff;--line:#dbe7dc;--ink:#102016;--muted:#607169;--red:#a12b2b;--amber:#a46a13;--blue:#123c69;--shadow:0 22px 70px rgba(6,69,31,.13)
+    :root {
+      --green:#06451f;
+      --green2:#0b5a2c;
+      --deep:#052e16;
+      --soft:#f4f8f3;
+      --card:#ffffff;
+      --line:#dfe9df;
+      --ink:#102016;
+      --muted:#607169;
+      --red:#b22222;
+      --redSoft:#fde7e7;
+      --blue:#123c69;
+      --blueSoft:#e8f0f8;
+      --shadow:0 18px 48px rgba(6,69,31,.10);
+      --shadow2:0 10px 24px rgba(6,69,31,.08);
     }
-    *{box-sizing:border-box} body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:radial-gradient(circle at top left,#eef7ef 0,#f8fbf6 38%,#edf4ec 100%);color:var(--ink)}
-    .hero{background:linear-gradient(135deg,var(--green),#083716);color:#fff;padding:28px 22px;border-bottom:1px solid rgba(255,255,255,.15)}
-    .heroInner{max-width:1180px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{display:flex;gap:14px;align-items:center}.tick{width:50px;height:50px;border-radius:17px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.3);font-size:30px;font-weight:900;background:rgba(255,255,255,.08)}.brand h1{margin:0;font-size:25px}.brand p{margin:4px 0 0;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:800;opacity:.9}.secure{font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:900;opacity:.9;text-align:right}.secure span{display:block;letter-spacing:0;text-transform:none;font-weight:700;margin-top:4px;opacity:.8}
-    .wrap{max-width:1180px;margin:auto;padding:28px 18px 60px}.card{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.login{max-width:760px;margin:44px auto;padding:32px}.login h2{font-size:38px;margin:0 0 8px;color:var(--green)}.small{color:var(--muted);line-height:1.45}.row{display:flex;gap:12px;flex-wrap:wrap}input,button{font:inherit;border-radius:14px;border:1px solid #cddbd0;padding:15px 16px}input{flex:1;min-width:240px;background:#fff}button{background:var(--green);color:#fff;font-weight:900;border-color:var(--green);cursor:pointer;box-shadow:0 10px 22px rgba(6,69,31,.16)}button.secondary{background:#fff;color:var(--green);box-shadow:none}button.light{background:#eef7ef;color:var(--green);box-shadow:none;border-color:#cbe1cf}.notice{background:#eef7ef;border:1px solid #cbe1cf;color:#123f22;border-radius:18px;padding:15px;margin:18px 0}.error{background:#fff0f0;border:1px solid #ffcaca;color:#801919;border-radius:18px;padding:15px;margin-top:16px}.hidden{display:none!important}
-    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:18px}.top h2{font-size:36px;margin:0;color:var(--green)}.roleBadge{display:inline-block;margin-top:8px;background:#e8f5ee;color:var(--green);border:1px solid #cbe1cf;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:900;letter-spacing:.05em;text-transform:uppercase}.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:18px 0}.metric{padding:22px}.label{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.08em;font-weight:900}.value{font-size:42px;font-weight:950;color:var(--green);margin-top:8px}.note{font-size:13px;color:var(--muted);margin-top:4px}.featured{background:linear-gradient(135deg,#ffffff,#f1f8ef)}.featured .value{color:var(--deep)}.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}.panel{padding:22px}.panel h3{margin:0 0 14px;color:var(--green);font-size:22px}.bar{height:36px;border-radius:999px;background:#e6eee5;overflow:hidden;display:flex}.bar span{display:block}.agree{background:var(--green2)}.disagree{background:var(--red)}.unknown{background:#98a2a0}.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-weight:700;font-size:13px;margin-top:12px}.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}.dot.good{background:var(--green2)}.dot.bad{background:var(--red)}.dot.unk{background:#98a2a0}.dot.part{background:var(--blue)}
-    .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.tableWrap{max-height:540px;overflow:auto;border-radius:16px;border:1px solid var(--line)}table{width:100%;border-collapse:collapse;background:#fff;font-size:14px}th,td{padding:12px;border-bottom:1px solid #edf2ee;text-align:left;vertical-align:top}th{position:sticky;top:0;background:#f7faf6;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.pill{display:inline-block;border-radius:999px;padding:5px 10px;font-weight:900;font-size:12px}.pill.good{background:#e8f5ee;color:var(--green)}.pill.bad{background:#fdecec;color:var(--red)}.pill.warn{background:#fff2df;color:var(--amber)}.footer{margin-top:18px;color:var(--muted);font-size:12px}.adminOnly{display:none}.adminMode .adminOnly{display:block}.adminMode .adminFlex{display:flex}.configBox{margin-top:16px;background:#fff7e8;border:1px solid #f1d19a;color:#663d00;border-radius:18px;padding:16px;line-height:1.45}.privacyNote{background:#f7faf6;border:1px solid var(--line);border-radius:18px;padding:14px;color:var(--muted);font-size:13px;margin-bottom:16px}.csvBox{margin:16px 0;padding:18px;border-radius:20px;border:1px dashed #b8ccb9;background:#fbfdf9}
-    .countdownCard{background:linear-gradient(135deg,#ffffff,#eef8f0);border-color:#b8d8bd}
-    .countdownValue{font-size:28px!important;letter-spacing:.04em;white-space:nowrap}
-    .countdownDate{font-size:13px;color:var(--muted);margin-top:8px;border-top:1px solid #d8eadb;padding-top:8px}
-    .resultBreakdown{display:grid;gap:12px;margin-top:8px}
-    .resultLine{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;color:var(--ink);font-weight:800}
-    .resultLine small{color:var(--muted);font-weight:700}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,Arial,Helvetica,sans-serif;
+      background:radial-gradient(circle at top left,#f5fbf4 0,#fbfdf9 42%,#edf4ec 100%);
+      color:var(--ink);
+      font-weight:400;
+    }
+    .hero{
+      background:linear-gradient(135deg,#053715 0%,#06451f 45%,#082f17 100%);
+      color:#fff;
+      padding:22px 28px;
+      border-bottom:1px solid rgba(255,255,255,.14);
+      box-shadow:0 14px 40px rgba(5,46,22,.18);
+    }
+    .heroInner{max-width:1280px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:18px}
+    .brand{display:flex;gap:16px;align-items:center}
+    .tick{
+      width:54px;height:54px;border-radius:16px;display:grid;place-items:center;
+      border:1px solid rgba(255,255,255,.32);font-size:31px;font-weight:800;
+      background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.04));
+      box-shadow:inset 0 0 18px rgba(255,255,255,.06)
+    }
+    .brand h1{margin:0;font-size:27px;font-weight:760;letter-spacing:-.02em}
+    .brand p{margin:4px 0 0;letter-spacing:.13em;text-transform:uppercase;font-size:12px;font-weight:650;opacity:.92}
+    .secure{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:760;opacity:.95;text-align:right}
+    .secure span{display:block;letter-spacing:0;text-transform:none;font-weight:500;margin-top:5px;opacity:.82}
+    .wrap{max-width:1280px;margin:auto;padding:34px 28px 70px}
+    .card{
+      background:rgba(255,255,255,.92);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow2);
+      backdrop-filter:blur(8px);
+    }
+    .login{max-width:760px;margin:44px auto;padding:32px}
+    .login h2{font-size:36px;margin:0 0 8px;color:var(--green);font-weight:720;letter-spacing:-.02em}
+    .small{color:var(--muted);line-height:1.45;font-weight:400}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    input,button{font:inherit;border-radius:13px;border:1px solid #cddbd0;padding:14px 16px}
+    input{flex:1;min-width:240px;background:#fff}
+    button{
+      background:var(--green);color:#fff;font-weight:700;border-color:var(--green);cursor:pointer;
+      box-shadow:0 10px 22px rgba(6,69,31,.14);transition:.15s ease
+    }
+    button:hover{transform:translateY(-1px)}
+    button.secondary{background:#fff;color:var(--green);box-shadow:none}
+    button.light{background:#eef7ef;color:var(--green);box-shadow:none;border-color:#cbe1cf}
+    .notice{background:#eef7ef;border:1px solid #cbe1cf;color:#123f22;border-radius:18px;padding:15px;margin:18px 0}
+    .error{background:#fff0f0;border:1px solid #ffcaca;color:#801919;border-radius:18px;padding:15px;margin-top:16px}
+    .hidden{display:none!important}
 
-    @media(max-width:900px){.heroInner,.top{display:block}.grid,.charts{grid-template-columns:1fr}.secure{text-align:left;margin-top:12px}.login h2,.top h2{font-size:30px}.actions{justify-content:flex-start;margin-top:14px}}@media print{.hero,.login,.actions,.noPrint,.adminOnly.csvBox{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none}.tableWrap{max-height:none;overflow:visible}body{background:#fff}}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:22px;margin-bottom:22px}
+    .top h2{font-size:34px;margin:0;color:var(--green);font-weight:720;letter-spacing:-.035em}
+    .roleBadge{
+      display:inline-flex;align-items:center;gap:8px;margin-top:14px;background:#e9f5ee;color:var(--green);
+      border:1px solid #cbe1cf;border-radius:999px;padding:8px 13px;font-size:12px;font-weight:760;
+      letter-spacing:.04em;text-transform:uppercase
+    }
+    .roleBadge::before{content:'◈';font-size:12px}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+    .actions button{min-height:42px;padding:12px 17px;font-size:14px}
+
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:18px 0}
+    .metric{padding:22px;min-height:122px;position:relative;overflow:hidden}
+    .metricIcon{
+      position:absolute;right:20px;top:20px;width:46px;height:46px;border-radius:50%;
+      display:grid;place-items:center;background:#eaf4eb;color:var(--green);font-size:24px;border:1px solid #d7ead9
+    }
+    .metricIcon.red{background:var(--redSoft);color:var(--red);border-color:#f5c5c5}
+    .label{color:#52635c;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:760}
+    .value{font-size:34px;font-weight:760;color:var(--green);margin-top:12px;letter-spacing:-.03em;line-height:1}
+    .note{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.35;font-weight:400}
+    .featured{background:linear-gradient(135deg,#ffffff,#f4faf2)}
+    .featured .value{color:var(--deep)}
+    .metric.accentGreen{border-color:#c4dec7;background:linear-gradient(135deg,#ffffff,#eef8f0)}
+
+    .countdownValue{font-size:27px!important;letter-spacing:.02em;white-space:nowrap}
+    .countdownDate{font-size:13px;color:var(--muted);margin-top:12px;border-top:1px solid #d8eadb;padding-top:10px;line-height:1.35}
+
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+    .panel{padding:24px;min-height:330px}
+    .panel h3{margin:0 0 16px;color:var(--green);font-size:20px;font-weight:700;letter-spacing:-.02em}
+    .bar{height:34px;border-radius:999px;background:#e6eee5;overflow:hidden;display:flex}
+    .bar span{display:block}
+    .legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-weight:600;font-size:13px;margin-top:12px}
+    .dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+    .dot.good{background:var(--green2)} .dot.bad{background:var(--red)} .dot.unk{background:#98a2a0} .dot.part{background:var(--blue)}
+
+    .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .tableWrap{max-height:540px;overflow:auto;border-radius:16px;border:1px solid var(--line)}
+    table{width:100%;border-collapse:collapse;background:#fff;font-size:14px}
+    th,td{padding:12px;border-bottom:1px solid #edf2ee;text-align:left;vertical-align:top}
+    th{position:sticky;top:0;background:#f7faf6;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+    .pill{display:inline-block;border-radius:999px;padding:5px 10px;font-weight:760;font-size:12px}
+    .pill.good{background:#e8f5ee;color:var(--green)} .pill.bad{background:#fdecec;color:var(--red)} .pill.warn{background:#fff2df;color:#8a5510}
+
+    .footer{margin-top:18px;color:var(--muted);font-size:12px}
+    .adminOnly{display:none} .adminMode .adminOnly{display:block} .adminMode .adminFlex{display:flex}
+    .configBox{margin-top:16px;background:#fff7e8;border:1px solid #f1d19a;color:#663d00;border-radius:18px;padding:16px;line-height:1.45}
+    .csvBox{margin:16px 0;padding:18px;border-radius:20px;border:1px dashed #b8ccb9;background:#fbfdf9}
+
+    @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}}
+    @media(max-width:720px){
+      .heroInner,.top{display:block} .secure{text-align:left;margin-top:14px} .wrap{padding:24px 16px 54px}
+      .grid,.charts{grid-template-columns:1fr} .actions{justify-content:flex-start;margin-top:16px}
+      .login h2,.top h2{font-size:28px} .countdownValue{font-size:24px!important}
+    }
+    @media print{
+      .hero,.login,.actions,.noPrint,.adminOnly.csvBox{display:none!important}.wrap{max-width:none;padding:0}
+      .card{box-shadow:none}.tableWrap{max-height:none;overflow:visible}body{background:#fff}
+    }
   </style>
 </head>
 <body>
-  <header class="hero"><div class="heroInner"><div class="brand"><div class="tick">✓</div><div><h1>Resident Parking Vote</h1><p>Directors Dashboard</p></div></div><div class="secure">Directors only<span>Aggregated results and secure reporting</span></div></div></header>
+  <header class="hero">
+    <div class="heroInner">
+      <div class="brand"><div class="tick">✓</div><div><h1>Resident Parking Vote</h1><p>Directors Dashboard</p></div></div>
+      <div class="secure">Directors only<span>Aggregated results and secure reporting</span></div>
+    </div>
+  </header>
   <main class="wrap">
     <section id="login" class="card login">
       <h2>Directors Dashboard</h2>
@@ -36,23 +152,47 @@
     </section>
 
     <section id="dashboard" class="hidden">
-      <div class="top"><div><h2>Resident Parking Vote Dashboard</h2><p id="generatedAt" class="small">Management report</p><span id="roleBadge" class="roleBadge">Director view</span></div><div class="actions noPrint"><button id="refreshBtn">Reload Dashboard</button><button class="secondary adminOnly" id="downloadBtn">Export full CSV</button><button class="secondary adminOnly" id="downloadSummaryBtn">Download summary CSV</button><button class="light" onclick="window.print()">Print / Save PDF</button></div></div>
-
-      <div class="grid">
-        <div class="card metric featured"><div class="label">Total residences</div><div class="value" id="totalResidences">227</div><div class="note">Official consultation base</div></div>
-        <div class="card metric"><div class="label">Votes received</div><div class="value" id="totalVotes">0</div><div class="note">All recorded submissions</div></div>
-        <div class="card metric"><div class="label">Participation rate</div><div class="value" id="participationRate">0%</div><div class="note" id="outstandingResidences">227 outstanding residences</div></div>
-        <div class="card metric"><div class="label">Unique Eircodes</div><div class="value" id="uniqueEircodes">0</div><div class="note" id="duplicateNote">No duplicates</div></div>
+      <div class="top">
+        <div>
+          <h2>Resident Parking Vote Dashboard</h2>
+          <p id="generatedAt" class="small">Management report</p>
+          <span id="roleBadge" class="roleBadge">Director view</span>
+        </div>
+        <div class="actions noPrint">
+          <button id="refreshBtn">↻ Reload Dashboard</button>
+          <button class="secondary adminOnly" id="downloadBtn">⇩ Export full CSV</button>
+          <button class="secondary adminOnly" id="downloadSummaryBtn">▣ Download summary CSV</button>
+          <button class="light" onclick="window.print()">▣ Print / Save PDF</button>
+        </div>
       </div>
 
       <div class="grid">
-        <div class="card metric"><div class="label">Agree</div><div class="value" id="agreeVotes">0</div><div class="note" id="agreePercent">0%</div></div>
-        <div class="card metric"><div class="label">Do Not Agree</div><div class="value" id="disagreeVotes">0</div><div class="note" id="disagreePercent">0%</div></div>
-        <div class="card metric countdownCard"><div class="label">Voting closes in</div><div class="value countdownValue" id="votingCountdown">Calculating...</div><div class="countdownDate" id="votingCloseDate">Closes 06 June 2026, 23:59</div></div>
-        <div class="card metric"><div class="label">Last updated</div><div class="value" style="font-size:22px" id="lastUpdated">—</div><div class="note">Ireland time</div></div>
+        <div class="card metric featured"><div class="metricIcon">⌂</div><div class="label">Total residences</div><div class="value" id="totalResidences">227</div><div class="note">Official consultation base</div></div>
+        <div class="card metric"><div class="metricIcon">♧</div><div class="label">Votes received</div><div class="value" id="totalVotes">0</div><div class="note">Valid counted votes</div></div>
+        <div class="card metric"><div class="metricIcon">↗</div><div class="label">Participation rate</div><div class="value" id="participationRate">0%</div><div class="note" id="outstandingResidences">227 outstanding residences</div></div>
+        <div class="card metric"><div class="metricIcon">⌖</div><div class="label">Unique Eircodes</div><div class="value" id="uniqueEircodes">0</div><div class="note" id="duplicateNote">No duplicates</div></div>
       </div>
 
-      <div class="charts"><div class="card panel"><h3>Result split</h3><canvas id="pie" width="500" height="260"></canvas><div class="legend"><span><i class="dot good"></i>Agree</span><span><i class="dot bad"></i>Do Not Agree</span></div></div><div class="card panel"><h3>Participation and daily trend</h3><div class="bar"><span id="participationBar" style="background:var(--blue)"></span><span id="outstandingBar" style="background:#d7e2d5"></span></div><div class="legend"><span><i class="dot part"></i>Participation</span><span><i class="dot unk"></i>Outstanding</span></div><canvas id="timeline" width="500" height="220" style="margin-top:18px"></canvas></div></div>
+      <div class="grid">
+        <div class="card metric"><div class="metricIcon">👍</div><div class="label">Agree</div><div class="value" id="agreeVotes">0</div><div class="note" id="agreePercent">0%</div></div>
+        <div class="card metric"><div class="metricIcon red">☟</div><div class="label">Do Not Agree</div><div class="value" id="disagreeVotes" style="color:var(--red)">0</div><div class="note" id="disagreePercent">0%</div></div>
+        <div class="card metric accentGreen"><div class="metricIcon">◴</div><div class="label">Voting closes in</div><div class="value countdownValue" id="votingCountdown">Calculating...</div><div class="countdownDate" id="votingCloseDate">Closes 06 June 2026, 23:59</div></div>
+        <div class="card metric"><div class="metricIcon">◷</div><div class="label">Last updated</div><div class="value" style="font-size:25px" id="lastUpdated">—</div><div class="note">Ireland time</div></div>
+      </div>
+
+      <div class="charts">
+        <div class="card panel">
+          <h3>Result split</h3>
+          <canvas id="pie" width="560" height="260"></canvas>
+          <div class="legend"><span><i class="dot good"></i>Agree</span><span><i class="dot bad"></i>Do Not Agree</span></div>
+        </div>
+        <div class="card panel">
+          <h3>Participation and daily trend</h3>
+          <div class="bar"><span id="participationBar" style="background:var(--blue)"></span><span id="outstandingBar" style="background:#d7e2d5"></span></div>
+          <div class="legend"><span><i class="dot part"></i>Participation</span><span><i class="dot unk"></i>Outstanding</span></div>
+          <canvas id="timeline" width="560" height="220" style="margin-top:18px"></canvas>
+        </div>
+      </div>
 
       <div id="duplicatesBox" class="card panel adminOnly hidden"><h3>Duplicate Eircode review</h3><p class="small">These Eircodes appear more than once and should be reviewed before final certification.</p><div id="duplicatesList"></div></div>
 
@@ -63,19 +203,36 @@
     </section>
   </main>
 <script>
+
 const ADMIN_EMAIL='claudiosantos1968@gmail.com'; let currentRows=[]; let currentReport=null; let currentDirector=''; const $=id=>document.getElementById(id);
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function showError(msg,setup=false,isAdmin=false){$('loginError').innerHTML= setup ? `<strong>Live API setup required.</strong><br>${esc(msg)}${isAdmin?`<div class="configBox">Administrator fallback is available after login if live API is unavailable. In Netlify, confirm these variables exist:<br><br><strong>ADMIN_PIN</strong> = OMCDIRETORES2026<br><strong>DIRECTOR_EMAILS</strong> = authorised emails<br><strong>NETLIFY_FORM_ID</strong> = your form ID<br><strong>NETLIFY_AUTH_TOKEN</strong> = your Netlify personal access token</div>`:''}` : esc(msg); $('loginError').classList.remove('hidden')}
 function nv(v){v=String(v||'').trim().toLowerCase(); if(['agree','approved','approve','yes','sim','aprovado'].includes(v))return'Agree'; if(['do not agree','disagree','not agree','no','não','nao','rejected','reject'].includes(v))return'Do Not Agree'; return v?String(v):'Unknown'}
 function ne(v){v=String(v||'').toUpperCase().replace(/\s+/g,''); return v.length>3?v.slice(0,3)+' '+v.slice(3):v}
 function pct(part,total){return total?Number(((part/total)*100).toFixed(1)):0}
+
+function firstValidRowsByEircode(rows){
+  const sorted=rows.slice().sort((a,b)=>{
+    const da=new Date(a.createdAt||a.submittedAtIreland||0).getTime();
+    const db=new Date(b.createdAt||b.submittedAtIreland||0).getTime();
+    return (isNaN(da)?0:da)-(isNaN(db)?0:db);
+  });
+  const seen=new Set(), validRows=[], excludedDuplicateRows=[];
+  sorted.forEach(r=>{
+    const key=String(r.eircode||'').toUpperCase().replace(/\s+/g,'');
+    if(!key){validRows.push(r);return}
+    if(seen.has(key)) excludedDuplicateRows.push(r);
+    else {seen.add(key);validRows.push(r)}
+  });
+  return {validRows,excludedDuplicateRows};
+}
 function isAdminEmail(){return currentDirector===ADMIN_EMAIL}
 async function loadLive(){const email=$('directorEmail').value.trim().toLowerCase(), pin=$('pin').value.trim(); currentDirector=email; if(!email)return showError('Please enter your director email.'); if(!pin)return showError('Please enter the directors password.'); $('loadBtn').disabled=true;$('loginError').classList.add('hidden'); try{const res=await fetch('/.netlify/functions/admin-report',{headers:{'X-Director-Email':email,'X-Admin-Pin':pin}}); const data=await res.json(); if(!res.ok||!data.ok){ if(data && data.isAdmin){openDashboardShell(true); showError(data.message||'Could not load live data.', data.code==='MISSING_NETLIFY_AUTH_TOKEN', true); return;} throw new Error(data.message||'Unable to open dashboard.')} openDashboardShell(data.isAdmin); render(data); }catch(e){showError(e.message||'Unable to open dashboard.')}finally{$('loadBtn').disabled=false}}
 function openDashboardShell(admin){$('login').classList.add('hidden');$('dashboard').classList.remove('hidden');document.body.classList.toggle('adminMode',!!admin);$('roleBadge').textContent=admin?'Administrator view':'Director view';}
 function parseCsv(text){const rows=[];let row=[],cur='',q=false;for(let i=0;i<text.length;i++){const ch=text[i],nx=text[i+1];if(ch==='"'&&q&&nx==='"'){cur+='"';i++;continue}if(ch==='"'){q=!q;continue}if(ch===','&&!q){row.push(cur);cur='';continue}if((ch==='\n'||ch==='\r')&&!q){if(cur||row.length){row.push(cur);rows.push(row);row=[];cur=''} if(ch==='\r'&&nx==='\n')i++;continue}cur+=ch}if(cur||row.length){row.push(cur);rows.push(row)}const headers=(rows.shift()||[]).map(h=>h.trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]||''])))}
-function buildFromRows(raw){const rows=raw.map((r,i)=>({number:i+1,email:String(r.email||r.Email||'').trim().toLowerCase(),eircode:ne(r.eircode||r.Eircode||r.postcode||''),vote:nv(r.vote||r.Vote||r.choice||''),confirmed:r.confirmed||r.Confirmed||'',referenceId:r.referenceId||r.reference_id||r.ref||'',submittedAtIreland:r.submitted_at_ireland||r.submittedAtIreland||r.created_at||r.createdAt||'',createdAt:r.created_at||r.createdAt||r.submitted_at_ireland||''})); const totalVotes=rows.length,agree=rows.filter(r=>r.vote==='Agree').length,doNotAgree=rows.filter(r=>r.vote==='Do Not Agree').length,unknown=totalVotes-agree-doNotAgree; const counts={};rows.forEach(r=>{if(r.eircode)counts[r.eircode]=(counts[r.eircode]||0)+1}); const duplicateEircodes=Object.entries(counts).filter(([,c])=>c>1).map(([eircode,count])=>({eircode,count})); const byDayMap={}; rows.forEach(r=>{const d=new Date(r.createdAt||r.submittedAtIreland); const key=isNaN(d)?String(r.submittedAtIreland).slice(0,10)||'Unknown':d.toISOString().slice(0,10); byDayMap[key]=byDayMap[key]||{date:key,total:0,agree:0,doNotAgree:0,unknown:0}; byDayMap[key].total++; if(r.vote==='Agree')byDayMap[key].agree++; else if(r.vote==='Do Not Agree')byDayMap[key].doNotAgree++; else byDayMap[key].unknown++;}); return {ok:true,isAdmin:true,authorisedDirector:ADMIN_EMAIL,totalResidences:227,generatedAtIreland:new Date().toLocaleString('en-IE',{timeZone:'Europe/Dublin',dateStyle:'medium',timeStyle:'short'}),summary:{totalResidences:227,totalVotes,outstandingResidences:Math.max(227-totalVotes,0),participationRate:pct(totalVotes,227),agree,doNotAgree,unknown,agreePercent:pct(agree,totalVotes),doNotAgreePercent:pct(doNotAgree,totalVotes),unknownPercent:pct(unknown,totalVotes),uniqueEircodes:Object.keys(counts).length,duplicateEircodesCount:duplicateEircodes.length,lastSubmission:rows[rows.length-1]||null},duplicateEircodes,byDay:Object.values(byDayMap).sort((a,b)=>a.date.localeCompare(b.date)),rows}}
+function buildFromRows(raw){const rows=raw.map((r,i)=>({number:i+1,email:String(r.email||r.Email||'').trim().toLowerCase(),eircode:ne(r.eircode||r.Eircode||r.postcode||''),vote:nv(r.vote||r.Vote||r.choice||''),confirmed:r.confirmed||r.Confirmed||'',referenceId:r.referenceId||r.reference_id||r.ref||'',submittedAtIreland:r.submitted_at_ireland||r.submittedAtIreland||r.created_at||r.createdAt||'',createdAt:r.created_at||r.createdAt||r.submitted_at_ireland||''})); const counts={};rows.forEach(r=>{if(r.eircode)counts[r.eircode]=(counts[r.eircode]||0)+1}); const duplicateEircodes=Object.entries(counts).filter(([,c])=>c>1).map(([eircode,count])=>({eircode,count})); const deduped=firstValidRowsByEircode(rows), validRows=deduped.validRows, excludedDuplicateRows=deduped.excludedDuplicateRows; const totalVotes=validRows.length,agree=validRows.filter(r=>r.vote==='Agree').length,doNotAgree=validRows.filter(r=>r.vote==='Do Not Agree').length,unknown=totalVotes-agree-doNotAgree; const validCounts={};validRows.forEach(r=>{if(r.eircode)validCounts[r.eircode]=(validCounts[r.eircode]||0)+1}); const byDayMap={}; validRows.forEach(r=>{const d=new Date(r.createdAt||r.submittedAtIreland); const key=isNaN(d)?String(r.submittedAtIreland).slice(0,10)||'Unknown':d.toISOString().slice(0,10); byDayMap[key]=byDayMap[key]||{date:key,total:0,agree:0,doNotAgree:0,unknown:0}; byDayMap[key].total++; if(r.vote==='Agree')byDayMap[key].agree++; else if(r.vote==='Do Not Agree')byDayMap[key].doNotAgree++; else byDayMap[key].unknown++;}); return {ok:true,isAdmin:true,authorisedDirector:ADMIN_EMAIL,totalResidences:227,generatedAtIreland:new Date().toLocaleString('en-IE',{timeZone:'Europe/Dublin',dateStyle:'medium',timeStyle:'short'}),summary:{totalResidences:227,totalVotes,recordedSubmissions:rows.length,excludedDuplicateVotes:excludedDuplicateRows.length,outstandingResidences:Math.max(227-totalVotes,0),participationRate:pct(totalVotes,227),agree,doNotAgree,unknown,agreePercent:pct(agree,totalVotes),doNotAgreePercent:pct(doNotAgree,totalVotes),unknownPercent:pct(unknown,totalVotes),uniqueEircodes:Object.keys(validCounts).length,duplicateEircodesCount:duplicateEircodes.length,lastSubmission:rows[rows.length-1]||null},duplicateEircodes,excludedDuplicateRows,byDay:Object.values(byDayMap).sort((a,b)=>a.date.localeCompare(b.date)),rows}}
 async function importCsv(){if(!isAdminEmail())return; const f=$('csvFile').files[0]; if(!f)return alert('Choose a CSV file first.'); const text=await f.text(); render(buildFromRows(parseCsv(text)))}
-function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'; $('lastUpdated').textContent=data.generatedAtIreland||'—'; $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderDup(data.duplicateEircodes||[]); renderTable(currentRows)}}
+function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.excludedDuplicateVotes?`${s.excludedDuplicateVotes} duplicate vote(s) excluded`:(s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'); $('lastUpdated').textContent=data.generatedAtIreland||'—'; $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderDup(data.duplicateEircodes||[]); renderTable(currentRows)}}
 function renderDup(list){if(!list.length){$('duplicatesBox').classList.add('hidden');return}$('duplicatesBox').classList.remove('hidden');$('duplicatesList').innerHTML=list.map(x=>`<span class="pill warn">${esc(x.eircode)} — ${x.count} submissions</span>`).join(' ')}
 function renderTable(rows){if(!isAdminEmail())return; const q=($('search').value||'').toLowerCase(); rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q)); $('tbody').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.submittedAtIreland||r.createdAt)}</td><td><span class="pill ${r.vote==='Agree'?'good':r.vote==='Do Not Agree'?'bad':'warn'}">${esc(r.vote)}</span></td><td>${esc(r.eircode)}</td><td>${esc(r.email)}</td><td>${esc(r.referenceId)}</td><td>${esc(r.confirmed)}</td></tr>`).join('')}
 function drawPie(s){
@@ -85,63 +242,82 @@ function drawPie(s){
   const agree=Number(s.agree||0);
   const disagree=Number(s.doNotAgree||0);
   const total=Math.max(agree+disagree,1);
+  const agreePct=pct(agree,total);
+  const disagreePct=pct(disagree,total);
+
+  const cx=150, cy=130, outer=92, inner=48;
   const vals=[agree,disagree];
-  const cols=['#0b5a2c','#a12b2b'];
+  const cols=['#0b5a2c','#b22222'];
   let st=-Math.PI/2;
 
   vals.forEach((v,i)=>{
     const a=v/total*Math.PI*2;
     if(v>0){
       ctx.beginPath();
-      ctx.moveTo(145,130);
-      ctx.arc(145,130,95,st,st+a);
+      ctx.arc(cx,cy,outer,st,st+a);
+      ctx.arc(cx,cy,inner,st+a,st,true);
       ctx.closePath();
       ctx.fillStyle=cols[i];
       ctx.fill();
 
       const mid=st+a/2;
-      const labelPct=Math.round((v/total)*1000)/10;
-      if(a>0.35){
+      if(a>0.28){
         ctx.fillStyle='#fff';
-        ctx.font='bold 18px Arial';
+        ctx.font='700 15px Arial';
         ctx.textAlign='center';
         ctx.textBaseline='middle';
-        ctx.fillText(labelPct+'%',145+Math.cos(mid)*58,130+Math.sin(mid)*58);
-        ctx.textAlign='left';
-        ctx.textBaseline='alphabetic';
+        ctx.fillText((Math.round((v/total)*1000)/10)+'%',cx+Math.cos(mid)*68,cy+Math.sin(mid)*68);
       }
     }
     st+=a;
   });
 
-  const agreePct=pct(agree,total);
-  const disagreePct=pct(disagree,total);
+  ctx.fillStyle='#ffffff';
+  ctx.beginPath();
+  ctx.arc(cx,cy,inner-1,0,Math.PI*2);
+  ctx.fill();
 
   ctx.fillStyle='#06451f';
-  ctx.font='bold 18px Arial';
-  ctx.fillText('Result summary',300,68);
+  ctx.font='700 22px Arial';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText(String(agree+disagree),cx,cy-8);
+  ctx.fillStyle='#607169';
+  ctx.font='13px Arial';
+  ctx.fillText('Total votes',cx,cy+16);
 
+  ctx.textAlign='left';
+  ctx.textBaseline='alphabetic';
+
+  const x=320;
   ctx.fillStyle='#0b5a2c';
-  ctx.beginPath();ctx.arc(308,103,7,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(x,88,7,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#102016';
-  ctx.font='bold 16px Arial';
-  ctx.fillText('Agree',326,108);
+  ctx.font='600 16px Arial';
+  ctx.fillText('Agree',x+22,93);
   ctx.fillStyle='#06451f';
-  ctx.font='bold 16px Arial';
-  ctx.fillText(`${agreePct}%  (${agree} vote${agree===1?'':'s'})`,410,108);
+  ctx.font='700 15px Arial';
+  ctx.fillText(`${agreePct}%  (${agree} vote${agree===1?'':'s'})`,x+162,93);
 
-  ctx.fillStyle='#a12b2b';
-  ctx.beginPath();ctx.arc(308,143,7,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#b22222';
+  ctx.beginPath();ctx.arc(x,130,7,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#102016';
-  ctx.font='bold 16px Arial';
-  ctx.fillText('Do Not Agree',326,148);
-  ctx.fillStyle='#06451f';
-  ctx.font='bold 16px Arial';
-  ctx.fillText(`${disagreePct}%  (${disagree} vote${disagree===1?'':'s'})`,450,148);
+  ctx.font='600 16px Arial';
+  ctx.fillText('Do Not Agree',x+22,135);
+  ctx.fillStyle='#b22222';
+  ctx.font='700 15px Arial';
+  ctx.fillText(`${disagreePct}%  (${disagree} vote${disagree===1?'':'s'})`,x+162,135);
+
+  ctx.strokeStyle='#e5eee5';
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(x,162);
+  ctx.lineTo(c.width-28,162);
+  ctx.stroke();
 
   ctx.fillStyle='#607169';
   ctx.font='14px Arial';
-  ctx.fillText(`${agree+disagree} valid recorded votes`,300,188);
+  ctx.fillText(`${agree+disagree} valid recorded votes`,x,192);
 }
 function formatChartDay(dateKey){
   if(!dateKey || dateKey==='Unknown') return 'Unknown';
@@ -209,6 +385,7 @@ function updateVotingCountdown(){
 setInterval(updateVotingCountdown,1000);
 updateVotingCountdown();
 $('loadBtn').onclick=loadLive; $('refreshBtn').onclick=loadLive; $('csvBtn').onclick=importCsv; $('downloadBtn').onclick=downloadCsv; $('downloadSummaryBtn').onclick=downloadSummary; $('search').oninput=()=>renderTable(currentRows); ['directorEmail','pin'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()}));
+
 </script>
 </body>
 </html>
