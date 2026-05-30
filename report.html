@@ -14,6 +14,13 @@
     .wrap{max-width:1180px;margin:auto;padding:28px 18px 60px}.card{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.login{max-width:760px;margin:44px auto;padding:32px}.login h2{font-size:38px;margin:0 0 8px;color:var(--green)}.small{color:var(--muted);line-height:1.45}.row{display:flex;gap:12px;flex-wrap:wrap}input,button{font:inherit;border-radius:14px;border:1px solid #cddbd0;padding:15px 16px}input{flex:1;min-width:240px;background:#fff}button{background:var(--green);color:#fff;font-weight:900;border-color:var(--green);cursor:pointer;box-shadow:0 10px 22px rgba(6,69,31,.16)}button.secondary{background:#fff;color:var(--green);box-shadow:none}button.light{background:#eef7ef;color:var(--green);box-shadow:none;border-color:#cbe1cf}.notice{background:#eef7ef;border:1px solid #cbe1cf;color:#123f22;border-radius:18px;padding:15px;margin:18px 0}.error{background:#fff0f0;border:1px solid #ffcaca;color:#801919;border-radius:18px;padding:15px;margin-top:16px}.hidden{display:none!important}
     .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:18px}.top h2{font-size:36px;margin:0;color:var(--green)}.roleBadge{display:inline-block;margin-top:8px;background:#e8f5ee;color:var(--green);border:1px solid #cbe1cf;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:900;letter-spacing:.05em;text-transform:uppercase}.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:18px 0}.metric{padding:22px}.label{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.08em;font-weight:900}.value{font-size:42px;font-weight:950;color:var(--green);margin-top:8px}.note{font-size:13px;color:var(--muted);margin-top:4px}.featured{background:linear-gradient(135deg,#ffffff,#f1f8ef)}.featured .value{color:var(--deep)}.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}.panel{padding:22px}.panel h3{margin:0 0 14px;color:var(--green);font-size:22px}.bar{height:36px;border-radius:999px;background:#e6eee5;overflow:hidden;display:flex}.bar span{display:block}.agree{background:var(--green2)}.disagree{background:var(--red)}.unknown{background:#98a2a0}.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-weight:700;font-size:13px;margin-top:12px}.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}.dot.good{background:var(--green2)}.dot.bad{background:var(--red)}.dot.unk{background:#98a2a0}.dot.part{background:var(--blue)}
     .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.tableWrap{max-height:540px;overflow:auto;border-radius:16px;border:1px solid var(--line)}table{width:100%;border-collapse:collapse;background:#fff;font-size:14px}th,td{padding:12px;border-bottom:1px solid #edf2ee;text-align:left;vertical-align:top}th{position:sticky;top:0;background:#f7faf6;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.pill{display:inline-block;border-radius:999px;padding:5px 10px;font-weight:900;font-size:12px}.pill.good{background:#e8f5ee;color:var(--green)}.pill.bad{background:#fdecec;color:var(--red)}.pill.warn{background:#fff2df;color:var(--amber)}.footer{margin-top:18px;color:var(--muted);font-size:12px}.adminOnly{display:none}.adminMode .adminOnly{display:block}.adminMode .adminFlex{display:flex}.configBox{margin-top:16px;background:#fff7e8;border:1px solid #f1d19a;color:#663d00;border-radius:18px;padding:16px;line-height:1.45}.privacyNote{background:#f7faf6;border:1px solid var(--line);border-radius:18px;padding:14px;color:var(--muted);font-size:13px;margin-bottom:16px}.csvBox{margin:16px 0;padding:18px;border-radius:20px;border:1px dashed #b8ccb9;background:#fbfdf9}
+    .countdownCard{background:linear-gradient(135deg,#ffffff,#eef8f0);border-color:#b8d8bd}
+    .countdownValue{font-size:28px!important;letter-spacing:.04em;white-space:nowrap}
+    .countdownDate{font-size:13px;color:var(--muted);margin-top:8px;border-top:1px solid #d8eadb;padding-top:8px}
+    .resultBreakdown{display:grid;gap:12px;margin-top:8px}
+    .resultLine{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;color:var(--ink);font-weight:800}
+    .resultLine small{color:var(--muted);font-weight:700}
+
     @media(max-width:900px){.heroInner,.top{display:block}.grid,.charts{grid-template-columns:1fr}.secure{text-align:left;margin-top:12px}.login h2,.top h2{font-size:30px}.actions{justify-content:flex-start;margin-top:14px}}@media print{.hero,.login,.actions,.noPrint,.adminOnly.csvBox{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none}.tableWrap{max-height:none;overflow:visible}body{background:#fff}}
   </style>
 </head>
@@ -41,11 +48,11 @@
       <div class="grid">
         <div class="card metric"><div class="label">Agree</div><div class="value" id="agreeVotes">0</div><div class="note" id="agreePercent">0%</div></div>
         <div class="card metric"><div class="label">Do Not Agree</div><div class="value" id="disagreeVotes">0</div><div class="note" id="disagreePercent">0%</div></div>
-        <div class="card metric"><div class="label">Voting closes</div><div class="value" style="font-size:22px" id="votingCloseDate">06 June 2026</div><div class="note" id="votingCountdown">Calculating countdown...</div></div>
+        <div class="card metric countdownCard"><div class="label">Voting closes in</div><div class="value countdownValue" id="votingCountdown">Calculating...</div><div class="countdownDate" id="votingCloseDate">Closes 06 June 2026, 23:59</div></div>
         <div class="card metric"><div class="label">Last updated</div><div class="value" style="font-size:22px" id="lastUpdated">—</div><div class="note">Ireland time</div></div>
       </div>
 
-      <div class="charts"><div class="card panel"><h3>Result split</h3><canvas id="pie" width="500" height="260"></canvas><div class="legend"><span><i class="dot good"></i>Agree</span><span><i class="dot bad"></i>Do Not Agree</span><span><i class="dot unk"></i>Unknown</span></div></div><div class="card panel"><h3>Participation and daily trend</h3><div class="bar"><span id="participationBar" style="background:var(--blue)"></span><span id="outstandingBar" style="background:#d7e2d5"></span></div><div class="legend"><span><i class="dot part"></i>Participation</span><span><i class="dot unk"></i>Outstanding</span></div><canvas id="timeline" width="500" height="220" style="margin-top:18px"></canvas></div></div>
+      <div class="charts"><div class="card panel"><h3>Result split</h3><canvas id="pie" width="500" height="260"></canvas><div class="legend"><span><i class="dot good"></i>Agree</span><span><i class="dot bad"></i>Do Not Agree</span></div></div><div class="card panel"><h3>Participation and daily trend</h3><div class="bar"><span id="participationBar" style="background:var(--blue)"></span><span id="outstandingBar" style="background:#d7e2d5"></span></div><div class="legend"><span><i class="dot part"></i>Participation</span><span><i class="dot unk"></i>Outstanding</span></div><canvas id="timeline" width="500" height="220" style="margin-top:18px"></canvas></div></div>
 
       <div id="duplicatesBox" class="card panel adminOnly hidden"><h3>Duplicate Eircode review</h3><p class="small">These Eircodes appear more than once and should be reviewed before final certification.</p><div id="duplicatesList"></div></div>
 
@@ -71,7 +78,71 @@ async function importCsv(){if(!isAdminEmail())return; const f=$('csvFile').files
 function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'; $('lastUpdated').textContent=data.generatedAtIreland||'—'; $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderDup(data.duplicateEircodes||[]); renderTable(currentRows)}}
 function renderDup(list){if(!list.length){$('duplicatesBox').classList.add('hidden');return}$('duplicatesBox').classList.remove('hidden');$('duplicatesList').innerHTML=list.map(x=>`<span class="pill warn">${esc(x.eircode)} — ${x.count} submissions</span>`).join(' ')}
 function renderTable(rows){if(!isAdminEmail())return; const q=($('search').value||'').toLowerCase(); rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q)); $('tbody').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.submittedAtIreland||r.createdAt)}</td><td><span class="pill ${r.vote==='Agree'?'good':r.vote==='Do Not Agree'?'bad':'warn'}">${esc(r.vote)}</span></td><td>${esc(r.eircode)}</td><td>${esc(r.email)}</td><td>${esc(r.referenceId)}</td><td>${esc(r.confirmed)}</td></tr>`).join('')}
-function drawPie(s){const c=$('pie'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);const vals=[s.agree||0,s.doNotAgree||0,s.unknown||0],cols=['#0b5a2c','#a12b2b','#98a2a0'];let total=vals.reduce((a,b)=>a+b,0)||1,st=-Math.PI/2;vals.forEach((v,i)=>{const a=v/total*Math.PI*2;ctx.beginPath();ctx.moveTo(145,130);ctx.arc(145,130,95,st,st+a);ctx.closePath();ctx.fillStyle=cols[i];ctx.fill();st+=a});ctx.fillStyle='#06451f';ctx.font='bold 34px Arial';ctx.fillText((s.agreePercent||0)+'%',300,112);ctx.font='16px Arial';ctx.fillText('Agree',300,140);ctx.fillStyle='#607169';ctx.fillText(`${s.totalVotes||0} votes`,300,168)}
+function drawPie(s){
+  const c=$('pie'),ctx=c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+
+  const agree=Number(s.agree||0);
+  const disagree=Number(s.doNotAgree||0);
+  const total=Math.max(agree+disagree,1);
+  const vals=[agree,disagree];
+  const cols=['#0b5a2c','#a12b2b'];
+  let st=-Math.PI/2;
+
+  vals.forEach((v,i)=>{
+    const a=v/total*Math.PI*2;
+    if(v>0){
+      ctx.beginPath();
+      ctx.moveTo(145,130);
+      ctx.arc(145,130,95,st,st+a);
+      ctx.closePath();
+      ctx.fillStyle=cols[i];
+      ctx.fill();
+
+      const mid=st+a/2;
+      const labelPct=Math.round((v/total)*1000)/10;
+      if(a>0.35){
+        ctx.fillStyle='#fff';
+        ctx.font='bold 18px Arial';
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillText(labelPct+'%',145+Math.cos(mid)*58,130+Math.sin(mid)*58);
+        ctx.textAlign='left';
+        ctx.textBaseline='alphabetic';
+      }
+    }
+    st+=a;
+  });
+
+  const agreePct=pct(agree,total);
+  const disagreePct=pct(disagree,total);
+
+  ctx.fillStyle='#06451f';
+  ctx.font='bold 18px Arial';
+  ctx.fillText('Result summary',300,68);
+
+  ctx.fillStyle='#0b5a2c';
+  ctx.beginPath();ctx.arc(308,103,7,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#102016';
+  ctx.font='bold 16px Arial';
+  ctx.fillText('Agree',326,108);
+  ctx.fillStyle='#06451f';
+  ctx.font='bold 16px Arial';
+  ctx.fillText(`${agreePct}%  (${agree} vote${agree===1?'':'s'})`,410,108);
+
+  ctx.fillStyle='#a12b2b';
+  ctx.beginPath();ctx.arc(308,143,7,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#102016';
+  ctx.font='bold 16px Arial';
+  ctx.fillText('Do Not Agree',326,148);
+  ctx.fillStyle='#06451f';
+  ctx.font='bold 16px Arial';
+  ctx.fillText(`${disagreePct}%  (${disagree} vote${disagree===1?'':'s'})`,450,148);
+
+  ctx.fillStyle='#607169';
+  ctx.font='14px Arial';
+  ctx.fillText(`${agree+disagree} valid recorded votes`,300,188);
+}
 function formatChartDay(dateKey){
   if(!dateKey || dateKey==='Unknown') return 'Unknown';
   const d=new Date(dateKey+'T12:00:00');
@@ -125,16 +196,17 @@ function updateVotingCountdown(){
   const el=$('votingCountdown');
   const dateEl=$('votingCloseDate');
   if(!el||!dateEl)return;
-  dateEl.textContent='06 June 2026, 23:59';
+  dateEl.textContent='Closes 06 June 2026, 23:59 · Ireland time';
   const diff=VOTING_CLOSE_AT.getTime()-Date.now();
   if(diff<=0){el.textContent='Voting closed';return}
-  const totalMinutes=Math.floor(diff/60000);
-  const days=Math.floor(totalMinutes/(60*24));
-  const hours=Math.floor((totalMinutes-(days*24*60))/60);
-  const minutes=totalMinutes%60;
-  el.textContent=`${String(days).padStart(2,'0')}d ${String(hours).padStart(2,'0')}h ${String(minutes).padStart(2,'0')}m remaining`;
+  const totalSeconds=Math.floor(diff/1000);
+  const days=Math.floor(totalSeconds/(60*60*24));
+  const hours=Math.floor((totalSeconds-(days*24*60*60))/(60*60));
+  const minutes=Math.floor((totalSeconds-(days*24*60*60)-(hours*60*60))/60);
+  const seconds=totalSeconds%60;
+  el.textContent=`${String(days).padStart(2,'0')}d ${String(hours).padStart(2,'0')}h ${String(minutes).padStart(2,'0')}m ${String(seconds).padStart(2,'0')}s`;
 }
-setInterval(updateVotingCountdown,60000);
+setInterval(updateVotingCountdown,1000);
 updateVotingCountdown();
 $('loadBtn').onclick=loadLive; $('refreshBtn').onclick=loadLive; $('csvBtn').onclick=importCsv; $('downloadBtn').onclick=downloadCsv; $('downloadSummaryBtn').onclick=downloadSummary; $('search').oninput=()=>renderTable(currentRows); ['directorEmail','pin'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()}));
 </script>
