@@ -74,7 +74,52 @@ function render(data){currentReport=data; currentRows=data.rows||[]; const s=dat
 function renderDup(list){if(!list.length){$('duplicatesBox').classList.add('hidden');return}$('duplicatesBox').classList.remove('hidden');$('duplicatesList').innerHTML=list.map(x=>`<span class="pill warn">${esc(x.eircode)} — ${x.count} submissions</span>`).join(' ')}
 function renderTable(rows){if(!isAdminEmail())return; const q=($('search').value||'').toLowerCase(); rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q)); $('tbody').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.submittedAtIreland||r.createdAt)}</td><td><span class="pill ${r.vote==='Agree'?'good':r.vote==='Do Not Agree'?'bad':'warn'}">${esc(r.vote)}</span></td><td>${esc(r.eircode)}</td><td>${esc(r.email)}</td><td>${esc(r.referenceId)}</td><td>${esc(r.confirmed)}</td></tr>`).join('')}
 function drawPie(s){const c=$('pie'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);const vals=[s.agree||0,s.doNotAgree||0,s.unknown||0],cols=['#0b5a2c','#a12b2b','#98a2a0'];let total=vals.reduce((a,b)=>a+b,0)||1,st=-Math.PI/2;vals.forEach((v,i)=>{const a=v/total*Math.PI*2;ctx.beginPath();ctx.moveTo(145,130);ctx.arc(145,130,95,st,st+a);ctx.closePath();ctx.fillStyle=cols[i];ctx.fill();st+=a});ctx.fillStyle='#06451f';ctx.font='bold 34px Arial';ctx.fillText((s.agreePercent||0)+'%',300,112);ctx.font='16px Arial';ctx.fillText('Agree',300,140);ctx.fillStyle='#607169';ctx.fillText(`${s.totalVotes||0} votes`,300,168)}
-function drawTimeline(days){const c=$('timeline'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#607169';ctx.font='13px Arial';ctx.fillText('Votes by day',10,18); if(!days.length){ctx.fillText('No data yet',10,58);return} const max=Math.max(...days.map(d=>d.total),1),w=(c.width-40)/days.length; days.forEach((d,i)=>{const h=(d.total/max)*150;ctx.fillStyle='#06451f';ctx.fillRect(20+i*w,190-h,Math.max(12,w-8),h);ctx.fillStyle='#607169';ctx.font='11px Arial';ctx.fillText(d.total,22+i*w,185-h)})}
+function formatChartDay(dateKey){
+  if(!dateKey || dateKey==='Unknown') return 'Unknown';
+  const d=new Date(dateKey+'T12:00:00');
+  if(isNaN(d)) return String(dateKey);
+  return d.toLocaleDateString('en-IE',{day:'2-digit',month:'short'}).replace(',', '');
+}
+function fillDailyRange(days){
+  const map=new Map((days||[]).filter(d=>d.date&&d.date!=='Unknown').map(d=>[d.date,d]));
+  const keys=[...map.keys()].sort();
+  if(!keys.length) return [];
+  const start=new Date(keys[0]+'T12:00:00');
+  const today=new Date();
+  const end=new Date(Math.max(new Date(keys[keys.length-1]+'T12:00:00').getTime(), new Date(today.getFullYear(),today.getMonth(),today.getDate(),12).getTime()));
+  const out=[];
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+    const key=d.toISOString().slice(0,10);
+    out.push(map.get(key)||{date:key,total:0,agree:0,doNotAgree:0,unknown:0});
+  }
+  return out;
+}
+function drawTimeline(days){
+  const c=$('timeline'),ctx=c.getContext('2d');
+  const rows=fillDailyRange(days);
+  const rowH=38, top=36, left=92, right=52, bottom=22;
+  c.height=Math.max(220, top+bottom+(Math.max(rows.length,1)*rowH));
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle='#06451f';
+  ctx.font='bold 15px Arial';
+  ctx.fillText('Daily Voting Activity',10,18);
+  if(!rows.length){ctx.fillStyle='#607169';ctx.font='13px Arial';ctx.fillText('No data yet',10,58);return}
+  const max=Math.max(...rows.map(d=>d.total),1);
+  const barMax=Math.max(70,c.width-left-right-36);
+  rows.forEach((d,i)=>{
+    const y=top+i*rowH;
+    const count=Number(d.total||0);
+    const barW=count===0?6:Math.max(18,(count/max)*barMax);
+    ctx.fillStyle='#102016';
+    ctx.font='15px Arial';
+    ctx.fillText(formatChartDay(d.date),10,y+17);
+    ctx.fillStyle=count===0?'#d7e2d5':'#06451f';
+    ctx.fillRect(left,y,barW,22);
+    ctx.fillStyle='#102016';
+    ctx.font='bold 15px Arial';
+    ctx.fillText(String(count),left+barW+12,y+17);
+  });
+}
 function downloadCsv(){if(!isAdminEmail())return; const h=['submittedAtIreland','vote','eircode','email','referenceId','confirmed']; const rows=currentRows.map(r=>h.map(k=>'"'+String(r[k]??'').replace(/"/g,'""')+'"').join(',')); const blob=new Blob([h.join(',')+'\n'+rows.join('\n')],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-full-database.csv';a.click();URL.revokeObjectURL(a.href)}
 function downloadSummary(){if(!isAdminEmail()||!currentReport)return; const s=currentReport.summary||{}; const lines=[['Metric','Value'],['Total residences',s.totalResidences||227],['Votes received',s.totalVotes||0],['Outstanding residences',s.outstandingResidences||0],['Participation rate',(s.participationRate||0)+'%'],['Agree',s.agree||0],['Agree %',(s.agreePercent||0)+'%'],['Do Not Agree',s.doNotAgree||0],['Do Not Agree %',(s.doNotAgreePercent||0)+'%'],['Unique Eircodes',s.uniqueEircodes||0],['Duplicate Eircodes',s.duplicateEircodesCount||0]]; const csv=lines.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-summary.csv';a.click();URL.revokeObjectURL(a.href)}
 $('loadBtn').onclick=loadLive; $('refreshBtn').onclick=loadLive; $('csvBtn').onclick=importCsv; $('downloadBtn').onclick=downloadCsv; $('downloadSummaryBtn').onclick=downloadSummary; $('search').oninput=()=>renderTable(currentRows); ['directorEmail','pin'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()}));
