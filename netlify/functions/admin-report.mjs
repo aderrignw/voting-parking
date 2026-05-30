@@ -6,8 +6,25 @@ const corsHeaders = {
   'Cache-Control': 'no-store'
 };
 
+const TOTAL_RESIDENCES = 227;
+const ADMIN_EMAIL = 'claudiosantos1968@gmail.com';
+const DEFAULT_DIRECTORS = [
+  'selerizzuti@gmail.com',
+  'bahrikaran@gmail.com',
+  'rohananeja@gmail.com',
+  'niravakbari20@gmail.com',
+  'aditiu008@gmail.com',
+  'claudiosantos1968@gmail.com'
+];
+
 function json(statusCode, body) {
   return { statusCode, headers: corsHeaders, body: JSON.stringify(body) };
+}
+
+function allowedDirectorEmails() {
+  const configured = String(process.env.DIRECTOR_EMAILS || '').trim();
+  if (!configured) return DEFAULT_DIRECTORS;
+  return configured.split(',').map(email => email.trim().toLowerCase()).filter(Boolean);
 }
 
 function normaliseVote(value = '') {
@@ -41,7 +58,11 @@ function field(data, names) {
   return '';
 }
 
-function buildReport(submissions) {
+function pct(part, total) {
+  return total ? Number(((part / total) * 100).toFixed(1)) : 0;
+}
+
+function buildReport(submissions, includeRows = false) {
   const rows = submissions.map((item, index) => {
     const data = item.data || item.form_data || item || {};
     const vote = normaliseVote(field(data, ['vote', 'Vote', 'decision', 'choice']));
@@ -68,14 +89,21 @@ function buildReport(submissions) {
   const agree = rows.filter(r => r.vote === 'Agree').length;
   const doNotAgree = rows.filter(r => r.vote === 'Do Not Agree').length;
   const unknown = totalVotes - agree - doNotAgree;
+  const outstandingResidences = Math.max(TOTAL_RESIDENCES - totalVotes, 0);
+
   const eircodeCounts = rows.reduce((acc, row) => {
     if (!row.eircode) return acc;
     acc[row.eircode] = (acc[row.eircode] || 0) + 1;
     return acc;
   }, {});
-  const duplicateEircodes = Object.entries(eircodeCounts).filter(([, count]) => count > 1).map(([eircode, count]) => ({ eircode, count }));
+  const duplicateEircodes = Object.entries(eircodeCounts)
+    .filter(([, count]) => count > 1)
+    .map(([eircode, count]) => ({ eircode, count }));
   const uniqueEircodes = Object.keys(eircodeCounts).length;
-  const lastSubmission = rows.slice().sort((a, b) => new Date(b.createdAt || b.submittedAtIreland) - new Date(a.createdAt || a.submittedAtIreland))[0] || null;
+
+  const lastSubmission = rows
+    .slice()
+    .sort((a, b) => new Date(b.createdAt || b.submittedAtIreland) - new Date(a.createdAt || a.submittedAtIreland))[0] || null;
 
   const byDayMap = {};
   for (const row of rows) {
@@ -89,24 +117,36 @@ function buildReport(submissions) {
     else byDayMap[key].unknown++;
   }
 
-  return {
+  const report = {
     generatedAtIreland: safeDate(new Date().toISOString()),
+    totalResidences: TOTAL_RESIDENCES,
     summary: {
+      totalResidences: TOTAL_RESIDENCES,
       totalVotes,
+      outstandingResidences,
+      participationRate: pct(totalVotes, TOTAL_RESIDENCES),
       agree,
       doNotAgree,
       unknown,
-      agreePercent: totalVotes ? Number(((agree / totalVotes) * 100).toFixed(1)) : 0,
-      doNotAgreePercent: totalVotes ? Number(((doNotAgree / totalVotes) * 100).toFixed(1)) : 0,
-      unknownPercent: totalVotes ? Number(((unknown / totalVotes) * 100).toFixed(1)) : 0,
+      agreePercent: pct(agree, totalVotes),
+      doNotAgreePercent: pct(doNotAgree, totalVotes),
+      unknownPercent: pct(unknown, totalVotes),
       uniqueEircodes,
       duplicateEircodesCount: duplicateEircodes.length,
-      lastSubmission
+      lastSubmission: includeRows ? lastSubmission : null
     },
-    duplicateEircodes,
-    byDay: Object.values(byDayMap).sort((a, b) => a.date.localeCompare(b.date)),
-    rows
+    byDay: Object.values(byDayMap).sort((a, b) => a.date.localeCompare(b.date))
   };
+
+  if (includeRows) {
+    report.duplicateEircodes = duplicateEircodes;
+    report.rows = rows;
+  } else {
+    report.duplicateEircodes = [];
+    report.rows = [];
+  }
+
+  return report;
 }
 
 export const handler = async (event) => {
@@ -116,14 +156,8 @@ export const handler = async (event) => {
   const expectedPin = process.env.ADMIN_PIN || 'OMCDIRETORES2026';
   const providedPin = event.headers['x-admin-pin'] || event.headers['X-Admin-Pin'] || '';
   const directorEmail = String(event.headers['x-director-email'] || event.headers['X-Director-Email'] || '').trim().toLowerCase();
-  const allowedEmails = [
-    'selerizzuti@gmail.com',
-    'bahrikaran@gmail.com',
-    'rohananeja@gmail.com',
-    'niravakbari20@gmail.com',
-    'aditiu008@gmail.com',
-    'claudiosantos1968@gmail.com'
-  ];
+  const allowedEmails = allowedDirectorEmails();
+  const isAdmin = directorEmail === ADMIN_EMAIL;
 
   if (!directorEmail) return json(401, { ok: false, message: 'Please enter your director email.' });
   if (!allowedEmails.includes(directorEmail)) return json(403, { ok: false, message: 'This email is not authorised to access the directors dashboard.' });
@@ -135,7 +169,9 @@ export const handler = async (event) => {
     return json(500, {
       ok: false,
       code: 'MISSING_NETLIFY_AUTH_TOKEN',
-      message: 'Live dashboard is not connected yet. Please configure NETLIFY_AUTH_TOKEN in Netlify Environment variables, or use Import CSV for now.'
+      isAdmin,
+      authorisedDirector: directorEmail,
+      message: 'Live dashboard is not connected yet. Please configure NETLIFY_AUTH_TOKEN in Netlify Environment variables.'
     });
   }
 
@@ -147,7 +183,13 @@ export const handler = async (event) => {
     const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
     if (!response.ok) {
       const text = await response.text();
-      return json(response.status, { ok: false, message: 'Could not read Netlify Forms submissions. Please check NETLIFY_AUTH_TOKEN and NETLIFY_FORM_ID.', detail: text.slice(0, 500) });
+      return json(response.status, {
+        ok: false,
+        isAdmin,
+        authorisedDirector: directorEmail,
+        message: 'Could not read Netlify Forms submissions. Please check NETLIFY_AUTH_TOKEN and NETLIFY_FORM_ID.',
+        detail: text.slice(0, 500)
+      });
     }
     const batch = await response.json();
     if (!Array.isArray(batch) || batch.length === 0) break;
@@ -156,5 +198,11 @@ export const handler = async (event) => {
     page++;
   }
 
-  return json(200, { ok: true, authorisedDirector: directorEmail, ...buildReport(all) });
+  return json(200, {
+    ok: true,
+    authorisedDirector: directorEmail,
+    isAdmin,
+    role: isAdmin ? 'administrator' : 'director',
+    ...buildReport(all, isAdmin)
+  });
 };
