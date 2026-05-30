@@ -1,5 +1,4 @@
 import { getStore } from '@netlify/blobs';
-import { randomBytes } from 'node:crypto';
 
 export const json = (statusCode, body) => ({
   statusCode,
@@ -30,10 +29,11 @@ export const clientIp = (event) => {
   return String(raw).split(',')[0].trim();
 };
 
+
 export const makeReferenceId = () => {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const bytes = randomBytes(8);
   let out = '';
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
   for (const b of bytes) out += alphabet[b % alphabet.length];
-  return `AG-2026-${out.slice(0, 4)}-${out.slice(4, 8)}`;
+  return `AG-2026-${out.slice(0,4)}-${out.slice(4,8)}`;
 };
