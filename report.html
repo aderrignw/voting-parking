@@ -100,6 +100,21 @@
 
     .countdownValue{font-size:27px!important;letter-spacing:.02em;white-space:nowrap}
     .countdownDate{font-size:13px;color:var(--muted);margin-top:12px;border-top:1px solid #d8eadb;padding-top:10px;line-height:1.35}
+    .metric{padding-right:84px}
+    .metric .note{max-width:100%;overflow-wrap:break-word}
+    #lastUpdated{font-size:22px!important;line-height:1.18;letter-spacing:-.02em}
+    .countdownValue{font-size:23px!important;line-height:1.15;letter-spacing:.01em}
+    .resultSplitLayout{display:grid;grid-template-columns:260px minmax(260px,1fr);gap:28px;align-items:center}
+    .donutWrap{display:flex;justify-content:center;align-items:center;min-width:0}
+    .resultSummaryBox{min-width:0}
+    .resultSummaryTitle{font-size:15px;font-weight:700;color:var(--green);margin-bottom:16px}
+    .resultRow{display:grid;grid-template-columns:14px minmax(112px,1fr) auto;gap:10px;align-items:center;margin:13px 0;font-size:15px;color:var(--ink)}
+    .resultRow .resultName{font-weight:600}
+    .resultRow .resultValue{font-weight:700;white-space:nowrap;text-align:right}
+    .resultRow.disagree .resultValue{color:var(--red)}
+    .summaryDivider{height:1px;background:#e5eee5;margin:18px 0 12px}
+    .validVotesText{font-size:13px;color:var(--muted)}
+
 
     .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
     .panel{padding:24px;min-height:330px}
@@ -123,10 +138,10 @@
     .configBox{margin-top:16px;background:#fff7e8;border:1px solid #f1d19a;color:#663d00;border-radius:18px;padding:16px;line-height:1.45}
     .csvBox{margin:16px 0;padding:18px;border-radius:20px;border:1px dashed #b8ccb9;background:#fbfdf9}
 
-    @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}}
+    @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.resultSplitLayout{grid-template-columns:260px minmax(260px,1fr)}}
     @media(max-width:720px){
       .heroInner,.top{display:block} .secure{text-align:left;margin-top:14px} .wrap{padding:24px 16px 54px}
-      .grid,.charts{grid-template-columns:1fr} .actions{justify-content:flex-start;margin-top:16px}
+      .grid,.charts,.resultSplitLayout{grid-template-columns:1fr} .actions{justify-content:flex-start;margin-top:16px}
       .login h2,.top h2{font-size:28px} .countdownValue{font-size:24px!important}
     }
     @media print{
@@ -183,7 +198,16 @@
       <div class="charts">
         <div class="card panel">
           <h3>Result split</h3>
-          <canvas id="pie" width="560" height="260"></canvas>
+          <div class="resultSplitLayout">
+            <div class="donutWrap"><canvas id="pie" width="260" height="240"></canvas></div>
+            <div class="resultSummaryBox">
+              <div class="resultSummaryTitle">Result summary</div>
+              <div class="resultRow agree"><i class="dot good"></i><span class="resultName">Agree</span><span class="resultValue" id="resultAgreeLine">0% (0 votes)</span></div>
+              <div class="resultRow disagree"><i class="dot bad"></i><span class="resultName">Do Not Agree</span><span class="resultValue" id="resultDisagreeLine">0% (0 votes)</span></div>
+              <div class="summaryDivider"></div>
+              <div class="validVotesText" id="resultValidVotes">0 valid recorded votes</div>
+            </div>
+          </div>
           <div class="legend"><span><i class="dot good"></i>Agree</span><span><i class="dot bad"></i>Do Not Agree</span></div>
         </div>
         <div class="card panel">
@@ -245,7 +269,11 @@ function drawPie(s){
   const agreePct=pct(agree,total);
   const disagreePct=pct(disagree,total);
 
-  const cx=150, cy=130, outer=92, inner=48;
+  if($('resultAgreeLine')) $('resultAgreeLine').textContent=`${agreePct}% (${agree} vote${agree===1?'':'s'})`;
+  if($('resultDisagreeLine')) $('resultDisagreeLine').textContent=`${disagreePct}% (${disagree} vote${disagree===1?'':'s'})`;
+  if($('resultValidVotes')) $('resultValidVotes').textContent=`${agree+disagree} valid recorded vote${agree+disagree===1?'':'s'}`;
+
+  const cx=130, cy=118, outer=88, inner=48;
   const vals=[agree,disagree];
   const cols=['#0b5a2c','#b22222'];
   let st=-Math.PI/2;
@@ -261,12 +289,12 @@ function drawPie(s){
       ctx.fill();
 
       const mid=st+a/2;
-      if(a>0.28){
+      if(a>0.30){
         ctx.fillStyle='#fff';
         ctx.font='700 15px Arial';
         ctx.textAlign='center';
         ctx.textBaseline='middle';
-        ctx.fillText((Math.round((v/total)*1000)/10)+'%',cx+Math.cos(mid)*68,cy+Math.sin(mid)*68);
+        ctx.fillText((Math.round((v/total)*1000)/10)+'%',cx+Math.cos(mid)*66,cy+Math.sin(mid)*66);
       }
     }
     st+=a;
@@ -285,39 +313,8 @@ function drawPie(s){
   ctx.fillStyle='#607169';
   ctx.font='13px Arial';
   ctx.fillText('Total votes',cx,cy+16);
-
   ctx.textAlign='left';
   ctx.textBaseline='alphabetic';
-
-  const x=320;
-  ctx.fillStyle='#0b5a2c';
-  ctx.beginPath();ctx.arc(x,88,7,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#102016';
-  ctx.font='600 16px Arial';
-  ctx.fillText('Agree',x+22,93);
-  ctx.fillStyle='#06451f';
-  ctx.font='700 15px Arial';
-  ctx.fillText(`${agreePct}%  (${agree} vote${agree===1?'':'s'})`,x+162,93);
-
-  ctx.fillStyle='#b22222';
-  ctx.beginPath();ctx.arc(x,130,7,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#102016';
-  ctx.font='600 16px Arial';
-  ctx.fillText('Do Not Agree',x+22,135);
-  ctx.fillStyle='#b22222';
-  ctx.font='700 15px Arial';
-  ctx.fillText(`${disagreePct}%  (${disagree} vote${disagree===1?'':'s'})`,x+162,135);
-
-  ctx.strokeStyle='#e5eee5';
-  ctx.lineWidth=1;
-  ctx.beginPath();
-  ctx.moveTo(x,162);
-  ctx.lineTo(c.width-28,162);
-  ctx.stroke();
-
-  ctx.fillStyle='#607169';
-  ctx.font='14px Arial';
-  ctx.fillText(`${agree+disagree} valid recorded votes`,x,192);
 }
 function formatChartDay(dateKey){
   if(!dateKey || dateKey==='Unknown') return 'Unknown';
@@ -366,7 +363,7 @@ function drawTimeline(days){
   });
 }
 function downloadCsv(){if(!isAdminEmail())return; const h=['submittedAtIreland','vote','eircode','email','referenceId','confirmed']; const rows=currentRows.map(r=>h.map(k=>'"'+String(r[k]??'').replace(/"/g,'""')+'"').join(',')); const blob=new Blob([h.join(',')+'\n'+rows.join('\n')],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-full-database.csv';a.click();URL.revokeObjectURL(a.href)}
-function downloadSummary(){if(!isAdminEmail()||!currentReport)return; const s=currentReport.summary||{}; const lines=[['Metric','Value'],['Total residences',s.totalResidences||227],['Votes received',s.totalVotes||0],['Outstanding residences',s.outstandingResidences||0],['Participation rate',(s.participationRate||0)+'%'],['Agree',s.agree||0],['Agree %',(s.agreePercent||0)+'%'],['Do Not Agree',s.doNotAgree||0],['Do Not Agree %',(s.doNotAgreePercent||0)+'%'],['Unique Eircodes',s.uniqueEircodes||0],['Duplicate Eircodes',s.duplicateEircodesCount||0]]; const csv=lines.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-summary.csv';a.click();URL.revokeObjectURL(a.href)}
+function downloadSummary(){if(!isAdminEmail()||!currentReport)return; const s=currentReport.summary||{}; const lines=[['Metric','Value'],['Total residences',s.totalResidences||227],['Votes received',s.totalVotes||0],['Outstanding residences',s.outstandingResidences||0],['Participation rate',(s.participationRate||0)+'%'],['Agree',s.agree||0],['Agree %',(s.agreePercent||0)+'%'],['Do Not Agree',s.doNotAgree||0],['Do Not Agree %',(s.doNotAgreePercent||0)+'%'],['Unique Eircodes',s.uniqueEircodes||0],['Duplicate Eircodes',s.duplicateEircodesCount||0],['Excluded duplicate votes',s.excludedDuplicateVotes||0]]; const csv=lines.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-summary.csv';a.click();URL.revokeObjectURL(a.href)}
 const VOTING_CLOSE_AT=new Date('2026-06-06T23:59:00+01:00');
 function updateVotingCountdown(){
   const el=$('votingCountdown');
