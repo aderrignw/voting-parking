@@ -7,6 +7,12 @@ import {
 } from './_utils.mjs';
 
 const NETLIFY_API_BASE = 'https://api.netlify.com/api/v1';
+const INELIGIBLE_EIRCODE_MESSAGE = 'This consultation is restricted to residents within the Aderrig Green area. The Eircode provided could not be verified as belonging to an eligible residence. Please check your Eircode and try again.';
+const DUPLICATE_EIRCODE_MESSAGE = 'This residence has already voted. One vote per Eircode is permitted.';
+
+function eligibleAderrigGreenEircode(eircode) {
+  return String(eircode || '').replace(/\s+/g, '').startsWith('K78');
+}
 
 function getFieldValue(submission, fieldName) {
   const wanted = String(fieldName || '').toLowerCase();
@@ -95,6 +101,14 @@ export const handler = async (event) => {
       return json(400, { ok: false, message: 'Please enter a valid Eircode.' });
     }
 
+    if (!eligibleAderrigGreenEircode(eircode)) {
+      return json(403, {
+        ok: false,
+        eligible: false,
+        message: INELIGIBLE_EIRCODE_MESSAGE
+      });
+    }
+
     if (!['Agree', 'Do Not Agree'].includes(vote)) {
       return json(400, { ok: false, message: 'Please select your vote.' });
     }
@@ -109,7 +123,7 @@ export const handler = async (event) => {
       return json(409, {
         ok: false,
         duplicate: true,
-        message: 'This residence has already voted. One vote per Eircode is permitted.'
+        message: DUPLICATE_EIRCODE_MESSAGE
       });
     }
 
