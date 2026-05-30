@@ -62,6 +62,35 @@ function pct(part, total) {
   return total ? Number(((part / total) * 100).toFixed(1)) : 0;
 }
 
+function firstValidRowsByEircode(rows) {
+  const sorted = rows.slice().sort((a, b) => {
+    const da = new Date(a.createdAt || a.submittedAtIreland || 0).getTime();
+    const db = new Date(b.createdAt || b.submittedAtIreland || 0).getTime();
+    return (Number.isNaN(da) ? 0 : da) - (Number.isNaN(db) ? 0 : db);
+  });
+
+  const seen = new Set();
+  const validRows = [];
+  const excludedDuplicateRows = [];
+
+  for (const row of sorted) {
+    const key = String(row.eircode || '').toUpperCase().replace(/\s+/g, '');
+    if (!key) {
+      validRows.push(row);
+      continue;
+    }
+    if (seen.has(key)) {
+      excludedDuplicateRows.push(row);
+    } else {
+      seen.add(key);
+      validRows.push(row);
+    }
+  }
+
+  return { validRows, excludedDuplicateRows };
+}
+
+
 function buildReport(submissions, includeRows = false) {
   const rows = submissions.map((item, index) => {
     const data = item.data || item.form_data || item || {};
@@ -85,12 +114,6 @@ function buildReport(submissions, includeRows = false) {
     };
   });
 
-  const totalVotes = rows.length;
-  const agree = rows.filter(r => r.vote === 'Agree').length;
-  const doNotAgree = rows.filter(r => r.vote === 'Do Not Agree').length;
-  const unknown = totalVotes - agree - doNotAgree;
-  const outstandingResidences = Math.max(TOTAL_RESIDENCES - totalVotes, 0);
-
   const eircodeCounts = rows.reduce((acc, row) => {
     if (!row.eircode) return acc;
     acc[row.eircode] = (acc[row.eircode] || 0) + 1;
@@ -99,14 +122,28 @@ function buildReport(submissions, includeRows = false) {
   const duplicateEircodes = Object.entries(eircodeCounts)
     .filter(([, count]) => count > 1)
     .map(([eircode, count]) => ({ eircode, count }));
-  const uniqueEircodes = Object.keys(eircodeCounts).length;
+
+  const { validRows, excludedDuplicateRows } = firstValidRowsByEircode(rows);
+
+  const totalVotes = validRows.length;
+  const agree = validRows.filter(r => r.vote === 'Agree').length;
+  const doNotAgree = validRows.filter(r => r.vote === 'Do Not Agree').length;
+  const unknown = totalVotes - agree - doNotAgree;
+  const outstandingResidences = Math.max(TOTAL_RESIDENCES - totalVotes, 0);
+
+  const validEircodeCounts = validRows.reduce((acc, row) => {
+    if (!row.eircode) return acc;
+    acc[row.eircode] = (acc[row.eircode] || 0) + 1;
+    return acc;
+  }, {});
+  const uniqueEircodes = Object.keys(validEircodeCounts).length;
 
   const lastSubmission = rows
     .slice()
     .sort((a, b) => new Date(b.createdAt || b.submittedAtIreland) - new Date(a.createdAt || a.submittedAtIreland))[0] || null;
 
   const byDayMap = {};
-  for (const row of rows) {
+  for (const row of validRows) {
     const raw = row.createdAt || row.submittedAtIreland;
     const d = new Date(raw);
     const key = Number.isNaN(d.getTime()) ? String(raw).slice(0, 10) || 'Unknown' : d.toISOString().slice(0, 10);
@@ -123,6 +160,8 @@ function buildReport(submissions, includeRows = false) {
     summary: {
       totalResidences: TOTAL_RESIDENCES,
       totalVotes,
+      recordedSubmissions: rows.length,
+      excludedDuplicateVotes: excludedDuplicateRows.length,
       outstandingResidences,
       participationRate: pct(totalVotes, TOTAL_RESIDENCES),
       agree,
@@ -140,9 +179,11 @@ function buildReport(submissions, includeRows = false) {
 
   if (includeRows) {
     report.duplicateEircodes = duplicateEircodes;
+    report.excludedDuplicateRows = excludedDuplicateRows;
     report.rows = rows;
   } else {
     report.duplicateEircodes = [];
+    report.excludedDuplicateRows = [];
     report.rows = [];
   }
 
