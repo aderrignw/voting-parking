@@ -153,7 +153,8 @@ export const handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: corsHeaders, body: '' };
   if (event.httpMethod !== 'GET') return json(405, { ok: false, message: 'Method not allowed.' });
 
-  const expectedPin = process.env.ADMIN_PIN || 'OMCDIRETORES2026';
+  const directorPin = process.env.DIRECTOR_PIN || process.env.ADMIN_PIN || 'OMCDIRETORES2026';
+  const adminPin = process.env.ADMIN_ONLY_PIN || 'OMCADMIN2026';
   const providedPin = event.headers['x-admin-pin'] || event.headers['X-Admin-Pin'] || '';
   const directorEmail = String(event.headers['x-director-email'] || event.headers['X-Director-Email'] || '').trim().toLowerCase();
   const allowedEmails = allowedDirectorEmails();
@@ -161,7 +162,14 @@ export const handler = async (event) => {
 
   if (!directorEmail) return json(401, { ok: false, message: 'Please enter your director email.' });
   if (!allowedEmails.includes(directorEmail)) return json(403, { ok: false, message: 'This email is not authorised to access the directors dashboard.' });
-  if (String(providedPin) !== String(expectedPin)) return json(401, { ok: false, message: 'Invalid directors password.' });
+
+  if (isAdmin) {
+    if (String(providedPin) !== String(adminPin)) {
+      return json(401, { ok: false, message: 'Invalid administrator password.' });
+    }
+  } else if (String(providedPin) !== String(directorPin)) {
+    return json(401, { ok: false, message: 'Invalid directors password.' });
+  }
 
   const formId = process.env.NETLIFY_FORM_ID || '6a19f4c677b40f0008c59273';
   const token = process.env.NETLIFY_AUTH_TOKEN || '';
