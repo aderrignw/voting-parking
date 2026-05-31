@@ -28,6 +28,22 @@ function normalizeEircode(value){
 function eligibleAderrigGreenEircode(eircode){
   return String(eircode || '').replace(/\s+/g, '').startsWith('K78');
 }
+const INVALID_EIRCODE_MESSAGE = 'This Eircode does not appear to be a valid residential Eircode. Please check the Eircode and try again.';
+
+function clearlyInvalidEircode(eircode){
+  const compact = String(eircode || '').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if (!/^K78[A-Z0-9]{4}$/.test(compact)) return false;
+
+  const unique = compact.slice(3);
+
+  if (['0000','XXXX','TEST'].includes(unique)) return true;
+  if (/^([A-Z0-9])\1{3}$/.test(unique)) return true;
+  if (/^1234$/.test(unique)) return true;
+  if (/^ABCD$/.test(unique)) return true;
+  if (/^ZZZZ$/.test(unique)) return true;
+
+  return false;
+}
 function setMessage(el, text, ok=false){
   el.textContent = text || '';
   el.classList.toggle('ok', !!ok);
@@ -128,6 +144,7 @@ verifyForm.addEventListener('submit', async (event) => {
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) return setMessage(verifyMessage, 'Please enter a valid email address.');
   if (!/^[A-Z0-9]{3}\s[A-Z0-9]{4}$/.test(eircode)) return setMessage(verifyMessage, 'Please enter a valid Eircode, e.g. K78 XXXX.');
   if (!eligibleAderrigGreenEircode(eircode)) return setMessage(verifyMessage, INELIGIBLE_EIRCODE_MESSAGE);
+  if (clearlyInvalidEircode(eircode)) return setMessage(verifyMessage, INVALID_EIRCODE_MESSAGE);
   const btn = verifyForm.querySelector('button');
   btn.disabled = true; btn.textContent = 'Checking...';
   try{
@@ -144,6 +161,7 @@ voteForm.addEventListener('submit', async (event) => {
   const selected = new FormData(voteForm).get('vote');
   const confirmed = $('confirmed').checked;
   if (!resident.email || !resident.eircode) return setMessage(voteMessage, 'Please complete resident verification first.');
+  if (clearlyInvalidEircode(resident.eircode)) return setMessage(voteMessage, INVALID_EIRCODE_MESSAGE);
   if (!reviewUnlocked) return setMessage(voteMessage, 'Please review the proposal before submitting your vote.');
   if (!selected) return setMessage(voteMessage, 'Please select your vote.');
   if (!confirmed) return setMessage(voteMessage, 'Please confirm one vote per residence.');
