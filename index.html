@@ -6,6 +6,14 @@
   <title>Aderrig Green — Car Parking Policy</title>
   <meta name="description" content="Resident approval process for the Aderrig Green Car Parking Policy proposal.">
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .draftDownloadLine{margin-top:18px;padding-top:14px;border-top:1px solid rgba(6,69,31,.12);font-size:.96rem;line-height:1.4}
+    .draftDownloadLink{display:inline-flex;align-items:center;gap:8px;color:#06451f;font-weight:700;text-decoration:none}
+    .draftDownloadLink:hover{text-decoration:underline}
+    .draftDownloadIcon{font-size:1.05rem;line-height:1}
+    .draftDownloadNote{display:block;margin-top:5px;color:#607169;font-size:.86rem;font-weight:400}
+  </style>
 </head>
 <body>
   <header class="topbar">
@@ -31,6 +39,13 @@
         <p><strong>One vote per residence (Eircode).</strong></p>
         <p><strong>Your vote matters.</strong></p>
       </div>
+        <div class="draftDownloadLine">
+          <a id="draftPolicyDownload" class="draftDownloadLink" href="assets/proposal-draft.pdf" target="_blank" rel="noopener" download>
+            <span class="draftDownloadIcon" aria-hidden="true">⧉</span>
+            <span>Download Draft Policy for Review</span>
+          </a>
+          <span class="draftDownloadNote">Draft version for consultation purposes only. This is not an officially approved policy.</span>
+        </div>
     </section>
 
     <section class="card verifyCard" id="verification" aria-labelledby="verifyTitle">
@@ -106,6 +121,18 @@
       </form>
     </section>
   </main>
+
+
+  <form name="aderrig-green-policy-download-audit" method="POST" data-netlify="true" data-netlify-honeypot="bot-field-download" hidden>
+    <input type="hidden" name="form-name" value="aderrig-green-policy-download-audit">
+    <input type="hidden" name="bot-field-download" value="">
+    <input type="hidden" name="visitorKey" value="">
+    <input type="hidden" name="email" value="">
+    <input type="hidden" name="eircode" value="">
+    <input type="hidden" name="downloadedAtIreland" value="">
+    <input type="hidden" name="document" value="Aderrig Green Parking Policy Draft">
+    <input type="hidden" name="status" value="Downloaded Draft Policy">
+  </form>
 
   <footer class="wrap footer">Created by the Directors of Aderrig Green Management Company.</footer>
   <script src="script.js"></script>
