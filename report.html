@@ -212,13 +212,11 @@
       vertical-align:middle;
     }
     .miniTableWrap th:nth-child(1),
-    .miniTableWrap td:nth-child(1){width:42%}
+    .miniTableWrap td:nth-child(1){width:52%}
     .miniTableWrap th:nth-child(2),
     .miniTableWrap td:nth-child(2){width:16%}
     .miniTableWrap th:nth-child(3),
-    .miniTableWrap td:nth-child(3){width:21%}
-    .miniTableWrap th:nth-child(4),
-    .miniTableWrap td:nth-child(4){width:21%}
+    .miniTableWrap td:nth-child(3){width:32%}
     #identifiedDownloadBody td:nth-child(1){width:46%}
     #identifiedDownloadBody td:nth-child(2){width:18%}
     #identifiedDownloadBody td:nth-child(3){width:16%}
@@ -343,7 +341,7 @@
         <div class="downloadAuditTables">
           <div>
             <h4>Anonymous download visitors</h4>
-            <div class="miniTableWrap"><table><thead><tr><th>Visitor</th><th>Downloads</th><th>First</th><th>Last</th></tr></thead><tbody id="anonymousDownloadBody"></tbody></table></div>
+            <div class="miniTableWrap"><table><thead><tr><th>Visitor</th><th>Downloads</th><th>Last Download</th></tr></thead><tbody id="anonymousDownloadBody"></tbody></table></div>
           </div>
           <div>
             <h4>Identified download visitors</h4>
@@ -405,7 +403,7 @@ function renderDownloadAudit(audit, configured=true, error=''){
   $('auditVotedAfterDownload').textContent=audit.votedAfterDownload||0;
   const anon=(audit.anonymousRows||[]).slice(0,80);
   const ident=(audit.identifiedRows||[]).slice(0,80);
-  $('anonymousDownloadBody').innerHTML=anon.length?anon.map(r=>`<tr><td>${esc(visitorLabel(r.visitorKey))}</td><td>${esc(r.downloads)}</td><td>${esc(r.firstDownload)}</td><td>${esc(r.lastDownload)}</td></tr>`).join(''):'<tr><td colspan="4">No anonymous downloads yet.</td></tr>';
+  $('anonymousDownloadBody').innerHTML=anon.length?anon.map(r=>`<tr><td>${esc(visitorLabel(r.visitorKey))}</td><td>${esc(r.downloads)}</td><td>${esc(r.lastDownload)}</td></tr>`).join(''):'<tr><td colspan="3">No anonymous downloads yet.</td></tr>';
   $('identifiedDownloadBody').innerHTML=ident.length?ident.map(r=>`<tr><td>${esc(r.email||'—')}</td><td>${esc(r.eircode||'—')}</td><td>${esc(r.downloads)}</td><td>${r.voted?'Yes':'No'}</td></tr>`).join(''):'<tr><td colspan="4">No identified downloads yet.</td></tr>';
   const note=$('downloadAuditNote');
   if(note){
