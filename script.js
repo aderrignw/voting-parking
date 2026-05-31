@@ -64,6 +64,72 @@ function makePublicReferenceId(){
   for (const b of bytes) out += alphabet[b % alphabet.length];
   return `AG-2026-${out.slice(0,4)}-${out.slice(4,8)}`;
 }
+
+function getPolicyDownloadVisitorKey(){
+  const storageKey = 'agPolicyDownloadVisitorKey';
+  let key = localStorage.getItem(storageKey);
+  if (!key) {
+    key = 'visitor-' + makePublicReferenceId().replace('AG-2026-', '').replace('-', '') + '-' + Date.now().toString(36);
+    localStorage.setItem(storageKey, key);
+  }
+  return key;
+}
+function getIrelandTimestamp(){
+  return new Date().toLocaleString('en-IE', { timeZone: 'Europe/Dublin', dateStyle: 'medium', timeStyle: 'short' });
+}
+function encodePolicyDownloadPayload(payload){
+  const params = new URLSearchParams();
+  Object.entries(payload).forEach(([key, value]) => params.append(key, value == null ? '' : String(value)));
+  return params.toString();
+}
+async function submitPolicyDownloadAudit(payload){
+  const body = encodePolicyDownloadPayload(payload);
+  let ok = false;
+  try{
+    const fn = await fetch('/.netlify/functions/register-policy-download', {
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    ok = fn.ok;
+  }catch(e){
+    ok = false;
+  }
+  if (!ok) {
+    try{
+      await fetch('/', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body
+      });
+    }catch(e){
+      console.warn('Policy download audit registration failed.', e);
+    }
+  }
+}
+function currentPolicyDownloadPayload(){
+  const emailInput = $('email');
+  const eircodeInput = $('eircode');
+  const currentEmail = resident.email || (emailInput ? emailInput.value.trim().toLowerCase() : '');
+  const currentEircode = resident.eircode || (eircodeInput ? normalizeEircode(eircodeInput.value) : '');
+  return {
+    'form-name':'aderrig-green-policy-download-audit',
+    visitorKey:getPolicyDownloadVisitorKey(),
+    email:currentEmail,
+    eircode:currentEircode,
+    downloadedAtIreland:getIrelandTimestamp(),
+    document:'Aderrig Green Parking Policy Draft',
+    status:'Downloaded Draft Policy'
+  };
+}
+function setupDraftPolicyDownload(){
+  const link = $('draftPolicyDownload');
+  if (!link) return;
+  link.addEventListener('click', () => {
+    submitPolicyDownloadAudit(currentPolicyDownloadPayload());
+  });
+}
+
 async function submitNetlifyVoteBackup(){
   voteEmail.value = resident.email;
   voteEircode.value = resident.eircode;
@@ -180,3 +246,5 @@ voteForm.addEventListener('submit', async (event) => {
   catch(err){ setMessage(voteMessage, err.message); }
   finally{ btn.disabled = false; btn.textContent = 'Submit Vote'; }
 });
+
+setupDraftPolicyDownload();
