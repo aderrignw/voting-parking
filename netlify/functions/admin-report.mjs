@@ -119,6 +119,121 @@ function firstValidRowsByEircode(rows) {
 }
 
 
+async function fetchNetlifyFormSubmissions(formId, token, maxPages = 30) {
+  const all = [];
+  let page = 1;
+  const perPage = 100;
+  while (page <= maxPages) {
+    const url = `https://api.netlify.com/api/v1/forms/${encodeURIComponent(formId)}/submissions?page=${page}&per_page=${perPage}`;
+    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!response.ok) {
+      const text = await response.text();
+      const error = new Error(text.slice(0, 500));
+      error.status = response.status;
+      throw error;
+    }
+    const batch = await response.json();
+    if (!Array.isArray(batch) || batch.length === 0) break;
+    all.push(...batch);
+    if (batch.length < perPage) break;
+    page++;
+  }
+  return all;
+}
+
+async function findDownloadFormId(token) {
+  const configured = String(process.env.NETLIFY_DOWNLOAD_FORM_ID || '').trim();
+  if (configured) return configured;
+
+  const siteId = String(process.env.NETLIFY_SITE_ID || process.env.SITE_ID || '').trim();
+  if (!siteId) return '';
+
+  const response = await fetch(`https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/forms`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) return '';
+  const forms = await response.json();
+  if (!Array.isArray(forms)) return '';
+  const found = forms.find(form => String(form.name || '').toLowerCase() === 'aderrig-green-policy-download-audit');
+  return found?.id || '';
+}
+
+function buildDownloadAudit(downloadSubmissions = [], voteRows = []) {
+  const voteEmails = new Set(voteRows.map(row => String(row.email || '').trim().toLowerCase()).filter(Boolean));
+  const voteEircodes = new Set(voteRows.map(row => String(row.eircode || '').toUpperCase().replace(/\s+/g, '')).filter(Boolean));
+  const groups = new Map();
+
+  for (const item of downloadSubmissions) {
+    const data = item.data || item.form_data || item || {};
+    const visitorKey = String(field(data, ['visitorKey', 'visitor_key', 'visitor', 'Visitor Key']) || item.id || '').trim();
+    const email = String(field(data, ['email', 'Email']) || '').trim().toLowerCase();
+    const eircode = normaliseEircode(field(data, ['eircode', 'Eircode']) || '');
+    const downloadedAt = field(data, ['downloadedAtIreland', 'downloaded_at_ireland', 'downloadedAt']) || safeDate(item.created_at || item.createdAt || new Date().toISOString());
+    const createdAt = item.created_at || item.createdAt || downloadedAt;
+    const key = visitorKey || email || eircode || item.id || `download-${groups.size + 1}`;
+
+    if (!groups.has(key)) {
+      groups.set(key, {
+        visitorKey: key,
+        email: '',
+        eircode: '',
+        downloads: 0,
+        firstDownload: downloadedAt,
+        lastDownload: downloadedAt,
+        firstCreatedAt: createdAt,
+        lastCreatedAt: createdAt,
+        identified: false,
+        voted: false
+      });
+    }
+
+    const group = groups.get(key);
+    group.downloads += 1;
+    if (email) group.email = email;
+    if (eircode) group.eircode = eircode;
+
+    const currentTime = new Date(createdAt).getTime();
+    const firstTime = new Date(group.firstCreatedAt).getTime();
+    const lastTime = new Date(group.lastCreatedAt).getTime();
+    if (!Number.isNaN(currentTime) && (Number.isNaN(firstTime) || currentTime < firstTime)) {
+      group.firstCreatedAt = createdAt;
+      group.firstDownload = downloadedAt;
+    }
+    if (!Number.isNaN(currentTime) && (Number.isNaN(lastTime) || currentTime > lastTime)) {
+      group.lastCreatedAt = createdAt;
+      group.lastDownload = downloadedAt;
+    }
+  }
+
+  const rows = Array.from(groups.values()).map(group => {
+    const eirKey = String(group.eircode || '').toUpperCase().replace(/\s+/g, '');
+    group.identified = !!(group.email || group.eircode);
+    group.voted = (group.email && voteEmails.has(group.email)) || (eirKey && voteEircodes.has(eirKey));
+    return group;
+  }).sort((a, b) => new Date(b.lastCreatedAt) - new Date(a.lastCreatedAt));
+
+  const identifiedRows = rows.filter(row => row.identified);
+  const anonymousRows = rows.filter(row => !row.identified);
+  const totalDownloadClicks = rows.reduce((sum, row) => sum + row.downloads, 0);
+  const identifiedDownloadClicks = identifiedRows.reduce((sum, row) => sum + row.downloads, 0);
+  const anonymousDownloadClicks = anonymousRows.reduce((sum, row) => sum + row.downloads, 0);
+  const votedAfterDownload = identifiedRows.filter(row => row.voted).length;
+
+  return {
+    totalDownloadClicks,
+    uniqueVisitors: rows.length,
+    anonymousVisitors: anonymousRows.length,
+    identifiedVisitors: identifiedRows.length,
+    anonymousDownloadClicks,
+    identifiedDownloadClicks,
+    votedAfterDownload,
+    conversionToVotePercent: pct(votedAfterDownload, identifiedRows.length),
+    rows,
+    anonymousRows,
+    identifiedRows
+  };
+}
+
 function buildReport(submissions, includeRows = false) {
   const rows = submissions.map((item, index) => {
     const data = item.data || item.form_data || item || {};
@@ -253,27 +368,32 @@ export const handler = async (event) => {
     });
   }
 
-  const all = [];
-  let page = 1;
-  const perPage = 100;
-  while (page <= 30) {
-    const url = `https://api.netlify.com/api/v1/forms/${encodeURIComponent(formId)}/submissions?page=${page}&per_page=${perPage}`;
-    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (!response.ok) {
-      const text = await response.text();
-      return json(response.status, {
-        ok: false,
-        isAdmin,
-        authorisedDirector: directorEmail,
-        message: 'Could not read Netlify Forms submissions. Please check NETLIFY_AUTH_TOKEN and NETLIFY_FORM_ID.',
-        detail: text.slice(0, 500)
-      });
+  let all = [];
+  try {
+    all = await fetchNetlifyFormSubmissions(formId, token, 30);
+  } catch (error) {
+    return json(error.status || 500, {
+      ok: false,
+      isAdmin,
+      authorisedDirector: directorEmail,
+      message: 'Could not read Netlify Forms submissions. Please check NETLIFY_AUTH_TOKEN and NETLIFY_FORM_ID.',
+      detail: String(error.message || '').slice(0, 500)
+    });
+  }
+
+  const report = buildReport(all, isAdmin);
+
+  if (isAdmin) {
+    try {
+      const downloadFormId = await findDownloadFormId(token);
+      const downloadSubmissions = downloadFormId ? await fetchNetlifyFormSubmissions(downloadFormId, token, 30) : [];
+      report.downloadAudit = buildDownloadAudit(downloadSubmissions, report.rows || []);
+      report.downloadAuditConfigured = !!downloadFormId;
+    } catch (error) {
+      report.downloadAudit = buildDownloadAudit([], report.rows || []);
+      report.downloadAuditConfigured = false;
+      report.downloadAuditError = String(error.message || '').slice(0, 500);
     }
-    const batch = await response.json();
-    if (!Array.isArray(batch) || batch.length === 0) break;
-    all.push(...batch);
-    if (batch.length < perPage) break;
-    page++;
   }
 
   return json(200, {
@@ -281,6 +401,6 @@ export const handler = async (event) => {
     authorisedDirector: directorEmail,
     isAdmin,
     role: isAdmin ? 'administrator' : 'director',
-    ...buildReport(all, isAdmin)
+    ...report
   });
 };
