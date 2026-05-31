@@ -115,6 +115,40 @@
     .summaryDivider{height:1px;background:#e5eee5;margin:18px 0 12px}
     .validVotesText{font-size:13px;color:var(--muted)}
 
+    .baselinePanel{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      padding:20px 22px;
+      margin:18px 0;
+      border-color:#c9e2ce;
+      background:linear-gradient(135deg,#ffffff,#f2faf3);
+    }
+    .baselineLeft{display:flex;align-items:flex-start;gap:14px;min-width:0}
+    .baselineIcon{
+      width:44px;height:44px;border-radius:16px;
+      display:grid;place-items:center;
+      background:#e8f5ee;color:var(--green);
+      border:1px solid #cbe1cf;
+      font-size:22px;
+      flex:0 0 auto;
+    }
+    .baselineTitle{font-size:15px;font-weight:760;color:var(--green);margin-bottom:5px}
+    .baselineText{font-size:13px;color:var(--muted);line-height:1.4}
+    .baselineGrid{display:grid;grid-template-columns:repeat(3,auto);gap:12px;align-items:center;flex:0 0 auto}
+    .baselineItem{
+      border:1px solid #dfeadf;
+      background:#fff;
+      border-radius:14px;
+      padding:10px 13px;
+      min-width:118px;
+    }
+    .baselineItem span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+    .baselineItem strong{display:block;margin-top:4px;font-size:14px;color:var(--ink);font-weight:700}
+    .baselineItem.status strong{color:var(--green)}
+
+
 
     .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
     .panel{padding:24px;min-height:330px}
@@ -138,10 +172,10 @@
     .configBox{margin-top:16px;background:#fff7e8;border:1px solid #f1d19a;color:#663d00;border-radius:18px;padding:16px;line-height:1.45}
     .csvBox{margin:16px 0;padding:18px;border-radius:20px;border:1px dashed #b8ccb9;background:#fbfdf9}
 
-    @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.resultSplitLayout{grid-template-columns:260px minmax(260px,1fr)}}
+    @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.resultSplitLayout{grid-template-columns:260px minmax(260px,1fr)}.baselinePanel{display:block}.baselineGrid{margin-top:14px;grid-template-columns:repeat(3,1fr)}}
     @media(max-width:720px){
       .heroInner,.top{display:block} .secure{text-align:left;margin-top:14px} .wrap{padding:24px 16px 54px}
-      .grid,.charts,.resultSplitLayout{grid-template-columns:1fr} .actions{justify-content:flex-start;margin-top:16px}
+      .grid,.charts,.resultSplitLayout{grid-template-columns:1fr} .actions{justify-content:flex-start;margin-top:16px}.baselineGrid{grid-template-columns:1fr}
       .login h2,.top h2{font-size:28px} .countdownValue{font-size:24px!important}
     }
     @media print{
@@ -178,6 +212,21 @@
           <button class="secondary adminOnly" id="downloadBtn">⇩ Export full CSV</button>
           <button class="secondary adminOnly" id="downloadSummaryBtn">▣ Download summary CSV</button>
           <button class="light" onclick="window.print()">▣ Print / Save PDF</button>
+        </div>
+      </div>
+
+      <div class="card baselinePanel">
+        <div class="baselineLeft">
+          <div class="baselineIcon">✓</div>
+          <div>
+            <div class="baselineTitle">Official Voting Baseline</div>
+            <div class="baselineText" id="baselineNote">System cleared before official launch. Voting started from zero recorded submissions.</div>
+          </div>
+        </div>
+        <div class="baselineGrid">
+          <div class="baselineItem status"><span>Status</span><strong id="baselineStatus">Confirmed</strong></div>
+          <div class="baselineItem"><span>Starting submissions</span><strong id="baselineSubmissions">0</strong></div>
+          <div class="baselineItem"><span>Established</span><strong id="baselineTime">31 May 2026, 15:32</strong></div>
         </div>
       </div>
 
@@ -256,7 +305,7 @@ function openDashboardShell(admin){$('login').classList.add('hidden');$('dashboa
 function parseCsv(text){const rows=[];let row=[],cur='',q=false;for(let i=0;i<text.length;i++){const ch=text[i],nx=text[i+1];if(ch==='"'&&q&&nx==='"'){cur+='"';i++;continue}if(ch==='"'){q=!q;continue}if(ch===','&&!q){row.push(cur);cur='';continue}if((ch==='\n'||ch==='\r')&&!q){if(cur||row.length){row.push(cur);rows.push(row);row=[];cur=''} if(ch==='\r'&&nx==='\n')i++;continue}cur+=ch}if(cur||row.length){row.push(cur);rows.push(row)}const headers=(rows.shift()||[]).map(h=>h.trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]||''])))}
 function buildFromRows(raw){const rows=raw.map((r,i)=>({number:i+1,email:String(r.email||r.Email||'').trim().toLowerCase(),eircode:ne(r.eircode||r.Eircode||r.postcode||''),vote:nv(r.vote||r.Vote||r.choice||''),confirmed:r.confirmed||r.Confirmed||'',referenceId:r.referenceId||r.publicReferenceId||r.public_reference_id||r.reference_id||r.reference||r.ref||r.id||'',submittedAtIreland:r.submitted_at_ireland||r.submittedAtIreland||r.created_at||r.createdAt||'',createdAt:r.created_at||r.createdAt||r.submitted_at_ireland||''})); const counts={};rows.forEach(r=>{if(r.eircode)counts[r.eircode]=(counts[r.eircode]||0)+1}); const duplicateEircodes=Object.entries(counts).filter(([,c])=>c>1).map(([eircode,count])=>({eircode,count})); const deduped=firstValidRowsByEircode(rows), validRows=deduped.validRows, excludedDuplicateRows=deduped.excludedDuplicateRows; const totalVotes=validRows.length,agree=validRows.filter(r=>r.vote==='Agree').length,doNotAgree=validRows.filter(r=>r.vote==='Do Not Agree').length,unknown=totalVotes-agree-doNotAgree; const validCounts={};validRows.forEach(r=>{if(r.eircode)validCounts[r.eircode]=(validCounts[r.eircode]||0)+1}); const byDayMap={}; validRows.forEach(r=>{const d=new Date(r.createdAt||r.submittedAtIreland); const key=isNaN(d)?String(r.submittedAtIreland).slice(0,10)||'Unknown':d.toISOString().slice(0,10); byDayMap[key]=byDayMap[key]||{date:key,total:0,agree:0,doNotAgree:0,unknown:0}; byDayMap[key].total++; if(r.vote==='Agree')byDayMap[key].agree++; else if(r.vote==='Do Not Agree')byDayMap[key].doNotAgree++; else byDayMap[key].unknown++;}); return {ok:true,isAdmin:true,authorisedDirector:ADMIN_EMAIL,totalResidences:227,generatedAtIreland:new Date().toLocaleString('en-IE',{timeZone:'Europe/Dublin',dateStyle:'medium',timeStyle:'short'}),summary:{totalResidences:227,totalVotes,recordedSubmissions:rows.length,excludedDuplicateVotes:excludedDuplicateRows.length,outstandingResidences:Math.max(227-totalVotes,0),participationRate:pct(totalVotes,227),agree,doNotAgree,unknown,agreePercent:pct(agree,totalVotes),doNotAgreePercent:pct(doNotAgree,totalVotes),unknownPercent:pct(unknown,totalVotes),uniqueEircodes:Object.keys(validCounts).length,duplicateEircodesCount:duplicateEircodes.length,lastSubmission:rows[rows.length-1]||null},duplicateEircodes,excludedDuplicateRows,byDay:Object.values(byDayMap).sort((a,b)=>a.date.localeCompare(b.date)),rows}}
 async function importCsv(){if(!isAdminEmail())return; const f=$('csvFile').files[0]; if(!f)return alert('Choose a CSV file first.'); const text=await f.text(); render(buildFromRows(parseCsv(text)))}
-function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.excludedDuplicateVotes?`${s.excludedDuplicateVotes} duplicate vote(s) excluded`:(s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'); $('lastUpdated').textContent=data.generatedAtIreland||'—'; $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderDup(data.duplicateEircodes||[]); renderTable(currentRows)}}
+function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.excludedDuplicateVotes?`${s.excludedDuplicateVotes} duplicate vote(s) excluded`:(s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'); $('lastUpdated').textContent=data.generatedAtIreland||'—'; const b=data.officialBaseline||{}; if($('baselineStatus')) $('baselineStatus').textContent=b.status||'Confirmed'; if($('baselineSubmissions')) $('baselineSubmissions').textContent=String(b.startingSubmissions??0); if($('baselineTime')) $('baselineTime').textContent=b.establishedAtIreland||'31 May 2026, 15:32'; if($('baselineNote')) $('baselineNote').textContent=b.note||'System cleared before official launch. Voting started from zero recorded submissions.'; $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderDup(data.duplicateEircodes||[]); renderTable(currentRows)}}
 function renderDup(list){if(!list.length){$('duplicatesBox').classList.add('hidden');return}$('duplicatesBox').classList.remove('hidden');$('duplicatesList').innerHTML=list.map(x=>`<span class="pill warn">${esc(x.eircode)} — ${x.count} submissions</span>`).join(' ')}
 function renderTable(rows){if(!isAdminEmail())return; const q=($('search').value||'').toLowerCase(); rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q)); $('tbody').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.submittedAtIreland||r.createdAt)}</td><td><span class="pill ${r.vote==='Agree'?'good':r.vote==='Do Not Agree'?'bad':'warn'}">${esc(r.vote)}</span></td><td>${esc(r.eircode)}</td><td>${esc(r.email)}</td><td>${esc(r.referenceId)}</td><td>${esc(r.confirmed)}</td></tr>`).join('')}
 function drawPie(s){
@@ -363,7 +412,7 @@ function drawTimeline(days){
   });
 }
 function downloadCsv(){if(!isAdminEmail())return; const h=['submittedAtIreland','vote','eircode','email','referenceId','confirmed']; const rows=currentRows.map(r=>h.map(k=>'"'+String(r[k]??'').replace(/"/g,'""')+'"').join(',')); const blob=new Blob([h.join(',')+'\n'+rows.join('\n')],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-full-database.csv';a.click();URL.revokeObjectURL(a.href)}
-function downloadSummary(){if(!isAdminEmail()||!currentReport)return; const s=currentReport.summary||{}; const lines=[['Metric','Value'],['Total residences',s.totalResidences||227],['Votes received',s.totalVotes||0],['Outstanding residences',s.outstandingResidences||0],['Participation rate',(s.participationRate||0)+'%'],['Agree',s.agree||0],['Agree %',(s.agreePercent||0)+'%'],['Do Not Agree',s.doNotAgree||0],['Do Not Agree %',(s.doNotAgreePercent||0)+'%'],['Unique Eircodes',s.uniqueEircodes||0],['Duplicate Eircodes',s.duplicateEircodesCount||0],['Excluded duplicate votes',s.excludedDuplicateVotes||0]]; const csv=lines.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-summary.csv';a.click();URL.revokeObjectURL(a.href)}
+function downloadSummary(){if(!isAdminEmail()||!currentReport)return; const s=currentReport.summary||{}; const lines=[['Metric','Value'],['Total residences',s.totalResidences||227],['Votes received',s.totalVotes||0],['Outstanding residences',s.outstandingResidences||0],['Participation rate',(s.participationRate||0)+'%'],['Agree',s.agree||0],['Agree %',(s.agreePercent||0)+'%'],['Do Not Agree',s.doNotAgree||0],['Do Not Agree %',(s.doNotAgreePercent||0)+'%'],['Unique Eircodes',s.uniqueEircodes||0],['Duplicate Eircodes',s.duplicateEircodesCount||0],['Excluded duplicate votes',s.excludedDuplicateVotes||0],['Official baseline status',(currentReport.officialBaseline||{}).status||'Confirmed'],['Starting submissions',(currentReport.officialBaseline||{}).startingSubmissions??0],['Baseline established',(currentReport.officialBaseline||{}).establishedAtIreland||'31 May 2026, 15:32']]; const csv=lines.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-summary.csv';a.click();URL.revokeObjectURL(a.href)}
 const VOTING_CLOSE_AT=new Date('2026-06-06T23:59:00+01:00');
 function updateVotingCountdown(){
   const el=$('votingCountdown');
