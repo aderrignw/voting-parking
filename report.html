@@ -175,7 +175,18 @@
     .downloadAuditMetric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
     .downloadAuditMetric span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:760}
     .downloadAuditMetric strong{display:block;margin-top:8px;color:var(--green);font-size:24px;line-height:1;font-weight:760}
-    .downloadAuditTables{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+    .downloadAuditTables{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+      gap:16px;
+      margin-top:14px;
+      width:100%;
+      overflow:hidden;
+    }
+    .downloadAuditTables > div{
+      min-width:0;
+      overflow:hidden;
+    }
     .downloadAuditTables h4{margin:0 0 10px;color:var(--green);font-size:15px}
     .miniTableWrap{
       max-height:390px;
@@ -183,31 +194,35 @@
       border:1px solid var(--line);
       border-radius:14px;
       background:#fff;
+      max-width:100%;
     }
     .miniTableWrap table{
-      font-size:12.5px;
-      table-layout:auto;
-      min-width:620px;
+      font-size:12px;
+      table-layout:fixed;
+      width:100%;
+      min-width:0;
     }
     .miniTableWrap th,
     .miniTableWrap td{
-      padding:10px 12px;
+      padding:9px 10px;
       white-space:nowrap;
       line-height:1.25;
-    }
-    .miniTableWrap td{
-      max-width:260px;
       overflow:hidden;
       text-overflow:ellipsis;
+      vertical-align:middle;
     }
+    .miniTableWrap th:nth-child(1),
+    .miniTableWrap td:nth-child(1){width:42%}
     .miniTableWrap th:nth-child(2),
-    .miniTableWrap td:nth-child(2),
+    .miniTableWrap td:nth-child(2){width:16%}
     .miniTableWrap th:nth-child(3),
-    .miniTableWrap td:nth-child(3),
+    .miniTableWrap td:nth-child(3){width:21%}
     .miniTableWrap th:nth-child(4),
-    .miniTableWrap td:nth-child(4){
-      width:1%;
-    }
+    .miniTableWrap td:nth-child(4){width:21%}
+    #identifiedDownloadBody td:nth-child(1){width:46%}
+    #identifiedDownloadBody td:nth-child(2){width:18%}
+    #identifiedDownloadBody td:nth-child(3){width:16%}
+    #identifiedDownloadBody td:nth-child(4){width:20%}
     .downloadSetupNote{margin-top:12px;color:var(--muted);font-size:13px;line-height:1.4}
 
 
