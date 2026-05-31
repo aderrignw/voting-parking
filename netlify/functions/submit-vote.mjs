@@ -10,6 +10,10 @@ const NETLIFY_API_BASE = 'https://api.netlify.com/api/v1';
 const INELIGIBLE_EIRCODE_MESSAGE = 'This consultation is restricted to residents within the Aderrig Green area. The Eircode provided could not be verified as belonging to an eligible residence. Please check your Eircode and try again.';
 const DUPLICATE_EIRCODE_MESSAGE = 'This residence has already voted. One vote per Eircode is permitted.';
 
+function validReferenceId(value) {
+  return /^AG-2026-[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(String(value || '').trim().toUpperCase());
+}
+
 function eligibleAderrigGreenEircode(eircode) {
   return String(eircode || '').replace(/\s+/g, '').startsWith('K78');
 }
@@ -92,6 +96,7 @@ export const handler = async (event) => {
     const eircode = normalizeEircode(body.eircode || '');
     const vote = String(body.vote || '').trim();
     const confirmed = body.confirmed === true || body.confirmed === 'true';
+    const submittedReferenceId = String(body.referenceId || body.reference_id || body.reference || '').trim().toUpperCase();
 
     if (!validEmail(email)) {
       return json(400, { ok: false, message: 'Please enter a valid email address.' });
@@ -128,7 +133,7 @@ export const handler = async (event) => {
     }
 
     const now = new Date();
-    const publicReferenceId = makeReferenceId();
+    const publicReferenceId = validReferenceId(submittedReferenceId) ? submittedReferenceId : makeReferenceId();
 
     return json(200, {
       ok: true,
