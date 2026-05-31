@@ -14,14 +14,19 @@ const reviewDone = $('reviewDone');
 const voteEmail = $('voteEmail');
 const voteEircode = $('voteEircode');
 const voteSubmittedAtIreland = $('voteSubmittedAtIreland');
+const voteReferenceId = $('voteReferenceId');
 let resident = { email: '', eircode: '' };
 let proposalLoaded = false;
 let reviewUnlocked = false;
 let reviewInterval = null;
 const REVIEW_SECONDS = 75;
+const INELIGIBLE_EIRCODE_MESSAGE = 'This consultation is restricted to residents within the Aderrig Green area. The Eircode provided could not be verified as belonging to an eligible residence. Please check your Eircode and try again.';
 
 function normalizeEircode(value){
   return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/^(.{3})(.{4})$/, '$1 $2');
+}
+function eligibleAderrigGreenEircode(eircode){
+  return String(eircode || '').replace(/\s+/g, '').startsWith('K78');
 }
 function setMessage(el, text, ok=false){
   el.textContent = text || '';
@@ -35,10 +40,19 @@ function serviceUnavailableMessage(){
 function encodeNetlifyForm(form){
   return new URLSearchParams(new FormData(form)).toString();
 }
+function makePublicReferenceId(){
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  let out = '';
+  for (const b of bytes) out += alphabet[b % alphabet.length];
+  return `AG-2026-${out.slice(0,4)}-${out.slice(4,8)}`;
+}
 async function submitNetlifyVoteBackup(){
   voteEmail.value = resident.email;
   voteEircode.value = resident.eircode;
   voteSubmittedAtIreland.value = new Date().toLocaleString('en-IE', { timeZone: 'Europe/Dublin', dateStyle: 'medium', timeStyle: 'short' });
+  if (voteReferenceId && !voteReferenceId.value) voteReferenceId.value = makePublicReferenceId();
   const res = await fetch('/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -113,6 +127,7 @@ verifyForm.addEventListener('submit', async (event) => {
   const eircode = normalizeEircode($('eircode').value);
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) return setMessage(verifyMessage, 'Please enter a valid email address.');
   if (!/^[A-Z0-9]{3}\s[A-Z0-9]{4}$/.test(eircode)) return setMessage(verifyMessage, 'Please enter a valid Eircode, e.g. K78 XXXX.');
+  if (!eligibleAderrigGreenEircode(eircode)) return setMessage(verifyMessage, INELIGIBLE_EIRCODE_MESSAGE);
   const btn = verifyForm.querySelector('button');
   btn.disabled = true; btn.textContent = 'Checking...';
   try{
@@ -135,9 +150,12 @@ voteForm.addEventListener('submit', async (event) => {
   const btn = voteForm.querySelector('button');
   btn.disabled = true; btn.textContent = 'Submitting...';
   try{
-    const result = await postJSON('/.netlify/functions/submit-vote', { ...resident, vote:selected, confirmed });
+    const publicReferenceId = makePublicReferenceId();
+    if (voteReferenceId) voteReferenceId.value = publicReferenceId;
+    const result = await postJSON('/.netlify/functions/submit-vote', { ...resident, vote:selected, confirmed, referenceId: publicReferenceId });
+    const ref = result?.record?.referenceId || publicReferenceId;
+    if (voteReferenceId) voteReferenceId.value = ref;
     try { await submitNetlifyVoteBackup(); } catch (formsErr) { console.warn(formsErr); }
-    const ref = result?.record?.referenceId || '';
     sessionStorage.setItem('agVoteReferenceId', ref);
     window.location.href = 'success.html?ref=' + encodeURIComponent(ref);
   }
