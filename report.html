@@ -211,16 +211,20 @@
       text-overflow:ellipsis;
       vertical-align:middle;
     }
-    .miniTableWrap th:nth-child(1),
-    .miniTableWrap td:nth-child(1){width:52%}
-    .miniTableWrap th:nth-child(2),
-    .miniTableWrap td:nth-child(2){width:16%}
-    .miniTableWrap th:nth-child(3),
-    .miniTableWrap td:nth-child(3){width:32%}
-    #identifiedDownloadBody td:nth-child(1){width:46%}
-    #identifiedDownloadBody td:nth-child(2){width:18%}
-    #identifiedDownloadBody td:nth-child(3){width:16%}
-    #identifiedDownloadBody td:nth-child(4){width:20%}
+    .anonymousAuditTable th:nth-child(1),
+    .anonymousAuditTable td:nth-child(1){width:52%}
+    .anonymousAuditTable th:nth-child(2),
+    .anonymousAuditTable td:nth-child(2){width:16%}
+    .anonymousAuditTable th:nth-child(3),
+    .anonymousAuditTable td:nth-child(3){width:32%}
+    .identifiedAuditTable th:nth-child(1),
+    .identifiedAuditTable td:nth-child(1){width:46%}
+    .identifiedAuditTable th:nth-child(2),
+    .identifiedAuditTable td:nth-child(2){width:18%}
+    .identifiedAuditTable th:nth-child(3),
+    .identifiedAuditTable td:nth-child(3){width:16%}
+    .identifiedAuditTable th:nth-child(4),
+    .identifiedAuditTable td:nth-child(4){width:20%}
     .downloadSetupNote{margin-top:12px;color:var(--muted);font-size:13px;line-height:1.4}
 
 
@@ -341,11 +345,11 @@
         <div class="downloadAuditTables">
           <div>
             <h4>Anonymous download visitors</h4>
-            <div class="miniTableWrap"><table><thead><tr><th>Visitor</th><th>Downloads</th><th>Last Download</th></tr></thead><tbody id="anonymousDownloadBody"></tbody></table></div>
+            <div class="miniTableWrap"><table class="anonymousAuditTable"><thead><tr><th>Visitor</th><th>Downloads</th><th>Last Download</th></tr></thead><tbody id="anonymousDownloadBody"></tbody></table></div>
           </div>
           <div>
             <h4>Identified download visitors</h4>
-            <div class="miniTableWrap"><table><thead><tr><th>Email</th><th>Eircode</th><th>Downloads</th><th>Voted</th></tr></thead><tbody id="identifiedDownloadBody"></tbody></table></div>
+            <div class="miniTableWrap"><table class="identifiedAuditTable"><thead><tr><th>Email</th><th>Eircode</th><th>Downloads</th><th>Voted</th></tr></thead><tbody id="identifiedDownloadBody"></tbody></table></div>
           </div>
         </div>
         <p class="downloadSetupNote" id="downloadAuditNote"></p>
