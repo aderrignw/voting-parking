@@ -61,6 +61,8 @@ function field(data, names) {
 function submissionReference(item, data) {
   return field(data, [
     'referenceId',
+    'publicReferenceId',
+    'public_reference_id',
     'reference_id',
     'reference',
     'Reference',
