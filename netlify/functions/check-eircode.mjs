@@ -3,9 +3,25 @@ import { json, normalizeEircode, validEircode } from './_utils.mjs';
 const NETLIFY_API_BASE = 'https://api.netlify.com/api/v1';
 const INELIGIBLE_EIRCODE_MESSAGE = 'This consultation is restricted to residents within the Aderrig Green area. The Eircode provided could not be verified as belonging to an eligible residence. Please check your Eircode and try again.';
 const DUPLICATE_EIRCODE_MESSAGE = 'This residence has already voted. One vote per Eircode is permitted.';
+const INVALID_EIRCODE_MESSAGE = 'This Eircode does not appear to be a valid residential Eircode. Please check the Eircode and try again.';
 
 function eligibleAderrigGreenEircode(eircode) {
   return String(eircode || '').replace(/\s+/g, '').startsWith('K78');
+}
+
+function clearlyInvalidEircode(eircode) {
+  const compact = String(eircode || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!/^K78[A-Z0-9]{4}$/.test(compact)) return false;
+
+  const unique = compact.slice(3);
+
+  if (['0000', 'XXXX', 'TEST'].includes(unique)) return true;
+  if (/^([A-Z0-9])\1{3}$/.test(unique)) return true;
+  if (/^1234$/.test(unique)) return true;
+  if (/^ABCD$/.test(unique)) return true;
+  if (/^ZZZZ$/.test(unique)) return true;
+
+  return false;
 }
 
 function getFieldValue(submission, fieldName) {
@@ -76,6 +92,14 @@ export const handler = async (event) => {
         ok: false,
         eligible: false,
         message: INELIGIBLE_EIRCODE_MESSAGE
+      });
+    }
+
+    if (clearlyInvalidEircode(eircode)) {
+      return json(400, {
+        ok: false,
+        eligible: false,
+        message: INVALID_EIRCODE_MESSAGE
       });
     }
 
