@@ -277,6 +277,38 @@
     .unknownEircodeBox.open{display:block}
     .unknownEircodeBox h4{margin:0 0 8px;color:var(--red);font-size:14px}
 
+    /* Uniform management layout refinement */
+    .grid{gap:14px;margin:14px 0}
+    .metric{min-height:112px;padding:19px 20px;padding-right:76px}
+    .metricIcon{right:18px;top:18px;width:42px;height:42px;font-size:21px}
+    .label{font-size:12px;letter-spacing:.075em}
+    .value{font-size:31px;margin-top:10px}
+    .note{font-size:13px;margin-top:8px}
+    .countdownValue{font-size:22px!important;line-height:1.15}
+    #lastUpdated{font-size:21px!important;line-height:1.15}
+    .charts{gap:14px;margin:14px 0}
+    .panel{padding:22px;min-height:292px}
+    .panel h3{font-size:18px;margin-bottom:14px}
+    .streetBreakdownPanel{padding:18px 22px;min-height:0;margin:14px 0 12px}
+    .streetHeader{margin-bottom:12px}
+    .streetHeader h3{font-size:18px}
+    .streetHeader .small{font-size:13px;margin:4px 0 0}
+    .streetActions button{font-size:13px;min-height:36px;padding:9px 13px}
+    .streetGridCompact{grid-template-columns:minmax(0,1.48fr) minmax(300px,.52fr);gap:18px}
+    .streetList{gap:8px}
+    .streetRowCompact{grid-template-columns:30px minmax(220px,1fr) 66px 58px minmax(150px,.75fr) 48px;gap:11px;padding:10px 12px;font-size:14px;border-radius:14px}
+    .streetRank{width:26px;height:26px;font-size:12px}
+    .streetNum{font-size:14px}
+    .streetNum span{font-size:11px;margin-top:2px}
+    .streetRateTrack{height:9px}
+    .streetRateFill{height:9px}
+    .streetRate{font-size:14px}
+    .streetInsights{padding:16px;border-radius:16px}
+    .streetInsights h4{font-size:16px;margin-bottom:12px}
+    .streetInsightLine{font-size:13px;padding:9px 0}
+    .streetUnknown{font-size:14px;line-height:1.45}
+    .csvBox{margin:12px 0;padding:18px}
+
     @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.streetGridCompact{grid-template-columns:1fr}.resultSplitLayout{grid-template-columns:260px minmax(260px,1fr)}.baselinePanel{display:block}.baselineGrid{margin-top:14px;grid-template-columns:repeat(3,1fr)}.downloadAuditGrid{grid-template-columns:repeat(2,1fr)}.downloadAuditTables{grid-template-columns:1fr}}
     @media(max-width:720px){
       .heroInner,.top,.streetHeader{display:block} .secure{text-align:left;margin-top:14px} .wrap{padding:24px 16px 54px}
@@ -518,7 +550,7 @@ function renderStreetBreakdown(breakdown){
   }
   const btn=$('streetTableBtn');
   if(btn){
-    btn.textContent=streetShowAll?'▴ Show top 5':'▣ Show all streets';
+    btn.textContent=streetShowAll?'▴ Show top 5':'▣ View all streets';
     btn.style.display=rows.length>5?'inline-flex':'none';
   }
   const totalPotential=breakdown?.totalPotential||rows.reduce((s,r)=>s+(Number(r.potential)||0),0);
