@@ -12,8 +12,8 @@ const OFFICIAL_BASELINE = {
   confirmed: true,
   status: 'Confirmed',
   startingSubmissions: 0,
-  establishedAtIreland: '31 May 2026, 15:32',
-  establishedAtIso: '2026-05-31T15:32:03.298857+01:00',
+  establishedAtIreland: '01 Jun 2026, 15:31',
+  establishedAtIso: '2026-06-01T15:31:00+01:00',
   note: 'System cleared before official launch. Voting started from zero recorded submissions.'
 };
 const DEFAULT_DIRECTORS = [
