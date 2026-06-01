@@ -16,6 +16,7 @@ const OFFICIAL_BASELINE = {
   establishedAtIso: '2026-06-01T15:31:00+01:00',
   note: 'System cleared before official launch. Voting started from zero recorded submissions.'
 };
+const OFFICIAL_RESIDENT_BASE = [{"eircodeKey":"K78N8X7","street":"Adamstown Way"},{"eircodeKey":"K78W1W7","street":"Adamstown Way"},{"eircodeKey":"K78T6C9","street":"Adamstown Way"},{"eircodeKey":"K78P6H2","street":"Adamstown Way"},{"eircodeKey":"K78T8N2","street":"Adamstown Way"},{"eircodeKey":"K78T2W8","street":"Adamstown Way"},{"eircodeKey":"K78T6X7","street":"Adamstown Way"},{"eircodeKey":"K78R2H6","street":"Adamstown Way"},{"eircodeKey":"K78E7Y0","street":"Adamstown Way"},{"eircodeKey":"K78A8P3","street":"Adamstown Way"},{"eircodeKey":"K78N9P3","street":"Adamstown Way"},{"eircodeKey":"K78Y0E0","street":"Adamstown Way"},{"eircodeKey":"K78C2H9","street":"Adamstown Way"},{"eircodeKey":"K78R6P2","street":"Adamstown Way"},{"eircodeKey":"K78X2R5","street":"Adamstown Way"},{"eircodeKey":"K78P8W6","street":"Adamstown Way"},{"eircodeKey":"K78E6H9","street":"Adamstown Way"},{"eircodeKey":"K78N7P0","street":"Adamstown Way"},{"eircodeKey":"K78H2P3","street":"Aderrig Court"},{"eircodeKey":"K78E6F2","street":"Aderrig Court"},{"eircodeKey":"K78T8X5","street":"Aderrig Court"},{"eircodeKey":"K78X3E8","street":"Aderrig Court"},{"eircodeKey":"K78V2X6","street":"Aderrig Court"},{"eircodeKey":"K78W4C0","street":"Aderrig Court"},{"eircodeKey":"K78F2P2","street":"Aderrig Court"},{"eircodeKey":"K78Y7Y8","street":"Aderrig Court"},{"eircodeKey":"K78H6N3","street":"Aderrig Court"},{"eircodeKey":"K78Y9K3","street":"Aderrig Court"},{"eircodeKey":"K78E3W6","street":"Aderrig Court"},{"eircodeKey":"K78W2N4","street":"Aderrig Court"},{"eircodeKey":"K78C2R4","street":"Aderrig Court"},{"eircodeKey":"K78A2C2","street":"Aderrig Court"},{"eircodeKey":"K78P2Y2","street":"Aderrig Court"},{"eircodeKey":"K78E7C9","street":"Aderrig Court"},{"eircodeKey":"K78A0F3","street":"Aderrig Court"},{"eircodeKey":"K78R9P9","street":"Aderrig Court"},{"eircodeKey":"K78P3K6","street":"Aderrig Green"},{"eircodeKey":"K78A8N2","street":"Aderrig Green"},{"eircodeKey":"K78W2P3","street":"Aderrig Green"},{"eircodeKey":"K78T2F5","street":"Aderrig Green"},{"eircodeKey":"K78E0W4","street":"Aderrig Green"},{"eircodeKey":"K78A9X7","street":"Aderrig Green"},{"eircodeKey":"K78X6N2","street":"Aderrig Green"},{"eircodeKey":"K78P2C8","street":"Aderrig Green"},{"eircodeKey":"K78K5W8","street":"Aderrig Green"},{"eircodeKey":"K78Y9E2","street":"Aderrig Green"},{"eircodeKey":"K78C8C4","street":"Aderrig Green"},{"eircodeKey":"K78A5F1","street":"Aderrig Green"},{"eircodeKey":"K78T1W6","street":"Aderrig Green"},{"eircodeKey":"K78N6P9","street":"Aderrig Green"},{"eircodeKey":"K78H7R2","street":"Aderrig Green"},{"eircodeKey":"K78K3H1","street":"Aderrig Green"},{"eircodeKey":"K78K7W7","street":"Aderrig Grove"},{"eircodeKey":"K78T3V1","street":"Aderrig Grove"},{"eircodeKey":"K78X0F4","street":"Aderrig Grove"},{"eircodeKey":"K78H0F3","street":"Aderrig Grove"},{"eircodeKey":"K78E9R2","street":"Aderrig Grove"},{"eircodeKey":"K78Y6X5","street":"Aderrig Grove"},{"eircodeKey":"K78K2T0","street":"Aderrig Grove"},{"eircodeKey":"K78X5K5","street":"Aderrig Grove"},{"eircodeKey":"K78W3C9","street":"Aderrig Grove"},{"eircodeKey":"K78R6C8","street":"Aderrig Grove"},{"eircodeKey":"K78W7P8","street":"Aderrig Grove"},{"eircodeKey":"K78W1K6","street":"Aderrig Grove"},{"eircodeKey":"K78W5A0","street":"Aderrig Grove"},{"eircodeKey":"K78N2N4","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78N5K0","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78E6N3","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78V3Y4","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78K2R4","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78Y2E5","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78H2F4","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78V0T9","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78T2N5","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78T9P8","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78V8K0","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78H7K3","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78R6C1","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78E4H3","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78P6V3","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78W2T7","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78Y3V6","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78N4X9","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78A2K3","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78E7Y4","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78H9F9","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78K3K2","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78E7R6","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78V9H2","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78E0K1","street":"Aderrig Heights, Celbridge Link Road"},{"eircodeKey":"K78T9H6","street":"Aderrig Lane"},{"eircodeKey":"K78P8E8","street":"Aderrig Lane"},{"eircodeKey":"K78C2W6","street":"Aderrig Lane"},{"eircodeKey":"K78H9Y5","street":"Aderrig Lane"},{"eircodeKey":"K78W2R3","street":"Aderrig Lane"},{"eircodeKey":"K78C9V6","street":"Aderrig Lane"},{"eircodeKey":"K78W6E4","street":"Aderrig Lane"},{"eircodeKey":"K78X4Y7","street":"Aderrig Lane"},{"eircodeKey":"K78P8N4","street":"Aderrig Lane"},{"eircodeKey":"K78R7F4","street":"Aderrig Lane"},{"eircodeKey":"K78E9R7","street":"Aderrig Lane"},{"eircodeKey":"K78X5X4","street":"Aderrig Lane"},{"eircodeKey":"K78Y5R3","street":"Aderrig Lane"},{"eircodeKey":"K78A2C9","street":"Aderrig Lane"},{"eircodeKey":"K78X5C6","street":"Aderrig Lane"},{"eircodeKey":"K78V5X8","street":"Aderrig Lane"},{"eircodeKey":"K78X6W2","street":"Aderrig Lane"},{"eircodeKey":"K78K5P1","street":"Aderrig Lane"},{"eircodeKey":"K78E4P9","street":"Aderrig Lane"},{"eircodeKey":"K78R1X7","street":"Aderrig Lane"},{"eircodeKey":"K78A3P8","street":"Aderrig Lane"},{"eircodeKey":"K78P6Y2","street":"Aderrig Lane"},{"eircodeKey":"K78X2W8","street":"Aderrig Lane"},{"eircodeKey":"K78V0Y8","street":"Aderrig Lane"},{"eircodeKey":"K78X8N9","street":"Aderrig Lane"},{"eircodeKey":"K78Y9P8","street":"Aderrig Lawn"},{"eircodeKey":"K78W5K3","street":"Aderrig Lawn"},{"eircodeKey":"K78E9T2","street":"Aderrig Lawn"},{"eircodeKey":"K78W9N2","street":"Aderrig Lawn"},{"eircodeKey":"K78N2T8","street":"Aderrig Lawn"},{"eircodeKey":"K78Y7N6","street":"Aderrig Lawn"},{"eircodeKey":"K78W2H5","street":"Aderrig Lawn"},{"eircodeKey":"K78E4E9","street":"Aderrig Lawn"},{"eircodeKey":"K78A6W0","street":"Aderrig Lawn"},{"eircodeKey":"K78F9X2","street":"Aderrig Lawn"},{"eircodeKey":"K78R6T2","street":"Aderrig Lawn"},{"eircodeKey":"K78N2K4","street":"Aderrig Lawn"},{"eircodeKey":"K78Y2R3","street":"Aderrig Lawn"},{"eircodeKey":"K78K2P1","street":"Aderrig Lawn"},{"eircodeKey":"K78W6A0","street":"Aderrig Lawn"},{"eircodeKey":"K78K2X3","street":"Aderrig Park Avenue"},{"eircodeKey":"K78R2N7","street":"Aderrig Park Avenue"},{"eircodeKey":"K78H2F1","street":"Aderrig Park Avenue"},{"eircodeKey":"K78X8X3","street":"Aderrig Park Avenue"},{"eircodeKey":"K78X6C5","street":"Aderrig Park Avenue"},{"eircodeKey":"K78K0T3","street":"Aderrig Park Avenue"},{"eircodeKey":"K78K7X6","street":"Aderrig Park Avenue"},{"eircodeKey":"K78V9X7","street":"Aderrig Park Avenue"},{"eircodeKey":"K78R3P1","street":"Aderrig Park Avenue"},{"eircodeKey":"K78A6Y1","street":"Aderrig Park Avenue"},{"eircodeKey":"K78Y0T0","street":"Aderrig Park Avenue"},{"eircodeKey":"K78V0A3","street":"Aderrig Park Avenue"},{"eircodeKey":"K78C7N0","street":"Aderrig Park Avenue"},{"eircodeKey":"K78N2T7","street":"Aderrig Park Avenue"},{"eircodeKey":"K78C2H2","street":"Aderrig Park Avenue"},{"eircodeKey":"K78H6P5","street":"Aderrig Park Avenue"},{"eircodeKey":"K78N5X7","street":"Aderrig Park Avenue"},{"eircodeKey":"K78W1X4","street":"Aderrig Park Avenue"},{"eircodeKey":"K78A0E2","street":"Aderrig Park Avenue"},{"eircodeKey":"K78E7F7","street":"Aderrig Park Avenue"},{"eircodeKey":"K78A6K2","street":"Aderrig Park Avenue"},{"eircodeKey":"K78W1C9","street":"Aderrig Park Avenue"},{"eircodeKey":"K78F4A3","street":"Aderrig Park Avenue"},{"eircodeKey":"K78A9F4","street":"Aderrig Park Avenue"},{"eircodeKey":"K78R9C8","street":"Aderrig Park Avenue"},{"eircodeKey":"K78T9K3","street":"Aderrig Park Avenue"},{"eircodeKey":"K78F5C8","street":"Aderrig Park Avenue"},{"eircodeKey":"K78W6V9","street":"Aderrig Park Avenue"},{"eircodeKey":"K78R2K2","street":"Aderrig Park Avenue"},{"eircodeKey":"K78X0N7","street":"Aderrig Park Avenue"},{"eircodeKey":"K78H2K8","street":"Aderrig Park Avenue"},{"eircodeKey":"K78C3V2","street":"Aderrig Park Avenue"},{"eircodeKey":"K78A0W5","street":"Aderrig Park Avenue"},{"eircodeKey":"K78T9P6","street":"Aderrig Park Avenue"},{"eircodeKey":"K78C9F7","street":"Aderrig Park Avenue"},{"eircodeKey":"K78T1W9","street":"Aderrig Park Avenue"},{"eircodeKey":"K78C6W7","street":"Aderrig Park Avenue"},{"eircodeKey":"K78K8W9","street":"Aderrig Park Avenue"},{"eircodeKey":"K78Y6P8","street":"Aderrig Park Avenue"},{"eircodeKey":"K78R1X2","street":"Aderrig Park Avenue"},{"eircodeKey":"K78F8C2","street":"Aderrig Place"},{"eircodeKey":"K78Y8X3","street":"Aderrig Place"},{"eircodeKey":"K78W3K1","street":"Aderrig Place"},{"eircodeKey":"K78Y9V9","street":"Aderrig Place"},{"eircodeKey":"K78W9Y0","street":"Aderrig Place"},{"eircodeKey":"K78A0X6","street":"Aderrig Place"},{"eircodeKey":"K78C9C4","street":"Aderrig Place"},{"eircodeKey":"K78A3H5","street":"Aderrig Place"},{"eircodeKey":"K78A9K6","street":"Aderrig Place"},{"eircodeKey":"K78W6W0","street":"Aderrig Place"},{"eircodeKey":"K78W9E8","street":"Aderrig Place"},{"eircodeKey":"K78A5R7","street":"Aderrig Place"},{"eircodeKey":"K78H2Y5","street":"Aderrig Place"},{"eircodeKey":"K78C8H2","street":"Aderrig Street"},{"eircodeKey":"K78P9Y1","street":"Aderrig Street"},{"eircodeKey":"K78F2R9","street":"Aderrig Street"},{"eircodeKey":"K78Y6Y3","street":"Aderrig Street"},{"eircodeKey":"K78F8A0","street":"Aderrig Street"},{"eircodeKey":"K78E6W4","street":"Aderrig Street"},{"eircodeKey":"K78T3Y4","street":"Aderrig Street"},{"eircodeKey":"K78Y3C8","street":"Aderrig Street"},{"eircodeKey":"K78F2A2","street":"Aderrig Street"},{"eircodeKey":"K78T3H5","street":"Aderrig Street"},{"eircodeKey":"K78V2C6","street":"Aderrig Street"},{"eircodeKey":"K78N8E8","street":"Aderrig Street"},{"eircodeKey":"K78C3C7","street":"Aderrig Street"},{"eircodeKey":"K78X3F4","street":"Aderrig Street"},{"eircodeKey":"K78K5K6","street":"Aderrig Street"},{"eircodeKey":"K78C3Y1","street":"Aderrig Walk"},{"eircodeKey":"K78R8C1","street":"Aderrig Walk"},{"eircodeKey":"K78V8E8","street":"Aderrig Walk"},{"eircodeKey":"K78E2K3","street":"Aderrig Walk"},{"eircodeKey":"K78C8P3","street":"Aderrig Walk"},{"eircodeKey":"K78A2P2","street":"Aderrig Walk"},{"eircodeKey":"K78Y9C3","street":"Aderrig Walk"},{"eircodeKey":"K78P7Y2","street":"Aderrig Walk"},{"eircodeKey":"K78F2C0","street":"Aderrig Walk"},{"eircodeKey":"K78P9K8","street":"Aderrig Walk"},{"eircodeKey":"K78C9W2","street":"Aderrig Walk"},{"eircodeKey":"K78N2W7","street":"Aderrig Walk"},{"eircodeKey":"K78Y3K5","street":"Airlie Park Road West"},{"eircodeKey":"K78F6Y7","street":"Airlie Park Road West"},{"eircodeKey":"K78R7Y5","street":"Airlie Park Road West"},{"eircodeKey":"K78A2T6","street":"Airlie Park Road West"},{"eircodeKey":"K78K1W7","street":"Airlie Park Road West"},{"eircodeKey":"K78H2V1","street":"Airlie Park Road West"},{"eircodeKey":"K78W5H9","street":"Airlie Park Road West"},{"eircodeKey":"K78T1F3","street":"Airlie Park Road West"},{"eircodeKey":"K78K5C3","street":"Airlie Park Road West"},{"eircodeKey":"K78A2Y5","street":"Airlie Park Road West"},{"eircodeKey":"K78W8Y9","street":"Airlie Park Road West"},{"eircodeKey":"K78F9R2","street":"Airlie Park Road West"},{"eircodeKey":"K78X8K5","street":"Airlie Park Road West"},{"eircodeKey":"K78W2X7","street":"Airlie Park Road West"},{"eircodeKey":"K78W3V7","street":"Airlie Park Road West"},{"eircodeKey":"K78W2N9","street":"Airlie Park Road West"},{"eircodeKey":"K78X6R7","street":"Airlie Park Road West"}];
 const DEFAULT_DIRECTORS = [
   'selerizzuti@gmail.com',
   'bahrikaran@gmail.com',
@@ -118,6 +119,74 @@ function firstValidRowsByEircode(rows) {
   return { validRows, excludedDuplicateRows };
 }
 
+
+
+function eircodeKey(value = '') {
+  return String(value || '').toUpperCase().replace(/\s+/g, '');
+}
+
+function buildStreetBreakdown(validRows = []) {
+  const baseByEircode = new Map();
+  const streetMap = new Map();
+
+  for (const item of OFFICIAL_RESIDENT_BASE) {
+    const key = eircodeKey(item.eircodeKey);
+    if (!key) continue;
+    const street = String(item.street || 'Unknown street').trim() || 'Unknown street';
+    baseByEircode.set(key, street);
+    if (!streetMap.has(street)) {
+      streetMap.set(street, {
+        street,
+        potential: 0,
+        votes: 0,
+        participationRate: 0
+      });
+    }
+    streetMap.get(street).potential += 1;
+  }
+
+  const unknownEircodesMap = new Map();
+
+  for (const row of validRows) {
+    const key = eircodeKey(row.eircode);
+    if (!key) continue;
+    const street = baseByEircode.get(key);
+    if (!street) {
+      if (!unknownEircodesMap.has(key)) {
+        unknownEircodesMap.set(key, {
+          eircode: normaliseEircode(key),
+          firstSubmitted: row.submittedAtIreland || safeDate(row.createdAt),
+          vote: row.vote || 'Unknown',
+          referenceId: row.referenceId || ''
+        });
+      }
+      continue;
+    }
+    if (!streetMap.has(street)) {
+      streetMap.set(street, {
+        street,
+        potential: 0,
+        votes: 0,
+        participationRate: 0
+      });
+    }
+    streetMap.get(street).votes += 1;
+  }
+
+  const streets = Array.from(streetMap.values())
+    .map(row => ({
+      ...row,
+      participationRate: pct(row.votes, row.potential)
+    }))
+    .sort((a, b) => b.participationRate - a.participationRate || b.votes - a.votes || b.potential - a.potential || a.street.localeCompare(b.street));
+
+  return {
+    totalPotential: streets.reduce((sum, row) => sum + row.potential, 0),
+    matchedVotes: streets.reduce((sum, row) => sum + row.votes, 0),
+    unknownEircodes: Array.from(unknownEircodesMap.values()),
+    streets
+  };
+}
 
 async function fetchNetlifyFormSubmissions(formId, token, maxPages = 30) {
   const all = [];
@@ -318,7 +387,8 @@ function buildReport(submissions, includeRows = false) {
       duplicateEircodesCount: duplicateEircodes.length,
       lastSubmission: includeRows ? lastSubmission : null
     },
-    byDay: Object.values(byDayMap).sort((a, b) => a.date.localeCompare(b.date))
+    byDay: Object.values(byDayMap).sort((a, b) => a.date.localeCompare(b.date)),
+    streetBreakdown: includeRows ? buildStreetBreakdown(validRows) : null
   };
 
   if (includeRows) {
