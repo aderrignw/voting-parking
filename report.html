@@ -228,11 +228,65 @@
     .downloadSetupNote{margin-top:12px;color:var(--muted);font-size:13px;line-height:1.4}
 
 
-    @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.resultSplitLayout{grid-template-columns:260px minmax(260px,1fr)}.baselinePanel{display:block}.baselineGrid{margin-top:14px;grid-template-columns:repeat(3,1fr)}.downloadAuditGrid{grid-template-columns:repeat(2,1fr)}.downloadAuditTables{grid-template-columns:1fr}}
+
+    .streetBreakdownPanel{padding:20px 22px;min-height:0;margin:14px 0}
+    .streetHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+    .streetHeader h3{margin:0;color:var(--green);font-size:18px;font-weight:700;letter-spacing:-.02em}
+    .streetHeader .small{margin:4px 0 0;font-size:12px}
+    .streetActions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .streetActions button{font-size:12px;min-height:36px;padding:9px 12px}
+    .streetGridCompact{display:grid;grid-template-columns:1.35fr .65fr;gap:18px;align-items:start}
+    .streetList{display:grid;gap:9px}
+    .streetRowCompact{
+      display:grid;
+      grid-template-columns:28px minmax(160px,1fr) 58px 48px minmax(120px,.8fr) 44px;
+      gap:10px;
+      align-items:center;
+      padding:8px 10px;
+      border:1px solid #edf2ee;
+      border-radius:13px;
+      background:#fff;
+      font-size:12px;
+    }
+    .streetRank{
+      width:24px;height:24px;border-radius:50%;
+      background:#e8f5ee;color:var(--green);
+      display:grid;place-items:center;font-weight:760;font-size:11px;
+    }
+    .streetName{font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .streetNum{text-align:right;color:var(--ink);font-weight:700}
+    .streetNum span{display:block;color:var(--muted);font-size:10px;font-weight:600;margin-top:1px}
+    .streetRateTrack{height:8px;background:#edf2ee;border-radius:999px;overflow:hidden}
+    .streetRateFill{height:8px;background:linear-gradient(90deg,#cfe5d1,var(--green2));border-radius:999px}
+    .streetRate{text-align:right;font-weight:760;color:var(--green)}
+    .streetInsights{
+      border:1px solid #dfeadf;
+      border-radius:16px;
+      background:linear-gradient(135deg,#ffffff,#f7fbf6);
+      padding:14px;
+      min-height:100%;
+    }
+    .streetInsights h4{margin:0 0 10px;color:var(--green);font-size:14px}
+    .streetInsightLine{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #edf2ee;padding:8px 0;font-size:12px}
+    .streetInsightLine:last-child{border-bottom:0}
+    .streetInsightLine span{color:var(--muted)}
+    .streetInsightLine strong{color:var(--ink);text-align:right}
+    .streetUnknown{margin-top:12px;border-top:1px dashed #dfeadf;padding-top:12px}
+    .streetUnknown strong{color:var(--red)}
+    .streetFullTable{margin-top:12px;display:none}
+    .streetFullTable.open{display:block}
+    .streetFullTable .miniTableWrap{max-height:330px}
+    .streetFullTable table{font-size:12px}
+    .streetFullTable th,.streetFullTable td{padding:9px 10px}
+    .unknownEircodeBox{margin-top:12px;display:none}
+    .unknownEircodeBox.open{display:block}
+    .unknownEircodeBox h4{margin:0 0 8px;color:var(--red);font-size:14px}
+
+    @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.streetGridCompact{grid-template-columns:1fr}.resultSplitLayout{grid-template-columns:260px minmax(260px,1fr)}.baselinePanel{display:block}.baselineGrid{margin-top:14px;grid-template-columns:repeat(3,1fr)}.downloadAuditGrid{grid-template-columns:repeat(2,1fr)}.downloadAuditTables{grid-template-columns:1fr}}
     @media(max-width:720px){
-      .heroInner,.top{display:block} .secure{text-align:left;margin-top:14px} .wrap{padding:24px 16px 54px}
-      .grid,.charts,.resultSplitLayout{grid-template-columns:1fr} .actions{justify-content:flex-start;margin-top:16px}.baselineGrid{grid-template-columns:1fr}.downloadAuditGrid{grid-template-columns:1fr}
-      .login h2,.top h2{font-size:28px} .countdownValue{font-size:24px!important}
+      .heroInner,.top,.streetHeader{display:block} .secure{text-align:left;margin-top:14px} .wrap{padding:24px 16px 54px}
+      .grid,.charts,.resultSplitLayout,.streetGridCompact{grid-template-columns:1fr} .actions{justify-content:flex-start;margin-top:16px}.baselineGrid{grid-template-columns:1fr}.downloadAuditGrid{grid-template-columns:1fr}
+      .login h2,.top h2{font-size:28px} .countdownValue{font-size:24px!important}.streetRowCompact{grid-template-columns:28px minmax(120px,1fr) 44px 44px 70px 40px}
     }
     @media print{
       .hero,.login,.actions,.noPrint,.adminOnly.csvBox{display:none!important}.wrap{max-width:none;padding:0}
@@ -323,6 +377,36 @@
         </div>
       </div>
 
+
+      <div class="card streetBreakdownPanel adminOnly" id="streetBreakdownPanel">
+        <div class="streetHeader">
+          <div>
+            <h3>Street breakdown</h3>
+            <p class="small">Participation rate (%) by street, ranked for admin review.</p>
+          </div>
+          <div class="streetActions noPrint">
+            <button class="secondary" id="streetTableBtn">▣ View full table</button>
+          </div>
+        </div>
+        <div class="streetGridCompact">
+          <div>
+            <div class="streetList" id="streetTopList"></div>
+            <div class="streetFullTable" id="streetFullTable">
+              <div class="miniTableWrap"><table><thead><tr><th>#</th><th>Street</th><th>Residences</th><th>Votes</th><th>Rate</th></tr></thead><tbody id="streetTableBody"></tbody></table></div>
+            </div>
+          </div>
+          <div class="streetInsights">
+            <h4>Key insights</h4>
+            <div id="streetInsightsBody"></div>
+            <div class="streetUnknown" id="streetUnknownSummary"></div>
+            <div class="unknownEircodeBox" id="streetUnknownBox">
+              <h4>Eircodes to review</h4>
+              <div class="miniTableWrap"><table><thead><tr><th>Eircode</th><th>First submitted</th></tr></thead><tbody id="streetUnknownBody"></tbody></table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="duplicatesBox" class="card panel adminOnly hidden"><h3>Duplicate Eircode review</h3><p class="small">These Eircodes appear more than once and should be reviewed before final certification.</p><div id="duplicatesList"></div></div>
 
       <div class="card panel adminOnly csvBox"><h3>Administrator tools</h3><p class="small">Visible only to claudiosantos1968@gmail.com. Use CSV import only as an emergency backup if the live Netlify API is unavailable.</p><div class="row"><input id="csvFile" type="file" accept=".csv,text/csv"><button class="secondary" id="csvBtn">Import CSV backup</button></div></div>
@@ -389,7 +473,7 @@ function openDashboardShell(admin){$('login').classList.add('hidden');$('dashboa
 function parseCsv(text){const rows=[];let row=[],cur='',q=false;for(let i=0;i<text.length;i++){const ch=text[i],nx=text[i+1];if(ch==='"'&&q&&nx==='"'){cur+='"';i++;continue}if(ch==='"'){q=!q;continue}if(ch===','&&!q){row.push(cur);cur='';continue}if((ch==='\n'||ch==='\r')&&!q){if(cur||row.length){row.push(cur);rows.push(row);row=[];cur=''} if(ch==='\r'&&nx==='\n')i++;continue}cur+=ch}if(cur||row.length){row.push(cur);rows.push(row)}const headers=(rows.shift()||[]).map(h=>h.trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]||''])))}
 function buildFromRows(raw){const rows=raw.map((r,i)=>({number:i+1,email:String(r.email||r.Email||'').trim().toLowerCase(),eircode:ne(r.eircode||r.Eircode||r.postcode||''),vote:nv(r.vote||r.Vote||r.choice||''),confirmed:r.confirmed||r.Confirmed||'',referenceId:r.referenceId||r.publicReferenceId||r.public_reference_id||r.reference_id||r.reference||r.ref||r.id||'',submittedAtIreland:r.submitted_at_ireland||r.submittedAtIreland||r.created_at||r.createdAt||'',createdAt:r.created_at||r.createdAt||r.submitted_at_ireland||''})); const counts={};rows.forEach(r=>{if(r.eircode)counts[r.eircode]=(counts[r.eircode]||0)+1}); const duplicateEircodes=Object.entries(counts).filter(([,c])=>c>1).map(([eircode,count])=>({eircode,count})); const deduped=firstValidRowsByEircode(rows), validRows=deduped.validRows, excludedDuplicateRows=deduped.excludedDuplicateRows; const totalVotes=validRows.length,agree=validRows.filter(r=>r.vote==='Agree').length,doNotAgree=validRows.filter(r=>r.vote==='Do Not Agree').length,unknown=totalVotes-agree-doNotAgree; const validCounts={};validRows.forEach(r=>{if(r.eircode)validCounts[r.eircode]=(validCounts[r.eircode]||0)+1}); const byDayMap={}; validRows.forEach(r=>{const d=new Date(r.createdAt||r.submittedAtIreland); const key=isNaN(d)?String(r.submittedAtIreland).slice(0,10)||'Unknown':d.toISOString().slice(0,10); byDayMap[key]=byDayMap[key]||{date:key,total:0,agree:0,doNotAgree:0,unknown:0}; byDayMap[key].total++; if(r.vote==='Agree')byDayMap[key].agree++; else if(r.vote==='Do Not Agree')byDayMap[key].doNotAgree++; else byDayMap[key].unknown++;}); return {ok:true,isAdmin:true,authorisedDirector:ADMIN_EMAIL,totalResidences:227,generatedAtIreland:new Date().toLocaleString('en-IE',{timeZone:'Europe/Dublin',dateStyle:'medium',timeStyle:'short'}),summary:{totalResidences:227,totalVotes,recordedSubmissions:rows.length,excludedDuplicateVotes:excludedDuplicateRows.length,outstandingResidences:Math.max(227-totalVotes,0),participationRate:pct(totalVotes,227),agree,doNotAgree,unknown,agreePercent:pct(agree,totalVotes),doNotAgreePercent:pct(doNotAgree,totalVotes),unknownPercent:pct(unknown,totalVotes),uniqueEircodes:Object.keys(validCounts).length,duplicateEircodesCount:duplicateEircodes.length,lastSubmission:rows[rows.length-1]||null},duplicateEircodes,excludedDuplicateRows,byDay:Object.values(byDayMap).sort((a,b)=>a.date.localeCompare(b.date)),rows}}
 async function importCsv(){if(!isAdminEmail())return; const f=$('csvFile').files[0]; if(!f)return alert('Choose a CSV file first.'); const text=await f.text(); render(buildFromRows(parseCsv(text)))}
-function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.excludedDuplicateVotes?`${s.excludedDuplicateVotes} duplicate vote(s) excluded`:(s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'); $('lastUpdated').textContent=data.generatedAtIreland||'—'; const b=data.officialBaseline||{}; if($('baselineStatus')) $('baselineStatus').textContent=b.status||'Confirmed'; if($('baselineSubmissions')) $('baselineSubmissions').textContent=String(b.startingSubmissions??0); if($('baselineTime')) $('baselineTime').textContent=b.establishedAtIreland||'01 Jun 2026, 15:31'; if($('baselineNote')) $('baselineNote').textContent=b.note||'System cleared before official launch. Voting started from zero recorded submissions.'; $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderDup(data.duplicateEircodes||[]); renderDownloadAudit(data.downloadAudit||{}, data.downloadAuditConfigured!==false, data.downloadAuditError||''); renderTable(currentRows)}}
+function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.excludedDuplicateVotes?`${s.excludedDuplicateVotes} duplicate vote(s) excluded`:(s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'); $('lastUpdated').textContent=data.generatedAtIreland||'—'; const b=data.officialBaseline||{}; if($('baselineStatus')) $('baselineStatus').textContent=b.status||'Confirmed'; if($('baselineSubmissions')) $('baselineSubmissions').textContent=String(b.startingSubmissions??0); if($('baselineTime')) $('baselineTime').textContent=b.establishedAtIreland||'01 Jun 2026, 15:31'; if($('baselineNote')) $('baselineNote').textContent=b.note||'System cleared before official launch. Voting started from zero recorded submissions.'; $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderStreetBreakdown(data.streetBreakdown||null); renderDup(data.duplicateEircodes||[]); renderDownloadAudit(data.downloadAudit||{}, data.downloadAuditConfigured!==false, data.downloadAuditError||''); renderTable(currentRows)}}
 function renderDup(list){if(!list.length){$('duplicatesBox').classList.add('hidden');return}$('duplicatesBox').classList.remove('hidden');$('duplicatesList').innerHTML=list.map(x=>`<span class="pill warn">${esc(x.eircode)} — ${x.count} submissions</span>`).join(' ')}
 function renderTable(rows){if(!isAdminEmail())return; const q=($('search').value||'').toLowerCase(); rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q)); $('tbody').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.submittedAtIreland||r.createdAt)}</td><td><span class="pill ${r.vote==='Agree'?'good':r.vote==='Do Not Agree'?'bad':'warn'}">${esc(r.vote)}</span></td><td>${esc(r.eircode)}</td><td>${esc(r.email)}</td><td>${esc(r.referenceId)}</td><td>${esc(r.confirmed)}</td></tr>`).join('')}
 
@@ -412,6 +496,61 @@ function renderDownloadAudit(audit, configured=true, error=''){
   const note=$('downloadAuditNote');
   if(note){
     note.textContent=configured?'Repeated downloads from the same visitor are grouped and counted in one line.':'Download audit form not found yet. It may appear after the first download submission, or configure NETLIFY_DOWNLOAD_FORM_ID in Netlify.'+(error?' Detail: '+error:'');
+  }
+}
+
+
+function streetRate(row){return Number(row?.participationRate||0)}
+function renderStreetBreakdown(breakdown){
+  if(!isAdminEmail())return;
+  const panel=$('streetBreakdownPanel');
+  if(!panel)return;
+  const rows=(breakdown&&breakdown.streets?breakdown.streets:[]).slice();
+  const unknown=(breakdown&&breakdown.unknownEircodes?breakdown.unknownEircodes:[]);
+  const top=rows.slice(0,5);
+  const list=$('streetTopList');
+  if(list){
+    list.innerHTML=top.length?top.map((r,i)=>{
+      const rate=streetRate(r);
+      return `<div class="streetRowCompact">
+        <div class="streetRank">${i+1}</div>
+        <div class="streetName" title="${esc(r.street)}">${esc(r.street)}</div>
+        <div class="streetNum">${esc(r.potential||0)}<span>Homes</span></div>
+        <div class="streetNum">${esc(r.votes||0)}<span>Votes</span></div>
+        <div class="streetRateTrack"><div class="streetRateFill" style="width:${Math.max(0,Math.min(100,rate))}%"></div></div>
+        <div class="streetRate">${rate}%</div>
+      </div>`;
+    }).join(''):'<p class="small">No street data available yet.</p>';
+  }
+  const body=$('streetTableBody');
+  if(body){
+    body.innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.street)}</td><td>${esc(r.potential||0)}</td><td>${esc(r.votes||0)}</td><td><strong>${streetRate(r)}%</strong></td></tr>`).join('');
+  }
+  const totalPotential=breakdown?.totalPotential||rows.reduce((s,r)=>s+(Number(r.potential)||0),0);
+  const matchedVotes=breakdown?.matchedVotes||rows.reduce((s,r)=>s+(Number(r.votes)||0),0);
+  const avg=pct(matchedVotes,totalPotential);
+  const sortedByVotes=rows.slice().sort((a,b)=>(b.votes||0)-(a.votes||0)||streetRate(b)-streetRate(a));
+  const best=rows[0]||null;
+  const lowest=rows.slice().reverse().find(r=>Number(r.potential||0)>0)||null;
+  const insights=$('streetInsightsBody');
+  if(insights){
+    insights.innerHTML=[
+      ['Base residences', totalPotential],
+      ['Matched votes', matchedVotes],
+      ['Average rate', avg+'%'],
+      ['Highest street', best?`${best.street} (${streetRate(best)}%)`:'—'],
+      ['Lowest street', lowest?`${lowest.street} (${streetRate(lowest)}%)`:'—']
+    ].map(([k,v])=>`<div class="streetInsightLine"><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join('');
+  }
+  const summary=$('streetUnknownSummary');
+  if(summary){
+    summary.innerHTML=unknown.length?`<strong>${unknown.length}</strong> Eircode${unknown.length===1?'':'s'} not found in the official base. <button class="secondary" id="streetUnknownBtn" style="margin-left:8px;padding:6px 10px;min-height:auto;font-size:12px">Review</button>`:'No Eircodes requiring review.';
+    const btn=$('streetUnknownBtn');
+    if(btn)btn.onclick=()=>$('streetUnknownBox').classList.toggle('open');
+  }
+  const unknownBody=$('streetUnknownBody');
+  if(unknownBody){
+    unknownBody.innerHTML=unknown.length?unknown.map(x=>`<tr><td>${esc(x.eircode)}</td><td>${esc(x.firstSubmitted||'—')}</td></tr>`).join(''):'<tr><td colspan="2">No Eircodes to review.</td></tr>';
   }
 }
 
@@ -537,7 +676,7 @@ function updateVotingCountdown(){
 }
 setInterval(updateVotingCountdown,1000);
 updateVotingCountdown();
-$('loadBtn').onclick=loadLive; $('refreshBtn').onclick=loadLive; $('csvBtn').onclick=importCsv; $('downloadBtn').onclick=downloadCsv; $('downloadSummaryBtn').onclick=downloadSummary; $('search').oninput=()=>renderTable(currentRows); ['directorEmail','pin'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()}));
+$('loadBtn').onclick=loadLive; $('refreshBtn').onclick=loadLive; $('csvBtn').onclick=importCsv; $('downloadBtn').onclick=downloadCsv; $('downloadSummaryBtn').onclick=downloadSummary; $('search').oninput=()=>renderTable(currentRows); if($('streetTableBtn')) $('streetTableBtn').onclick=()=>$('streetFullTable').classList.toggle('open'); ['directorEmail','pin'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()}));
 
 </script>
 </body>
