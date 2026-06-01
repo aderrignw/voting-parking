@@ -259,6 +259,15 @@
     .streetRateTrack{height:8px;background:#edf2ee;border-radius:999px;overflow:hidden}
     .streetRateFill{height:8px;background:linear-gradient(90deg,#cfe5d1,var(--green2));border-radius:999px}
     .streetRate{text-align:right;font-weight:760;color:var(--green)}
+
+    .streetTotalRow{
+      border-color:#cfe3d0;
+      background:linear-gradient(135deg,#f4faf2,#ffffff);
+      font-weight:760;
+    }
+    .streetTotalRow .streetName{color:var(--green)}
+    .streetTotalRow .streetRank{background:var(--green);color:#fff}
+    .streetTotalRow .streetRateTrack{background:#dfeadf}
     .streetInsights{
       border:1px solid #dfeadf;
       border-radius:16px;
@@ -532,9 +541,12 @@ function renderStreetBreakdown(breakdown){
   const rows=(breakdown&&breakdown.streets?breakdown.streets:[]).slice();
   const unknown=(breakdown&&breakdown.unknownEircodes?breakdown.unknownEircodes:[]);
   const visibleRows=streetShowAll?rows:rows.slice(0,5);
+  const totalPotential=breakdown?.totalPotential||rows.reduce((s,r)=>s+(Number(r.potential)||0),0);
+  const matchedVotes=breakdown?.matchedVotes||rows.reduce((s,r)=>s+(Number(r.votes)||0),0);
+  const avg=pct(matchedVotes,totalPotential);
   const list=$('streetTopList');
   if(list){
-    list.innerHTML=visibleRows.length?visibleRows.map((r,i)=>{
+    const rowHtml=visibleRows.length?visibleRows.map((r,i)=>{
       const originalIndex=rows.indexOf(r);
       const rank=originalIndex>=0?originalIndex+1:i+1;
       const rate=streetRate(r);
@@ -547,15 +559,21 @@ function renderStreetBreakdown(breakdown){
         <div class="streetRate">${rate}%</div>
       </div>`;
     }).join(''):'<p class="small">No street data available yet.</p>';
+    const totalHtml=rows.length?`<div class="streetRowCompact streetTotalRow">
+        <div class="streetRank">Σ</div>
+        <div class="streetName">TOTAL</div>
+        <div class="streetNum">${esc(totalPotential)}<span>Homes</span></div>
+        <div class="streetNum">${esc(matchedVotes)}<span>Votes</span></div>
+        <div class="streetRateTrack"><div class="streetRateFill" style="width:${Math.max(0,Math.min(100,avg))}%"></div></div>
+        <div class="streetRate">${avg}%</div>
+      </div>`:'';
+    list.innerHTML=rowHtml+totalHtml;
   }
   const btn=$('streetTableBtn');
   if(btn){
     btn.textContent=streetShowAll?'▴ Show top 5':'▣ View all streets';
     btn.style.display=rows.length>5?'inline-flex':'none';
   }
-  const totalPotential=breakdown?.totalPotential||rows.reduce((s,r)=>s+(Number(r.potential)||0),0);
-  const matchedVotes=breakdown?.matchedVotes||rows.reduce((s,r)=>s+(Number(r.votes)||0),0);
-  const avg=pct(matchedVotes,totalPotential);
   const best=rows[0]||null;
   const lowest=rows.slice().reverse().find(r=>Number(r.potential||0)>0)||null;
   const insights=$('streetInsightsBody');
