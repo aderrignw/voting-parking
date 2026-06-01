@@ -273,11 +273,6 @@
     .streetInsightLine strong{color:var(--ink);text-align:right}
     .streetUnknown{margin-top:12px;border-top:1px dashed #dfeadf;padding-top:12px}
     .streetUnknown strong{color:var(--red)}
-    .streetFullTable{margin-top:12px;display:none}
-    .streetFullTable.open{display:block}
-    .streetFullTable .miniTableWrap{max-height:330px}
-    .streetFullTable table{font-size:12px}
-    .streetFullTable th,.streetFullTable td{padding:9px 10px}
     .unknownEircodeBox{margin-top:12px;display:none}
     .unknownEircodeBox.open{display:block}
     .unknownEircodeBox h4{margin:0 0 8px;color:var(--red);font-size:14px}
@@ -385,15 +380,12 @@
             <p class="small">Participation rate (%) by street, ranked for admin review.</p>
           </div>
           <div class="streetActions noPrint">
-            <button class="secondary" id="streetTableBtn">▣ View full table</button>
+            <button class="secondary" id="streetTableBtn">▣ Show all streets</button>
           </div>
         </div>
         <div class="streetGridCompact">
           <div>
             <div class="streetList" id="streetTopList"></div>
-            <div class="streetFullTable" id="streetFullTable">
-              <div class="miniTableWrap"><table><thead><tr><th>#</th><th>Street</th><th>Residences</th><th>Votes</th><th>Rate</th></tr></thead><tbody id="streetTableBody"></tbody></table></div>
-            </div>
           </div>
           <div class="streetInsights">
             <h4>Key insights</h4>
@@ -445,7 +437,7 @@
   </main>
 <script>
 
-const ADMIN_EMAIL='claudiosantos1968@gmail.com'; let currentRows=[]; let currentReport=null; let currentDirector=''; const $=id=>document.getElementById(id);
+const ADMIN_EMAIL='claudiosantos1968@gmail.com'; let currentRows=[]; let currentReport=null; let currentDirector=''; let streetShowAll=false; const $=id=>document.getElementById(id);
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function showError(msg,setup=false,isAdmin=false){$('loginError').innerHTML= setup ? `<strong>Live API setup required.</strong><br>${esc(msg)}${isAdmin?`<div class="configBox">Administrator fallback is available after login if live API is unavailable. In Netlify, confirm these variables exist:<br><br><strong>ADMIN_PIN</strong> = OMCDIRETORES2026<br><strong>DIRECTOR_EMAILS</strong> = authorised emails<br><strong>NETLIFY_FORM_ID</strong> = your form ID<br><strong>NETLIFY_AUTH_TOKEN</strong> = your Netlify personal access token</div>`:''}` : esc(msg); $('loginError').classList.remove('hidden')}
 function nv(v){v=String(v||'').trim().toLowerCase(); if(['agree','approved','approve','yes','sim','aprovado'].includes(v))return'Agree'; if(['do not agree','disagree','not agree','no','não','nao','rejected','reject'].includes(v))return'Do Not Agree'; return v?String(v):'Unknown'}
@@ -507,13 +499,15 @@ function renderStreetBreakdown(breakdown){
   if(!panel)return;
   const rows=(breakdown&&breakdown.streets?breakdown.streets:[]).slice();
   const unknown=(breakdown&&breakdown.unknownEircodes?breakdown.unknownEircodes:[]);
-  const top=rows.slice(0,5);
+  const visibleRows=streetShowAll?rows:rows.slice(0,5);
   const list=$('streetTopList');
   if(list){
-    list.innerHTML=top.length?top.map((r,i)=>{
+    list.innerHTML=visibleRows.length?visibleRows.map((r,i)=>{
+      const originalIndex=rows.indexOf(r);
+      const rank=originalIndex>=0?originalIndex+1:i+1;
       const rate=streetRate(r);
       return `<div class="streetRowCompact">
-        <div class="streetRank">${i+1}</div>
+        <div class="streetRank">${rank}</div>
         <div class="streetName" title="${esc(r.street)}">${esc(r.street)}</div>
         <div class="streetNum">${esc(r.potential||0)}<span>Homes</span></div>
         <div class="streetNum">${esc(r.votes||0)}<span>Votes</span></div>
@@ -522,14 +516,14 @@ function renderStreetBreakdown(breakdown){
       </div>`;
     }).join(''):'<p class="small">No street data available yet.</p>';
   }
-  const body=$('streetTableBody');
-  if(body){
-    body.innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.street)}</td><td>${esc(r.potential||0)}</td><td>${esc(r.votes||0)}</td><td><strong>${streetRate(r)}%</strong></td></tr>`).join('');
+  const btn=$('streetTableBtn');
+  if(btn){
+    btn.textContent=streetShowAll?'▴ Show top 5':'▣ Show all streets';
+    btn.style.display=rows.length>5?'inline-flex':'none';
   }
   const totalPotential=breakdown?.totalPotential||rows.reduce((s,r)=>s+(Number(r.potential)||0),0);
   const matchedVotes=breakdown?.matchedVotes||rows.reduce((s,r)=>s+(Number(r.votes)||0),0);
   const avg=pct(matchedVotes,totalPotential);
-  const sortedByVotes=rows.slice().sort((a,b)=>(b.votes||0)-(a.votes||0)||streetRate(b)-streetRate(a));
   const best=rows[0]||null;
   const lowest=rows.slice().reverse().find(r=>Number(r.potential||0)>0)||null;
   const insights=$('streetInsightsBody');
@@ -545,8 +539,8 @@ function renderStreetBreakdown(breakdown){
   const summary=$('streetUnknownSummary');
   if(summary){
     summary.innerHTML=unknown.length?`<strong>${unknown.length}</strong> Eircode${unknown.length===1?'':'s'} not found in the official base. <button class="secondary" id="streetUnknownBtn" style="margin-left:8px;padding:6px 10px;min-height:auto;font-size:12px">Review</button>`:'No Eircodes requiring review.';
-    const btn=$('streetUnknownBtn');
-    if(btn)btn.onclick=()=>$('streetUnknownBox').classList.toggle('open');
+    const reviewBtn=$('streetUnknownBtn');
+    if(reviewBtn)reviewBtn.onclick=()=>$('streetUnknownBox').classList.toggle('open');
   }
   const unknownBody=$('streetUnknownBody');
   if(unknownBody){
@@ -676,7 +670,7 @@ function updateVotingCountdown(){
 }
 setInterval(updateVotingCountdown,1000);
 updateVotingCountdown();
-$('loadBtn').onclick=loadLive; $('refreshBtn').onclick=loadLive; $('csvBtn').onclick=importCsv; $('downloadBtn').onclick=downloadCsv; $('downloadSummaryBtn').onclick=downloadSummary; $('search').oninput=()=>renderTable(currentRows); if($('streetTableBtn')) $('streetTableBtn').onclick=()=>$('streetFullTable').classList.toggle('open'); ['directorEmail','pin'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()}));
+$('loadBtn').onclick=loadLive; $('refreshBtn').onclick=loadLive; $('csvBtn').onclick=importCsv; $('downloadBtn').onclick=downloadCsv; $('downloadSummaryBtn').onclick=downloadSummary; $('search').oninput=()=>renderTable(currentRows); if($('streetTableBtn')) $('streetTableBtn').onclick=()=>{streetShowAll=!streetShowAll; if(currentReport)renderStreetBreakdown(currentReport.streetBreakdown||null);}; ['directorEmail','pin'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()}));
 
 </script>
 </body>
