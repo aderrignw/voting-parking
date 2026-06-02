@@ -241,7 +241,8 @@ voteForm.addEventListener('submit', async (event) => {
     if (voteReferenceId) voteReferenceId.value = ref;
     try { await submitNetlifyVoteBackup(); } catch (formsErr) { console.warn(formsErr); }
     sessionStorage.setItem('agVoteReferenceId', ref);
-    window.location.href = 'success.html?ref=' + encodeURIComponent(ref);
+    sessionStorage.setItem('agVoteChoice', selected);
+    window.location.href = 'success.html?ref=' + encodeURIComponent(ref) + '&vote=' + encodeURIComponent(selected);
   }
   catch(err){ setMessage(voteMessage, err.message); }
   finally{ btn.disabled = false; btn.textContent = 'Submit Vote'; }
