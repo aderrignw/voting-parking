@@ -318,6 +318,25 @@
     .streetUnknown{font-size:14px;line-height:1.45}
     .csvBox{margin:12px 0;padding:18px}
 
+    .satisfactionPanel{padding:20px 22px;min-height:0;margin:12px 0}
+    .satisfactionGrid{display:grid;grid-template-columns:280px minmax(0,1fr);gap:22px;align-items:center}
+    .satisfactionChartWrap{display:grid;place-items:center;min-width:0}
+    .satisfactionSummary{display:grid;gap:10px}
+    .satisfactionHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+    .satisfactionHeader h3{margin:0;color:var(--green);font-size:18px;font-weight:700;letter-spacing:-.02em}
+    .satisfactionHeader .small{font-size:13px;margin:4px 0 0}
+    .satisfactionRow{display:grid;grid-template-columns:92px minmax(90px,1fr) 64px 74px;gap:10px;align-items:center;font-size:13px}
+    .satisfactionLabel{font-weight:700;color:var(--ink)}
+    .satisfactionTrack{height:9px;background:#edf2ee;border-radius:999px;overflow:hidden}
+    .satisfactionFill{height:9px;background:linear-gradient(90deg,#cfe5d1,var(--green2));border-radius:999px}
+    .satisfactionPercent{text-align:right;font-weight:760;color:var(--green)}
+    .satisfactionCount{text-align:right;color:var(--muted);font-weight:700}
+    .satisfactionNote{font-size:13px;color:var(--muted);margin-top:10px}
+    .feedbackCommentsBox{margin-top:14px;display:none}
+    .feedbackCommentsBox.open{display:block}
+    .feedbackCommentsBox h4{margin:0 0 8px;color:var(--green);font-size:14px}
+    .satisfactionActions button{font-size:12px;min-height:34px;padding:8px 11px}
+
     @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.streetGridCompact{grid-template-columns:1fr}.resultSplitLayout{grid-template-columns:260px minmax(260px,1fr)}.baselinePanel{display:block}.baselineGrid{margin-top:14px;grid-template-columns:repeat(3,1fr)}.downloadAuditGrid{grid-template-columns:repeat(2,1fr)}.downloadAuditTables{grid-template-columns:1fr}}
     @media(max-width:720px){
       .heroInner,.top,.streetHeader{display:block} .secure{text-align:left;margin-top:14px} .wrap{padding:24px 16px 54px}
@@ -440,6 +459,31 @@
         </div>
       </div>
 
+      <div class="card satisfactionPanel adminOnly" id="satisfactionPanel">
+        <div class="satisfactionHeader">
+          <div>
+            <h3>Site satisfaction</h3>
+            <p class="small">Resident feedback on the voting experience.</p>
+          </div>
+          <div class="satisfactionActions noPrint">
+            <button class="secondary" id="feedbackCommentsBtn">▣ View comments</button>
+          </div>
+        </div>
+        <div class="satisfactionGrid">
+          <div class="satisfactionChartWrap">
+            <canvas id="satisfactionDonut" width="240" height="220"></canvas>
+            <p class="satisfactionNote" id="satisfactionOverview">No feedback responses yet.</p>
+          </div>
+          <div>
+            <div class="satisfactionSummary" id="satisfactionSummary"></div>
+            <div class="feedbackCommentsBox" id="feedbackCommentsBox">
+              <h4>Feedback comments</h4>
+              <div class="miniTableWrap"><table><thead><tr><th>Rating</th><th>Comment</th><th>Submitted</th></tr></thead><tbody id="feedbackCommentsBody"></tbody></table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="duplicatesBox" class="card panel adminOnly hidden"><h3>Duplicate Eircode review</h3><p class="small">These Eircodes appear more than once and should be reviewed before final certification.</p><div id="duplicatesList"></div></div>
 
       <div class="card panel adminOnly csvBox"><h3>Administrator tools</h3><p class="small">Visible only to claudiosantos1968@gmail.com. Use CSV import only as an emergency backup if the live Netlify API is unavailable.</p><div class="row"><input id="csvFile" type="file" accept=".csv,text/csv"><button class="secondary" id="csvBtn">Import CSV backup</button></div></div>
@@ -506,7 +550,7 @@ function openDashboardShell(admin){$('login').classList.add('hidden');$('dashboa
 function parseCsv(text){const rows=[];let row=[],cur='',q=false;for(let i=0;i<text.length;i++){const ch=text[i],nx=text[i+1];if(ch==='"'&&q&&nx==='"'){cur+='"';i++;continue}if(ch==='"'){q=!q;continue}if(ch===','&&!q){row.push(cur);cur='';continue}if((ch==='\n'||ch==='\r')&&!q){if(cur||row.length){row.push(cur);rows.push(row);row=[];cur=''} if(ch==='\r'&&nx==='\n')i++;continue}cur+=ch}if(cur||row.length){row.push(cur);rows.push(row)}const headers=(rows.shift()||[]).map(h=>h.trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]||''])))}
 function buildFromRows(raw){const rows=raw.map((r,i)=>({number:i+1,email:String(r.email||r.Email||'').trim().toLowerCase(),eircode:ne(r.eircode||r.Eircode||r.postcode||''),vote:nv(r.vote||r.Vote||r.choice||''),confirmed:r.confirmed||r.Confirmed||'',referenceId:r.referenceId||r.publicReferenceId||r.public_reference_id||r.reference_id||r.reference||r.ref||r.id||'',submittedAtIreland:r.submitted_at_ireland||r.submittedAtIreland||r.created_at||r.createdAt||'',createdAt:r.created_at||r.createdAt||r.submitted_at_ireland||''})); const counts={};rows.forEach(r=>{if(r.eircode)counts[r.eircode]=(counts[r.eircode]||0)+1}); const duplicateEircodes=Object.entries(counts).filter(([,c])=>c>1).map(([eircode,count])=>({eircode,count})); const deduped=firstValidRowsByEircode(rows), validRows=deduped.validRows, excludedDuplicateRows=deduped.excludedDuplicateRows; const totalVotes=validRows.length,agree=validRows.filter(r=>r.vote==='Agree').length,doNotAgree=validRows.filter(r=>r.vote==='Do Not Agree').length,unknown=totalVotes-agree-doNotAgree; const validCounts={};validRows.forEach(r=>{if(r.eircode)validCounts[r.eircode]=(validCounts[r.eircode]||0)+1}); const byDayMap={}; validRows.forEach(r=>{const d=new Date(r.createdAt||r.submittedAtIreland); const key=isNaN(d)?String(r.submittedAtIreland).slice(0,10)||'Unknown':d.toISOString().slice(0,10); byDayMap[key]=byDayMap[key]||{date:key,total:0,agree:0,doNotAgree:0,unknown:0}; byDayMap[key].total++; if(r.vote==='Agree')byDayMap[key].agree++; else if(r.vote==='Do Not Agree')byDayMap[key].doNotAgree++; else byDayMap[key].unknown++;}); return {ok:true,isAdmin:true,authorisedDirector:ADMIN_EMAIL,totalResidences:227,generatedAtIreland:new Date().toLocaleString('en-IE',{timeZone:'Europe/Dublin',dateStyle:'medium',timeStyle:'short'}),summary:{totalResidences:227,totalVotes,recordedSubmissions:rows.length,excludedDuplicateVotes:excludedDuplicateRows.length,outstandingResidences:Math.max(227-totalVotes,0),participationRate:pct(totalVotes,227),agree,doNotAgree,unknown,agreePercent:pct(agree,totalVotes),doNotAgreePercent:pct(doNotAgree,totalVotes),unknownPercent:pct(unknown,totalVotes),uniqueEircodes:Object.keys(validCounts).length,duplicateEircodesCount:duplicateEircodes.length,lastSubmission:rows[rows.length-1]||null},duplicateEircodes,excludedDuplicateRows,byDay:Object.values(byDayMap).sort((a,b)=>a.date.localeCompare(b.date)),rows}}
 async function importCsv(){if(!isAdminEmail())return; const f=$('csvFile').files[0]; if(!f)return alert('Choose a CSV file first.'); const text=await f.text(); render(buildFromRows(parseCsv(text)))}
-function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.excludedDuplicateVotes?`${s.excludedDuplicateVotes} duplicate vote(s) excluded`:(s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'); $('lastUpdated').textContent=data.generatedAtIreland||'—'; const b=data.officialBaseline||{}; if($('baselineStatus')) $('baselineStatus').textContent=b.status||'Confirmed'; if($('baselineSubmissions')) $('baselineSubmissions').textContent=String(b.startingSubmissions??0); if($('baselineTime')) $('baselineTime').textContent=b.establishedAtIreland||'01 Jun 2026, 15:31'; if($('baselineNote')) $('baselineNote').textContent=b.note||'System cleared before official launch. Voting started from zero recorded submissions.'; $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderStreetBreakdown(data.streetBreakdown||null); renderDup(data.duplicateEircodes||[]); renderDownloadAudit(data.downloadAudit||{}, data.downloadAuditConfigured!==false, data.downloadAuditError||''); renderTable(currentRows)}}
+function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.excludedDuplicateVotes?`${s.excludedDuplicateVotes} duplicate vote(s) excluded`:(s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'); $('lastUpdated').textContent=data.generatedAtIreland||'—'; const b=data.officialBaseline||{}; if($('baselineStatus')) $('baselineStatus').textContent=b.status||'Confirmed'; if($('baselineSubmissions')) $('baselineSubmissions').textContent=String(b.startingSubmissions??0); if($('baselineTime')) $('baselineTime').textContent=b.establishedAtIreland||'01 Jun 2026, 15:31'; if($('baselineNote')) $('baselineNote').textContent=b.note||'System cleared before official launch. Voting started from zero recorded submissions.'; $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderStreetBreakdown(data.streetBreakdown||null); renderSiteSatisfaction(data.siteSatisfaction||null, data.siteSatisfactionConfigured!==false, data.siteSatisfactionError||''); renderDup(data.duplicateEircodes||[]); renderDownloadAudit(data.downloadAudit||{}, data.downloadAuditConfigured!==false, data.downloadAuditError||''); renderTable(currentRows)}}
 function renderDup(list){if(!list.length){$('duplicatesBox').classList.add('hidden');return}$('duplicatesBox').classList.remove('hidden');$('duplicatesList').innerHTML=list.map(x=>`<span class="pill warn">${esc(x.eircode)} — ${x.count} submissions</span>`).join(' ')}
 function renderTable(rows){if(!isAdminEmail())return; const q=($('search').value||'').toLowerCase(); rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q)); $('tbody').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.submittedAtIreland||r.createdAt)}</td><td><span class="pill ${r.vote==='Agree'?'good':r.vote==='Do Not Agree'?'bad':'warn'}">${esc(r.vote)}</span></td><td>${esc(r.eircode)}</td><td>${esc(r.email)}</td><td>${esc(r.referenceId)}</td><td>${esc(r.confirmed)}</td></tr>`).join('')}
 
@@ -597,6 +641,83 @@ function renderStreetBreakdown(breakdown){
     unknownBody.innerHTML=unknown.length?unknown.map(x=>`<tr><td>${esc(x.eircode)}</td><td>${esc(x.firstSubmitted||'—')}</td></tr>`).join(''):'<tr><td colspan="2">No Eircodes to review.</td></tr>';
   }
 }
+
+
+function drawSatisfactionDonut(data){
+  const c=$('satisfactionDonut');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  const distribution=(data&&data.distribution)||[];
+  const total=Number(data?.totalResponses||0);
+  const average=Number(data?.averageRating||0);
+  const cx=120, cy=105, outer=78, inner=45;
+  const colours={5:'#0b5a2c',4:'#39a935',3:'#e9aa00',2:'#f26c00',1:'#b22222'};
+  let start=-Math.PI/2;
+  if(!total){
+    ctx.beginPath();ctx.arc(cx,cy,outer,0,Math.PI*2);ctx.arc(cx,cy,inner,0,Math.PI*2,true);ctx.closePath();ctx.fillStyle='#edf2ee';ctx.fill();
+  }else{
+    distribution.forEach(item=>{
+      const value=Number(item.count||0);
+      const angle=value/total*Math.PI*2;
+      if(value>0){
+        ctx.beginPath();
+        ctx.arc(cx,cy,outer,start,start+angle);
+        ctx.arc(cx,cy,inner,start+angle,start,true);
+        ctx.closePath();
+        ctx.fillStyle=colours[item.rating]||'#98a2a0';
+        ctx.fill();
+      }
+      start+=angle;
+    });
+  }
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,inner-1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#06451f';ctx.font='700 24px Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(total?average.toFixed(1):'0.0',cx,cy-8);
+  ctx.fillStyle='#607169';ctx.font='13px Arial';
+  ctx.fillText('/ 5',cx,cy+16);
+  ctx.textAlign='left';ctx.textBaseline='alphabetic';
+}
+
+function renderSiteSatisfaction(data, configured=true, error=''){
+  if(!isAdminEmail())return;
+  data=data||{totalResponses:0,averageRating:0,positivePercent:0,distribution:[],comments:[]};
+  drawSatisfactionDonut(data);
+  const overview=$('satisfactionOverview');
+  if(overview){
+    overview.textContent=data.totalResponses
+      ? `${data.totalResponses} feedback response${data.totalResponses===1?'':'s'} · ${data.positivePercent||0}% rated Good or Excellent`
+      : (configured?'No feedback responses yet.':'Feedback form not found yet.'+(error?' Detail: '+error:''));
+  }
+  const summary=$('satisfactionSummary');
+  if(summary){
+    const rows=(data.distribution&&data.distribution.length?data.distribution:[
+      {rating:5,label:'Excellent',count:0,percent:0},
+      {rating:4,label:'Good',count:0,percent:0},
+      {rating:3,label:'Average',count:0,percent:0},
+      {rating:2,label:'Poor',count:0,percent:0},
+      {rating:1,label:'Very Poor',count:0,percent:0}
+    ]);
+    summary.innerHTML=rows.map(row=>`<div class="satisfactionRow">
+      <div class="satisfactionLabel">${esc(row.rating)} ${esc(row.label)}</div>
+      <div class="satisfactionTrack"><div class="satisfactionFill" style="width:${Math.max(0,Math.min(100,Number(row.percent||0)))}%"></div></div>
+      <div class="satisfactionPercent">${esc(row.percent||0)}%</div>
+      <div class="satisfactionCount">${esc(row.count||0)} vote${Number(row.count||0)===1?'':'s'}</div>
+    </div>`).join('');
+  }
+  const btn=$('feedbackCommentsBtn');
+  const box=$('feedbackCommentsBox');
+  const comments=(data.comments||[]).slice(0,80);
+  if(btn&&box){
+    btn.style.display=comments.length?'inline-flex':'none';
+    btn.onclick=()=>{box.classList.toggle('open');btn.textContent=box.classList.contains('open')?'▴ Hide comments':'▣ View comments';};
+  }
+  const body=$('feedbackCommentsBody');
+  if(body){
+    body.innerHTML=comments.length?comments.map(row=>`<tr><td>${esc(row.rating)} - ${esc(row.ratingLabel)}</td><td>${esc(row.comment)}</td><td>${esc(row.submittedAtIreland||'—')}</td></tr>`).join(''):'<tr><td colspan="3">No feedback comments yet.</td></tr>';
+  }
+}
+
 
 function drawPie(s){
   const c=$('pie'),ctx=c.getContext('2d');
