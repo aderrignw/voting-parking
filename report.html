@@ -278,6 +278,8 @@
     .streetInsights h4{margin:0 0 10px;color:var(--green);font-size:14px}
     .streetInsightLine{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #edf2ee;padding:8px 0;font-size:12px}
     .streetInsightLine:last-child{border-bottom:0}
+
+    .streetInsightDivider{height:1px;background:#e5eee5;margin:6px 0}
     .streetInsightLine span{color:var(--muted)}
     .streetInsightLine strong{color:var(--ink);text-align:right}
     .streetUnknown{margin-top:12px;border-top:1px dashed #dfeadf;padding-top:12px}
@@ -620,15 +622,22 @@ function renderStreetBreakdown(breakdown){
   }
   const best=rows[0]||null;
   const lowest=rows.slice().reverse().find(r=>Number(r.potential||0)>0)||null;
+  const mostVotes=rows.slice().sort((a,b)=>Number(b.votes||0)-Number(a.votes||0)||Number(b.potential||0)-Number(a.potential||0)||String(a.street||'').localeCompare(String(b.street||'')))[0]||null;
+  const mostOutstanding=rows.slice().map(r=>({...r,outstanding:Math.max(Number(r.potential||0)-Number(r.votes||0),0)})).sort((a,b)=>Number(b.outstanding||0)-Number(a.outstanding||0)||Number(b.potential||0)-Number(a.potential||0)||String(a.street||'').localeCompare(String(b.street||'')))[0]||null;
   const insights=$('streetInsightsBody');
   if(insights){
+    const line=([k,v])=>`<div class="streetInsightLine"><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`;
     insights.innerHTML=[
       ['Base residences', totalPotential],
       ['Matched votes', matchedVotes],
       ['Average rate', avg+'%'],
       ['Highest street', best?`${best.street} (${streetRate(best)}%)`:'—'],
       ['Lowest street', lowest?`${lowest.street} (${streetRate(lowest)}%)`:'—']
-    ].map(([k,v])=>`<div class="streetInsightLine"><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join('');
+    ].map(line).join('')+
+    '<div class="streetInsightDivider"></div>'+[
+      ['Most votes received', mostVotes?`${mostVotes.street} (${Number(mostVotes.votes||0)})`:'—'],
+      ['Most votes outstanding', mostOutstanding?`${mostOutstanding.street} (${Number(mostOutstanding.outstanding||0)} remaining)`:'—']
+    ].map(line).join('');
   }
   const summary=$('streetUnknownSummary');
   if(summary){
