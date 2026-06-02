@@ -227,6 +227,79 @@ async function findDownloadFormId(token) {
   return found?.id || '';
 }
 
+async function findFeedbackFormId(token) {
+  const configured = String(process.env.NETLIFY_FEEDBACK_FORM_ID || '').trim();
+  if (configured) return configured;
+
+  const siteId = String(process.env.NETLIFY_SITE_ID || process.env.SITE_ID || '').trim();
+  if (!siteId) return '';
+
+  const response = await fetch(`https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/forms`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) return '';
+  const forms = await response.json();
+  if (!Array.isArray(forms)) return '';
+  const found = forms.find(form => String(form.name || '').toLowerCase() === 'aderrig-voting-experience-feedback');
+  return found?.id || '';
+}
+
+function normaliseFeedbackRating(value = '') {
+  const rating = Number.parseInt(String(value || '').trim(), 10);
+  return Number.isInteger(rating) && rating >= 1 && rating <= 5 ? rating : 0;
+}
+
+function buildSiteSatisfaction(feedbackSubmissions = []) {
+  const labels = {
+    1: 'Very Poor',
+    2: 'Poor',
+    3: 'Average',
+    4: 'Good',
+    5: 'Excellent'
+  };
+  const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  const rows = [];
+
+  for (const item of feedbackSubmissions) {
+    const data = item.data || item.form_data || item || {};
+    const rating = normaliseFeedbackRating(field(data, ['rating', 'Rating']));
+    if (!rating) continue;
+    const createdAt = item.created_at || item.createdAt || data.created_at || data.createdAt || new Date().toISOString();
+    const comment = String(field(data, ['comment', 'Comment']) || '').trim();
+    counts[rating] += 1;
+    rows.push({
+      referenceId: String(field(data, ['referenceId', 'reference_id', 'Reference ID', 'reference']) || '').trim().toUpperCase(),
+      rating,
+      ratingLabel: String(field(data, ['ratingLabel', 'rating_label', 'Rating Label']) || labels[rating]).trim(),
+      comment,
+      submittedAtIreland: field(data, ['submittedAtIreland', 'submitted_at_ireland']) || safeDate(createdAt),
+      createdAt
+    });
+  }
+
+  const totalResponses = rows.length;
+  const totalScore = rows.reduce((sum, row) => sum + row.rating, 0);
+  const averageRating = totalResponses ? Number((totalScore / totalResponses).toFixed(1)) : 0;
+  const positiveResponses = counts[4] + counts[5];
+
+  const distribution = [5, 4, 3, 2, 1].map(rating => ({
+    rating,
+    label: labels[rating],
+    count: counts[rating],
+    percent: pct(counts[rating], totalResponses)
+  }));
+
+  return {
+    totalResponses,
+    averageRating,
+    positivePercent: pct(positiveResponses, totalResponses),
+    counts,
+    distribution,
+    rows: rows.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+    comments: rows.filter(row => row.comment).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  };
+}
+
 function buildDownloadAudit(downloadSubmissions = [], voteRows = []) {
   const voteEmails = new Set(voteRows.map(row => String(row.email || '').trim().toLowerCase()).filter(Boolean));
   const voteEircodes = new Set(voteRows.map(row => String(row.eircode || '').toUpperCase().replace(/\s+/g, '')).filter(Boolean));
@@ -463,6 +536,17 @@ export const handler = async (event) => {
       report.downloadAudit = buildDownloadAudit([], report.rows || []);
       report.downloadAuditConfigured = false;
       report.downloadAuditError = String(error.message || '').slice(0, 500);
+    }
+
+    try {
+      const feedbackFormId = await findFeedbackFormId(token);
+      const feedbackSubmissions = feedbackFormId ? await fetchNetlifyFormSubmissions(feedbackFormId, token, 30) : [];
+      report.siteSatisfaction = buildSiteSatisfaction(feedbackSubmissions);
+      report.siteSatisfactionConfigured = !!feedbackFormId;
+    } catch (error) {
+      report.siteSatisfaction = buildSiteSatisfaction([]);
+      report.siteSatisfactionConfigured = false;
+      report.siteSatisfactionError = String(error.message || '').slice(0, 500);
     }
   }
 
