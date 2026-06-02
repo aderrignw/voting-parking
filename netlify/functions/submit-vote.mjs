@@ -5,6 +5,7 @@ import {
   validEircode,
   makeReferenceId
 } from './_utils.mjs';
+import { backupVoteRecord } from './_github-backup.mjs';
 
 const NETLIFY_API_BASE = 'https://api.netlify.com/api/v1';
 const INELIGIBLE_EIRCODE_MESSAGE = 'This consultation is restricted to residents within the Aderrig Green area. The Eircode provided could not be verified as belonging to an eligible residence. Please check your Eircode and try again.';
@@ -157,7 +158,25 @@ export const handler = async (event) => {
     }
 
     const now = new Date();
+    const submittedAtIso = now.toISOString();
+    const submittedAtIreland = now.toLocaleString('en-IE', {
+      timeZone: 'Europe/Dublin',
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    });
     const publicReferenceId = validReferenceId(submittedReferenceId) ? submittedReferenceId : makeReferenceId();
+
+    const record = {
+      referenceId: publicReferenceId,
+      email,
+      eircode,
+      eircodeKey: String(eircode || '').replace(/\s+/g, ''),
+      vote,
+      submittedAtIreland,
+      submittedAtIso
+    };
+
+    const backup = await backupVoteRecord(record);
 
     return json(200, {
       ok: true,
@@ -166,12 +185,9 @@ export const handler = async (event) => {
         referenceId: publicReferenceId,
         eircode,
         vote,
-        submittedAtIreland: now.toLocaleString('en-IE', {
-          timeZone: 'Europe/Dublin',
-          dateStyle: 'medium',
-          timeStyle: 'short'
-        })
-      }
+        submittedAtIreland
+      },
+      backup
     });
   } catch (error) {
     console.error('submit-vote error:', error);

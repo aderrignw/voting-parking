@@ -1,3 +1,5 @@
+import { backupDownloadRecord } from './_github-backup.mjs';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
@@ -41,6 +43,7 @@ export const handler = async (event) => {
   try {
     const body = JSON.parse(event.body || '{}');
     const visitorKey = clean(body.visitorKey) || `server-${Date.now().toString(36)}`;
+    const downloadedAtIso = new Date().toISOString();
     const payload = {
       'form-name': 'aderrig-green-policy-download-audit',
       visitorKey,
@@ -51,9 +54,20 @@ export const handler = async (event) => {
       status: 'Downloaded Draft Policy'
     };
 
+    const backup = await backupDownloadRecord({
+      visitorKey,
+      email: payload.email,
+      eircode: payload.eircode,
+      eircodeKey: String(payload.eircode || '').replace(/\s+/g, ''),
+      document: payload.document,
+      status: payload.status,
+      downloadedAtIreland: payload.downloadedAtIreland,
+      downloadedAtIso
+    });
+
     const siteUrl = process.env.URL || process.env.DEPLOY_PRIME_URL || '';
     if (!siteUrl) {
-      return json(200, { ok: true, stored: false, message: 'Download acknowledged. Site URL unavailable for server-side form registration.' });
+      return json(200, { ok: true, stored: false, backup, message: 'Download acknowledged. Site URL unavailable for server-side form registration.' });
     }
 
     const response = await fetch(siteUrl, {
@@ -62,7 +76,7 @@ export const handler = async (event) => {
       body: formEncode(payload)
     });
 
-    return json(200, { ok: true, stored: response.ok });
+    return json(200, { ok: true, stored: response.ok, backup });
   } catch (error) {
     console.error('register-policy-download error:', error);
     return json(200, { ok: true, stored: false });
