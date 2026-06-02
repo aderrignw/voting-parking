@@ -10,17 +10,161 @@
   <main class="wrap successWrap">
     <section class="card successCard">
       <p class="successTick">✓</p>
-      <h1>Vote Successfully Recorded</h1>
-      <p class="lead">Your vote has been securely registered.</p>
-      <p>Thank you for participating in the Aderrig Green resident consultation.</p>
-      <p class="referenceLine"><strong>Reference ID:</strong> <span id="referenceId">AG-2026-XXXX-XXXX</span></p>
-      <button class="btn" id="closeBtn" type="button">Close</button>
+      <h1>Vote Recorded Successfully</h1>
+      <p class="lead">Thank you for your participation.</p>
+
+      <div class="successRecord">
+        <p class="referenceLine"><strong>Reference:</strong> <span id="referenceId">AG-2026-XXXX-XXXX</span></p>
+        <p class="voteLine"><strong>Vote:</strong> <span id="voteChoice">Recorded</span></p>
+        <button class="btn secondaryBtn" id="downloadRecordBtn" type="button">⇩ Print / Save Voting Record (PDF)</button>
+      </div>
+
+      <form
+        name="aderrig-voting-experience-feedback"
+        id="feedbackForm"
+        class="feedbackCard"
+        method="POST"
+        data-netlify="true"
+        netlify
+      >
+        <input type="hidden" name="form-name" value="aderrig-voting-experience-feedback">
+        <input type="hidden" name="referenceId" id="feedbackReferenceId">
+        <input type="hidden" name="rating" id="feedbackRating">
+
+        <h2>Rate this voting experience</h2>
+        <p class="feedbackIntro">Please choose a rating from 1 to 5.</p>
+
+        <div class="ratingGrid" role="radiogroup" aria-label="Voting experience rating">
+          <button type="button" class="ratingBtn" data-rating="1" aria-label="1 Very Poor">
+            <span class="ratingStar">★</span><strong>1</strong><span>Very Poor</span>
+          </button>
+          <button type="button" class="ratingBtn" data-rating="2" aria-label="2 Poor">
+            <span class="ratingStar">★</span><strong>2</strong><span>Poor</span>
+          </button>
+          <button type="button" class="ratingBtn" data-rating="3" aria-label="3 Average">
+            <span class="ratingStar">★</span><strong>3</strong><span>Average</span>
+          </button>
+          <button type="button" class="ratingBtn" data-rating="4" aria-label="4 Good">
+            <span class="ratingStar">★</span><strong>4</strong><span>Good</span>
+          </button>
+          <button type="button" class="ratingBtn" data-rating="5" aria-label="5 Excellent">
+            <span class="ratingStar">★</span><strong>5</strong><span>Excellent</span>
+          </button>
+        </div>
+
+        <label class="commentLabel" for="feedbackComment">Optional comment</label>
+        <textarea id="feedbackComment" name="comment" maxlength="200" rows="3" placeholder="Share your feedback..."></textarea>
+        <div class="commentCount"><span id="commentCount">0</span>/200</div>
+
+        <div class="feedbackActions">
+          <button class="btn" id="submitFeedbackBtn" type="submit" disabled>Send feedback</button>
+          <p class="message" id="feedbackMessage" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+
+      <button class="btn closeBtn" id="closeBtn" type="button">Close</button>
+      <p class="smallClose">You can close this page.</p>
     </section>
+
   </main>
+
   <script>
     const params = new URLSearchParams(location.search);
     const ref = params.get('ref') || sessionStorage.getItem('agVoteReferenceId') || '';
-    if (ref) document.getElementById('referenceId').textContent = ref;
+    const vote = params.get('vote') || sessionStorage.getItem('agVoteChoice') || '';
+
+    const referenceId = document.getElementById('referenceId');
+    const voteChoice = document.getElementById('voteChoice');
+    const feedbackReferenceId = document.getElementById('feedbackReferenceId');
+    const feedbackRating = document.getElementById('feedbackRating');
+    const feedbackForm = document.getElementById('feedbackForm');
+    const feedbackMessage = document.getElementById('feedbackMessage');
+    const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+    const feedbackComment = document.getElementById('feedbackComment');
+    const commentCount = document.getElementById('commentCount');
+
+    if (ref) {
+      referenceId.textContent = ref;
+      feedbackReferenceId.value = ref;
+    }
+    if (vote) voteChoice.textContent = vote.toUpperCase();
+
+    document.querySelectorAll('.ratingBtn').forEach((button) => {
+      button.addEventListener('click', () => {
+        const rating = button.dataset.rating;
+        feedbackRating.value = rating;
+        submitFeedbackBtn.disabled = false;
+        document.querySelectorAll('.ratingBtn').forEach((btn) => {
+          btn.classList.toggle('selected', btn === button);
+          btn.setAttribute('aria-checked', btn === button ? 'true' : 'false');
+        });
+        feedbackMessage.textContent = '';
+        feedbackMessage.classList.remove('ok');
+      });
+    });
+
+    feedbackComment.addEventListener('input', () => {
+      commentCount.textContent = String(feedbackComment.value.length);
+    });
+
+    function encodeForm(form) {
+      return new URLSearchParams(new FormData(form)).toString();
+    }
+
+    async function submitNetlifyFeedbackBackup() {
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: encodeForm(feedbackForm)
+      });
+      if (!response.ok) throw new Error('Feedback form backup failed.');
+    }
+
+    feedbackForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!feedbackRating.value) {
+        feedbackMessage.textContent = 'Please choose a rating from 1 to 5.';
+        return;
+      }
+
+      submitFeedbackBtn.disabled = true;
+      submitFeedbackBtn.textContent = 'Sending...';
+      feedbackMessage.textContent = '';
+
+      const payload = {
+        referenceId: feedbackReferenceId.value,
+        rating: feedbackRating.value,
+        comment: feedbackComment.value.trim()
+      };
+
+      try {
+        let stored = false;
+        try {
+          const response = await fetch('/.netlify/functions/register-voting-feedback', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          stored = response.ok;
+        } catch (error) {
+          console.warn(error);
+        }
+
+        if (!stored) await submitNetlifyFeedbackBackup();
+        feedbackMessage.textContent = 'Thank you. Your feedback has been recorded.';
+        feedbackMessage.classList.add('ok');
+        submitFeedbackBtn.textContent = 'Feedback sent';
+      } catch (error) {
+        submitFeedbackBtn.disabled = false;
+        submitFeedbackBtn.textContent = 'Send feedback';
+        feedbackMessage.textContent = 'Unable to record feedback. You can still close this page.';
+      }
+    });
+
+    document.getElementById('downloadRecordBtn').addEventListener('click', () => {
+      window.print();
+    });
+
     document.getElementById('closeBtn').addEventListener('click', () => {
       window.location.href = '/';
     });
