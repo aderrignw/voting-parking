@@ -278,3 +278,12 @@
   .ratingBtn strong{font-size:17px}
   .ratingBtn span:not(.ratingStar){font-size:11px}
 }
+
+/* Print / Save PDF button hover refinement */
+.secondaryBtn:hover,
+.secondaryBtn:focus-visible{
+  background:#f2faf4;
+  color:#07572c;
+  border-color:#07572c;
+  box-shadow:0 0 0 4px rgba(11,63,36,.08);
+}
