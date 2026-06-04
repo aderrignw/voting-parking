@@ -287,3 +287,20 @@
   border-color:#07572c;
   box-shadow:0 0 0 4px rgba(11,63,36,.08);
 }
+
+
+/* Eircode confirmation refinement */
+.eircodeReviewBox{
+  margin:14px 0 0;
+  padding:16px;
+  border:1px solid #f1d19a;
+  border-left:5px solid #b87400;
+  border-radius:14px;
+  background:#fff8ea;
+  color:#3b2a0b;
+}
+.eircodeReviewBox strong{display:block;color:#6d4300;font-size:15px;margin-bottom:6px}
+.eircodeReviewBox p{margin:6px 0;line-height:1.45}
+.eircodeReviewActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.eircodeReviewActions .btn{min-width:190px;height:46px}
+@media(max-width:760px){.eircodeReviewActions .btn{width:100%}}
