@@ -26,6 +26,42 @@ const DEFAULT_SETTINGS = {
 const json = (statusCode, body) => ({ statusCode, headers: corsHeaders, body: JSON.stringify(body) });
 const store = () => getStore({ name: 'aderrig-parking-settings', consistency: 'strong' });
 
+function headerValue(headers = {}, name = '') {
+  const target = String(name).toLowerCase();
+  for (const [key, value] of Object.entries(headers || {})) {
+    if (String(key).toLowerCase() === target) return value;
+  }
+  return '';
+}
+
+function toIsoFromParts(dateValue = '', timeValue = '') {
+  const date = String(dateValue || '').trim();
+  const time = String(timeValue || '').trim();
+  if (!date || !time) return '';
+  const parsed = new Date(`${date} ${time}`);
+  if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+  return '';
+}
+
+async function saveSettings(settings) {
+  const s = store();
+  if (typeof s.setJSON === 'function') {
+    await s.setJSON(SETTINGS_KEY, settings);
+  } else {
+    await s.set(SETTINGS_KEY, JSON.stringify(settings), { metadata: { contentType: 'application/json' } });
+  }
+
+  // Confirm the write completed. This avoids a false success message on the dashboard.
+  try {
+    const saved = await s.get(SETTINGS_KEY, { type: 'json', consistency: 'strong' });
+    if (!saved || String(saved.votingCloseAtIso || '') !== String(settings.votingCloseAtIso || '')) {
+      throw new Error('Settings were written but could not be verified immediately.');
+    }
+  } catch (error) {
+    throw new Error(`Settings save verification failed: ${error.message || error}`);
+  }
+}
+
 function irelandDateTime(value) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '';
@@ -55,8 +91,8 @@ export const handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const email = String(event.headers['x-director-email'] || body.directorEmail || '').trim().toLowerCase();
-    const pin = String(event.headers['x-admin-pin'] || body.pin || '');
+    const email = String(headerValue(event.headers, 'x-director-email') || body.directorEmail || '').trim().toLowerCase();
+    const pin = String(headerValue(event.headers, 'x-admin-pin') || body.pin || '');
     const required = process.env.ADMIN_ONLY_PIN || 'OMCADMIN2026';
     const directorPin = process.env.DIRECTOR_PIN || process.env.ADMIN_PIN || 'OMCDIRETORES2026';
 
@@ -64,8 +100,8 @@ export const handler = async (event) => {
     if (pin !== required && pin !== directorPin) return json(401, { ok: false, message: 'Invalid administrator password.' });
 
     const current = await readCurrent();
-    const votingCloseAtIso = String(body.votingCloseAtIso || current.votingCloseAtIso || '').trim();
-    const resetAtIso = String(body.resetAtIso || current.baseline.establishedAtIso || '').trim();
+    const votingCloseAtIso = String(body.votingCloseAtIso || toIsoFromParts(body.votingEndDate, body.votingEndTime) || current.votingCloseAtIso || '').trim();
+    const resetAtIso = String(body.resetAtIso || toIsoFromParts(body.resetDate, body.resetTime) || current.baseline.establishedAtIso || '').trim();
     const resetAtIreland = String(body.resetAtIreland || irelandDateTime(resetAtIso) || current.baseline.establishedAtIreland || '').trim();
     const note = String(body.baselineNote || current.baseline.note || DEFAULT_SETTINGS.baseline.note).trim();
 
@@ -91,9 +127,9 @@ export const handler = async (event) => {
       updatedBy: email
     };
 
-    await store().set(SETTINGS_KEY, JSON.stringify(settings), { contentType: 'application/json' });
+    await saveSettings(settings);
     return json(200, { ok: true, settings });
   } catch (error) {
-    return json(500, { ok: false, message: 'Unable to update voting settings.' });
+    return json(500, { ok: false, message: 'Unable to update voting settings.', detail: String(error.message || error).slice(0, 500) });
   }
 };
