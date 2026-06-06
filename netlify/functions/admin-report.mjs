@@ -1,74 +1,3 @@
-import { getStore } from '@netlify/blobs';
-
-const SETTINGS_KEY = 'settings/voting-settings.json';
-const REMOVED_PREFIX = 'removed-votes/';
-
-const DEFAULT_VOTING_SETTINGS = {
-  votingCloseAtIso: '2026-06-08T23:59:00+01:00',
-  votingCloseLabel: '08 June 2026, 23:59 · Ireland time',
-  baseline: {
-    confirmed: true,
-    status: 'Confirmed',
-    startingSubmissions: 0,
-    establishedAtIreland: '04 Jun 2026, 17:43',
-    establishedAtIso: '2026-06-04T17:43+01:00',
-    note: 'System cleared before official launch. Voting started from zero recorded submissions.'
-  }
-};
-
-const settingsStore = () => getStore({ name: 'aderrig-parking-settings', consistency: 'strong' });
-
-async function readVotingSettings() {
-  try {
-    const stored = await settingsStore().get(SETTINGS_KEY, { type: 'json', consistency: 'strong' });
-    if (!stored || typeof stored !== 'object') return DEFAULT_VOTING_SETTINGS;
-    return {
-      ...DEFAULT_VOTING_SETTINGS,
-      ...stored,
-      baseline: { ...DEFAULT_VOTING_SETTINGS.baseline, ...(stored.baseline || {}) }
-    };
-  } catch {
-    return DEFAULT_VOTING_SETTINGS;
-  }
-}
-
-async function readRemovedVotes() {
-  const store = settingsStore();
-  const out = [];
-  let cursor;
-  try {
-    do {
-      const result = await store.list({ prefix: REMOVED_PREFIX, cursor });
-      for (const blob of result.blobs || []) {
-        const item = await store.get(blob.key, { type: 'json', consistency: 'strong' });
-        if (item) out.push(item);
-      }
-      cursor = result.cursor;
-    } while (cursor);
-  } catch {}
-  out.sort((a, b) => String(b.removedAtIso || '').localeCompare(String(a.removedAtIso || '')));
-  return out;
-}
-
-function removalKey(row = {}) {
-  const values = [row.id, row.referenceId, row.eircode, row.email, row.submittedAtIreland, row.createdAt]
-    .map(v => String(v || '').trim().toLowerCase())
-    .filter(Boolean);
-  return values.join('|');
-}
-
-function removedMatcher(removedVotes = []) {
-  const tokens = new Set();
-  for (const item of removedVotes) {
-    [item.submissionId, item.referenceId, item.eircode, item.email, item.submittedAtIreland, item.createdAt]
-      .map(v => String(v || '').trim().toLowerCase())
-      .filter(Boolean)
-      .forEach(v => tokens.add(v));
-  }
-  return (row = {}) => [row.id, row.referenceId, row.eircode, row.email, row.submittedAtIreland, row.createdAt]
-    .some(v => tokens.has(String(v || '').trim().toLowerCase()));
-}
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Pin, X-Director-Email',
@@ -447,7 +376,7 @@ function buildDownloadAudit(downloadSubmissions = [], voteRows = []) {
   };
 }
 
-function buildReport(submissions, includeRows = false, settings = DEFAULT_VOTING_SETTINGS, removedVotes = []) {
+function buildReport(submissions, includeRows = false) {
   const rows = submissions.map((item, index) => {
     const data = item.data || item.form_data || item || {};
     const vote = normaliseVote(field(data, ['vote', 'Vote', 'decision', 'choice']));
@@ -470,11 +399,7 @@ function buildReport(submissions, includeRows = false, settings = DEFAULT_VOTING
     };
   });
 
-  const isRemoved = removedMatcher(removedVotes);
-  const removedRows = rows.filter(row => isRemoved(row));
-  const activeRows = rows.filter(row => !isRemoved(row));
-
-  const eircodeCounts = activeRows.reduce((acc, row) => {
+  const eircodeCounts = rows.reduce((acc, row) => {
     if (!row.eircode) return acc;
     acc[row.eircode] = (acc[row.eircode] || 0) + 1;
     return acc;
@@ -483,7 +408,7 @@ function buildReport(submissions, includeRows = false, settings = DEFAULT_VOTING
     .filter(([, count]) => count > 1)
     .map(([eircode, count]) => ({ eircode, count }));
 
-  const { validRows, excludedDuplicateRows } = firstValidRowsByEircode(activeRows);
+  const { validRows, excludedDuplicateRows } = firstValidRowsByEircode(rows);
 
   const totalVotes = validRows.length;
   const agree = validRows.filter(r => r.vote === 'Agree').length;
@@ -498,7 +423,7 @@ function buildReport(submissions, includeRows = false, settings = DEFAULT_VOTING
   }, {});
   const uniqueEircodes = Object.keys(validEircodeCounts).length;
 
-  const lastSubmission = activeRows
+  const lastSubmission = rows
     .slice()
     .sort((a, b) => new Date(b.createdAt || b.submittedAtIreland) - new Date(a.createdAt || a.submittedAtIreland))[0] || null;
 
@@ -516,19 +441,12 @@ function buildReport(submissions, includeRows = false, settings = DEFAULT_VOTING
 
   const report = {
     generatedAtIreland: safeDate(new Date().toISOString()),
-    officialBaseline: settings.baseline || OFFICIAL_BASELINE,
-    votingSettings: {
-      votingCloseAtIso: settings.votingCloseAtIso,
-      votingCloseLabel: settings.votingCloseLabel
-    },
-    removedVotes: includeRows ? removedVotes : [],
+    officialBaseline: OFFICIAL_BASELINE,
     totalResidences: TOTAL_RESIDENCES,
     summary: {
       totalResidences: TOTAL_RESIDENCES,
       totalVotes,
       recordedSubmissions: rows.length,
-      activeSubmissions: activeRows.length,
-      removedVotes: removedRows.length,
       excludedDuplicateVotes: excludedDuplicateRows.length,
       outstandingResidences,
       participationRate: pct(totalVotes, TOTAL_RESIDENCES),
@@ -549,7 +467,7 @@ function buildReport(submissions, includeRows = false, settings = DEFAULT_VOTING
   if (includeRows) {
     report.duplicateEircodes = duplicateEircodes;
     report.excludedDuplicateRows = excludedDuplicateRows;
-    report.rows = activeRows;
+    report.rows = rows;
   } else {
     report.duplicateEircodes = [];
     report.excludedDuplicateRows = [];
@@ -606,9 +524,7 @@ export const handler = async (event) => {
     });
   }
 
-  const votingSettings = await readVotingSettings();
-  const removedVotes = await readRemovedVotes();
-  const report = buildReport(all, isAdmin, votingSettings, removedVotes);
+  const report = buildReport(all, isAdmin);
 
   if (isAdmin) {
     try {
