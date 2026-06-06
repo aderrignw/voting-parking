@@ -38,28 +38,41 @@ function toIsoFromParts(dateValue = '', timeValue = '') {
   const date = String(dateValue || '').trim();
   const time = String(timeValue || '').trim();
   if (!date || !time) return '';
-  const parsed = new Date(`${date} ${time}`);
-  if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
-  return '';
+  const parsed = new Date(`${date}T${time}:00+01:00`);
+  return Number.isNaN(parsed.getTime()) ? '' : parsed.toISOString();
+}
+
+async function readJson(s) {
+  try {
+    const item = await s.get(SETTINGS_KEY, { type: 'json', consistency: 'strong' });
+    if (item && typeof item === 'object') return item;
+  } catch {}
+  try {
+    const text = await s.get(SETTINGS_KEY, { type: 'text', consistency: 'strong' });
+    return text ? JSON.parse(text) : null;
+  } catch {
+    return null;
+  }
 }
 
 async function saveSettings(settings) {
   const s = store();
+  const payload = JSON.stringify(settings);
+
   if (typeof s.setJSON === 'function') {
     await s.setJSON(SETTINGS_KEY, settings);
   } else {
-    await s.set(SETTINGS_KEY, JSON.stringify(settings), { metadata: { contentType: 'application/json' } });
+    await s.set(SETTINGS_KEY, payload, { metadata: { contentType: 'application/json' } });
   }
 
-  // Confirm the write completed. This avoids a false success message on the dashboard.
-  try {
-    const saved = await s.get(SETTINGS_KEY, { type: 'json', consistency: 'strong' });
-    if (!saved || String(saved.votingCloseAtIso || '') !== String(settings.votingCloseAtIso || '')) {
-      throw new Error('Settings were written but could not be verified immediately.');
-    }
-  } catch (error) {
-    throw new Error(`Settings save verification failed: ${error.message || error}`);
+  let saved = null;
+  for (let i = 0; i < 3; i += 1) {
+    saved = await readJson(s);
+    if (saved && String(saved.votingCloseAtIso || '') === String(settings.votingCloseAtIso || '')) return saved;
+    await new Promise(resolve => setTimeout(resolve, 200));
   }
+
+  throw new Error('Settings were written but could not be verified from Netlify Blobs.');
 }
 
 function irelandDateTime(value) {
@@ -78,8 +91,10 @@ function closeLabel(value) {
 
 async function readCurrent() {
   try {
-    const existing = await store().get(SETTINGS_KEY, { type: 'json', consistency: 'strong' });
-    return existing && typeof existing === 'object' ? { ...DEFAULT_SETTINGS, ...existing, baseline: { ...DEFAULT_SETTINGS.baseline, ...(existing.baseline || {}) } } : DEFAULT_SETTINGS;
+    const existing = await readJson(store());
+    return existing && typeof existing === 'object'
+      ? { ...DEFAULT_SETTINGS, ...existing, baseline: { ...DEFAULT_SETTINGS.baseline, ...(existing.baseline || {}) } }
+      : DEFAULT_SETTINGS;
   } catch {
     return DEFAULT_SETTINGS;
   }
@@ -127,9 +142,13 @@ export const handler = async (event) => {
       updatedBy: email
     };
 
-    await saveSettings(settings);
-    return json(200, { ok: true, settings });
+    const saved = await saveSettings(settings);
+    return json(200, { ok: true, settings: saved });
   } catch (error) {
-    return json(500, { ok: false, message: 'Unable to update voting settings.', detail: String(error.message || error).slice(0, 500) });
+    return json(500, {
+      ok: false,
+      message: 'Unable to update voting settings.',
+      detail: String(error.message || error).slice(0, 500)
+    });
   }
 };
