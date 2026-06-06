@@ -648,7 +648,7 @@ async function saveVotingSettings(){
       body:JSON.stringify({votingCloseAtIso,resetAtIso})
     });
     const data=await res.json();
-    if(!res.ok||!data.ok) throw new Error(data.message||'Unable to save settings.');
+    if(!res.ok||!data.ok) throw new Error((data.message||'Unable to save settings.')+(data.detail?' Detail: '+data.detail:''));
     if(msg) msg.textContent='Settings saved.';
     await loadLive();
   }catch(e){
