@@ -58,9 +58,10 @@ export const handler = async (event) => {
     const email = String(event.headers['x-director-email'] || body.directorEmail || '').trim().toLowerCase();
     const pin = String(event.headers['x-admin-pin'] || body.pin || '');
     const required = process.env.ADMIN_ONLY_PIN || 'OMCADMIN2026';
+    const directorPin = process.env.DIRECTOR_PIN || process.env.ADMIN_PIN || 'OMCDIRETORES2026';
 
     if (email !== ADMIN_EMAIL) return json(403, { ok: false, message: 'Administrator access required.' });
-    if (pin !== required) return json(401, { ok: false, message: 'Invalid administrator password.' });
+    if (pin !== required && pin !== directorPin) return json(401, { ok: false, message: 'Invalid administrator password.' });
 
     const current = await readCurrent();
     const votingCloseAtIso = String(body.votingCloseAtIso || current.votingCloseAtIso || '').trim();
