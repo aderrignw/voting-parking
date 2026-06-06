@@ -21,7 +21,18 @@ export const validEmail = (email = '') => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(Stri
 
 export const validEircode = (eircode = '') => /^[A-Z0-9]{3}\s?[A-Z0-9]{4}$/.test(String(eircode).trim().toUpperCase());
 
-export const getVotesStore = () => getStore({ name: 'aderrig-parking-votes', consistency: 'strong' });
+export const getBlobStore = (name, options = {}) => {
+  const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
+  const token = process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_API_TOKEN;
+  const config = { name, consistency: 'strong', ...options };
+  if (siteID && token) {
+    config.siteID = siteID;
+    config.token = token;
+  }
+  return getStore(config);
+};
+
+export const getVotesStore = () => getBlobStore('aderrig-parking-votes');
 
 export const clientIp = (event) => {
   const headers = event.headers || {};
