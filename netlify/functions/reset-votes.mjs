@@ -26,7 +26,7 @@ async function updateResetBaseline(note = '') {
     },
     updatedAtIso: now.toISOString()
   };
-  await store.setJSON(SETTINGS_KEY, settings);
+  await store.set(SETTINGS_KEY, JSON.stringify(settings), { contentType: 'application/json' });
   return settings.baseline;
 }
 
