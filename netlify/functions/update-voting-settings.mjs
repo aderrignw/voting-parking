@@ -1,4 +1,4 @@
-import { getStore } from '@netlify/blobs';
+import { getBlobStore } from './_utils.mjs';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,7 +24,7 @@ const DEFAULT_SETTINGS = {
 };
 
 const json = (statusCode, body) => ({ statusCode, headers: corsHeaders, body: JSON.stringify(body) });
-const store = () => getStore({ name: 'aderrig-parking-settings', consistency: 'strong' });
+const store = () => getBlobStore('aderrig-parking-settings');
 
 function headerValue(headers = {}, name = '') {
   const target = String(name).toLowerCase();
