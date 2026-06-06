@@ -1,4 +1,4 @@
-import { getStore } from '@netlify/blobs';
+import { getBlobStore } from './_utils.mjs';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Pin, X-Director-Email',
@@ -24,7 +24,7 @@ const DEFAULT_VOTING_SETTINGS = {
   votingCloseLabel: '08 June 2026, 23:59 · Ireland time',
   baseline: OFFICIAL_BASELINE
 };
-const settingsStore = () => getStore({ name: 'aderrig-parking-settings', consistency: 'strong' });
+const settingsStore = () => getBlobStore('aderrig-parking-settings');
 
 async function readVotingSettings() {
   try {
