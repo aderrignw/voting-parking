@@ -62,7 +62,7 @@ export const handler = async (event) => {
     };
 
     const keySeed = submissionId || referenceId || `${eircode}-${emailValue}` || String(Date.now());
-    await store().setJSON(`${REMOVED_PREFIX}${safeId(keySeed)}.json`, record);
+    await store().set(`${REMOVED_PREFIX}${safeId(keySeed)}.json`, JSON.stringify(record), { contentType: 'application/json' });
     return json(200, { ok: true, removed: record });
   } catch (error) {
     return json(500, { ok: false, message: 'Unable to remove vote.' });
