@@ -91,7 +91,7 @@ export const handler = async (event) => {
       updatedBy: email
     };
 
-    await store().setJSON(SETTINGS_KEY, settings);
+    await store().set(SETTINGS_KEY, JSON.stringify(settings), { contentType: 'application/json' });
     return json(200, { ok: true, settings });
   } catch (error) {
     return json(500, { ok: false, message: 'Unable to update voting settings.' });
