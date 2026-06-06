@@ -1,4 +1,34 @@
 import { json, getVotesStore } from './_utils.mjs';
+import { getStore } from '@netlify/blobs';
+
+const settingsStore = () => getStore({ name: 'aderrig-parking-settings', consistency: 'strong' });
+const SETTINGS_KEY = 'settings/voting-settings.json';
+
+function irelandTimestamp(date = new Date()) {
+  return date.toLocaleString('en-IE', { timeZone: 'Europe/Dublin', dateStyle: 'medium', timeStyle: 'short' });
+}
+
+async function updateResetBaseline(note = '') {
+  const now = new Date();
+  const store = settingsStore();
+  let current = {};
+  try { current = await store.get(SETTINGS_KEY, { type: 'json', consistency: 'strong' }) || {}; } catch {}
+  const settings = {
+    ...current,
+    baseline: {
+      ...(current.baseline || {}),
+      confirmed: true,
+      status: 'Confirmed',
+      startingSubmissions: 0,
+      establishedAtIreland: irelandTimestamp(now),
+      establishedAtIso: now.toISOString(),
+      note: note || 'System cleared before official launch. Voting started from zero recorded submissions.'
+    },
+    updatedAtIso: now.toISOString()
+  };
+  await store.setJSON(SETTINGS_KEY, settings);
+  return settings.baseline;
+}
 
 const deleteAllVotes = async () => {
   const store = getVotesStore();
@@ -28,7 +58,8 @@ export const handler = async (event) => {
       return json(400, { ok: false, message: 'Please type RESET ALL VOTES to confirm.' });
     }
     const deleted = await deleteAllVotes();
-    return json(200, { ok: true, deleted, message: `Reset complete. ${deleted} vote record(s) removed.` });
+    const baseline = await updateResetBaseline(String(body.note || '').trim());
+    return json(200, { ok: true, deleted, baseline, message: `Reset complete. ${deleted} vote record(s) removed.` });
   } catch (error) {
     return json(500, { ok: false, message: 'Unable to reset votes.' });
   }
