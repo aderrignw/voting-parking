@@ -339,6 +339,23 @@
     .feedbackCommentsBox h4{margin:0 0 8px;color:var(--green);font-size:14px}
     .satisfactionActions button{font-size:12px;min-height:34px;padding:8px 11px}
 
+
+    .adminToolsPanel{margin:16px 0;padding:20px 22px}
+    .adminToolsPanel details{border:1px solid var(--line);background:#fff;border-radius:16px;padding:14px 16px;margin:10px 0}
+    .adminToolsPanel summary{cursor:pointer;font-weight:760;color:var(--green);list-style:none}
+    .adminToolsPanel summary::-webkit-details-marker{display:none}
+    .adminToolsPanel summary::before{content:'▶';display:inline-block;margin-right:8px;color:var(--green)}
+    .adminToolsPanel details[open] summary::before{content:'▼'}
+    .adminToolsGrid{display:grid;grid-template-columns:repeat(2,minmax(240px,1fr));gap:14px;margin-top:14px}
+    .adminToolsBox{border:1px solid #edf2ee;border-radius:14px;background:#fbfdf9;padding:14px}
+    .adminToolsBox h4{margin:0 0 10px;color:var(--green)}
+    .adminToolsBox label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:760;color:var(--muted);margin:8px 0 5px}
+    .adminToolsBox input{width:100%;min-width:0;padding:11px 12px}
+    .adminToolsBox button{margin-top:10px;font-size:13px;padding:10px 14px}
+    .adminToolsMessage{font-size:13px;margin-top:10px;color:var(--muted)}
+    .dangerBtn{background:#fff;color:var(--red);border-color:#f0b6b6;box-shadow:none}
+    .dangerBtn:hover{background:#fff5f5}
+
     @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.streetGridCompact{grid-template-columns:1fr}.resultSplitLayout{grid-template-columns:260px minmax(260px,1fr)}.baselinePanel{display:block}.baselineGrid{margin-top:14px;grid-template-columns:repeat(3,1fr)}.downloadAuditGrid{grid-template-columns:repeat(2,1fr)}.downloadAuditTables{grid-template-columns:1fr}}
     @media(max-width:720px){
       .heroInner,.top,.streetHeader{display:block} .secure{text-align:left;margin-top:14px} .wrap{padding:24px 16px 54px}
@@ -397,12 +414,48 @@
         </div>
       </div>
 
+      <div class="card adminToolsPanel adminOnly" id="adminToolsPanel">
+        <details id="adminToolsDetails">
+          <summary>Administration Tools</summary>
+          <div class="adminToolsGrid">
+            <div class="adminToolsBox">
+              <h4>Voting Settings</h4>
+              <label for="votingEndDate">Voting End Date</label>
+              <input id="votingEndDate" type="date">
+              <label for="votingEndTime">Voting End Time</label>
+              <input id="votingEndTime" type="time">
+              <label for="resetDate">Official Start / Reset Date</label>
+              <input id="resetDate" type="date">
+              <label for="resetTime">Official Start / Reset Time</label>
+              <input id="resetTime" type="time">
+              <button id="saveVotingSettingsBtn">Save Voting Settings</button>
+              <div class="adminToolsMessage" id="votingSettingsMessage"></div>
+            </div>
+            <div class="adminToolsBox">
+              <h4>Removed Votes Audit Log</h4>
+              <p class="small">Votes removed by the administrator are excluded from all official counts and retained here for transparency.</p>
+              <details id="removedVotesDetails">
+                <summary id="removedVotesSummary">Removed Votes Log (0)</summary>
+                <div class="miniTableWrap" style="margin-top:10px">
+                  <table>
+                    <thead><tr><th>Removed</th><th>Reference</th><th>Eircode</th><th>Reason</th></tr></thead>
+                    <tbody id="removedVotesBody"></tbody>
+                  </table>
+                </div>
+              </details>
+            </div>
+          </div>
+        </details>
+      </div>
+
       <div class="grid">
         <div class="card metric featured"><div class="metricIcon">⌂</div><div class="label">Total residences</div><div class="value" id="totalResidences">227</div><div class="note">Official consultation base</div></div>
         <div class="card metric"><div class="metricIcon">♧</div><div class="label">Votes received</div><div class="value" id="totalVotes">0</div><div class="note">Valid counted votes</div></div>
         <div class="card metric"><div class="metricIcon">↗</div><div class="label">Participation rate</div><div class="value" id="participationRate">0%</div><div class="note" id="outstandingResidences">227 outstanding residences</div></div>
         <div class="card metric"><div class="metricIcon">⌖</div><div class="label">Unique Eircodes</div><div class="value" id="uniqueEircodes">0</div><div class="note" id="duplicateNote">No duplicates</div></div>
       </div>
+
+      
 
       <div class="grid">
         <div class="card metric"><div class="metricIcon">👍</div><div class="label">Agree</div><div class="value" id="agreeVotes">0</div><div class="note" id="agreePercent">0%</div></div>
@@ -518,13 +571,13 @@
         <p class="downloadSetupNote" id="downloadAuditNote"></p>
       </div>
 
-      <div class="card panel adminOnly"><div class="toolbar"><div><h3 style="margin:0">Full submissions</h3><p class="small" style="margin:6px 0 0">Administrator-only view with resident email, Eircode and audit fields.</p></div><input id="search" type="search" placeholder="Search email, Eircode, vote or reference"></div><div class="tableWrap"><table><thead><tr><th>#</th><th>Submitted</th><th>Vote</th><th>Eircode</th><th>Email</th><th>Reference</th><th>Confirmed</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
+      <div class="card panel adminOnly"><div class="toolbar"><div><h3 style="margin:0">Full submissions</h3><p class="small" style="margin:6px 0 0">Administrator-only view with resident email, Eircode and audit fields.</p></div><input id="search" type="search" placeholder="Search email, Eircode, vote or reference"></div><div class="tableWrap"><table><thead><tr><th>#</th><th>Submitted</th><th>Vote</th><th>Eircode</th><th>Email</th><th>Reference</th><th>Confirmed</th><th class="adminOnly">Action</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
       <p class="footer">Internal report for directors. Final certification should include duplicate checks and reconciliation against the official Netlify Forms submissions export.</p>
     </section>
   </main>
 <script>
 
-const ADMIN_EMAIL='claudiosantos1968@gmail.com'; let currentRows=[]; let currentReport=null; let currentDirector=''; let streetShowAll=false; const $=id=>document.getElementById(id);
+const ADMIN_EMAIL='claudiosantos1968@gmail.com'; let currentRows=[]; let currentReport=null; let currentDirector=''; let currentAdminPin=''; let streetShowAll=false; const $=id=>document.getElementById(id);
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function showError(msg,setup=false,isAdmin=false){$('loginError').innerHTML= setup ? `<strong>Live API setup required.</strong><br>${esc(msg)}${isAdmin?`<div class="configBox">Administrator fallback is available after login if live API is unavailable. In Netlify, confirm these variables exist:<br><br><strong>ADMIN_PIN</strong> = OMCDIRETORES2026<br><strong>DIRECTOR_EMAILS</strong> = authorised emails<br><strong>NETLIFY_FORM_ID</strong> = your form ID<br><strong>NETLIFY_AUTH_TOKEN</strong> = your Netlify personal access token</div>`:''}` : esc(msg); $('loginError').classList.remove('hidden')}
 function nv(v){v=String(v||'').trim().toLowerCase(); if(['agree','approved','approve','yes','sim','aprovado'].includes(v))return'Agree'; if(['do not agree','disagree','not agree','no','não','nao','rejected','reject'].includes(v))return'Do Not Agree'; return v?String(v):'Unknown'}
@@ -547,14 +600,80 @@ function firstValidRowsByEircode(rows){
   return {validRows,excludedDuplicateRows};
 }
 function isAdminEmail(){return currentDirector===ADMIN_EMAIL}
-async function loadLive(){const email=$('directorEmail').value.trim().toLowerCase(), pin=$('pin').value.trim(); currentDirector=email; if(!email)return showError('Please enter your director email.'); if(!pin)return showError('Please enter the directors password.'); $('loadBtn').disabled=true;$('loginError').classList.add('hidden'); try{const res=await fetch('/.netlify/functions/admin-report',{headers:{'X-Director-Email':email,'X-Admin-Pin':pin}}); const data=await res.json(); if(!res.ok||!data.ok){ if(data && data.isAdmin){openDashboardShell(true); showError(data.message||'Could not load live data.', data.code==='MISSING_NETLIFY_AUTH_TOKEN', true); return;} throw new Error(data.message||'Unable to open dashboard.')} openDashboardShell(data.isAdmin); render(data); }catch(e){showError(e.message||'Unable to open dashboard.')}finally{$('loadBtn').disabled=false}}
+async function loadLive(){const email=$('directorEmail').value.trim().toLowerCase(), pin=$('pin').value.trim(); currentDirector=email; currentAdminPin=pin; if(!email)return showError('Please enter your director email.'); if(!pin)return showError('Please enter the directors password.'); $('loadBtn').disabled=true;$('loginError').classList.add('hidden'); try{const res=await fetch('/.netlify/functions/admin-report',{headers:{'X-Director-Email':email,'X-Admin-Pin':pin}}); const data=await res.json(); if(!res.ok||!data.ok){ if(data && data.isAdmin){openDashboardShell(true); showError(data.message||'Could not load live data.', data.code==='MISSING_NETLIFY_AUTH_TOKEN', true); return;} throw new Error(data.message||'Unable to open dashboard.')} openDashboardShell(data.isAdmin); render(data); }catch(e){showError(e.message||'Unable to open dashboard.')}finally{$('loadBtn').disabled=false}}
 function openDashboardShell(admin){$('login').classList.add('hidden');$('dashboard').classList.remove('hidden');document.body.classList.toggle('adminMode',!!admin);$('roleBadge').textContent=admin?'Administrator view':'Director view';}
 function parseCsv(text){const rows=[];let row=[],cur='',q=false;for(let i=0;i<text.length;i++){const ch=text[i],nx=text[i+1];if(ch==='"'&&q&&nx==='"'){cur+='"';i++;continue}if(ch==='"'){q=!q;continue}if(ch===','&&!q){row.push(cur);cur='';continue}if((ch==='\n'||ch==='\r')&&!q){if(cur||row.length){row.push(cur);rows.push(row);row=[];cur=''} if(ch==='\r'&&nx==='\n')i++;continue}cur+=ch}if(cur||row.length){row.push(cur);rows.push(row)}const headers=(rows.shift()||[]).map(h=>h.trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]||''])))}
 function buildFromRows(raw){const rows=raw.map((r,i)=>({number:i+1,email:String(r.email||r.Email||'').trim().toLowerCase(),eircode:ne(r.eircode||r.Eircode||r.postcode||''),vote:nv(r.vote||r.Vote||r.choice||''),confirmed:r.confirmed||r.Confirmed||'',referenceId:r.referenceId||r.publicReferenceId||r.public_reference_id||r.reference_id||r.reference||r.ref||r.id||'',submittedAtIreland:r.submitted_at_ireland||r.submittedAtIreland||r.created_at||r.createdAt||'',createdAt:r.created_at||r.createdAt||r.submitted_at_ireland||''})); const counts={};rows.forEach(r=>{if(r.eircode)counts[r.eircode]=(counts[r.eircode]||0)+1}); const duplicateEircodes=Object.entries(counts).filter(([,c])=>c>1).map(([eircode,count])=>({eircode,count})); const deduped=firstValidRowsByEircode(rows), validRows=deduped.validRows, excludedDuplicateRows=deduped.excludedDuplicateRows; const totalVotes=validRows.length,agree=validRows.filter(r=>r.vote==='Agree').length,doNotAgree=validRows.filter(r=>r.vote==='Do Not Agree').length,unknown=totalVotes-agree-doNotAgree; const validCounts={};validRows.forEach(r=>{if(r.eircode)validCounts[r.eircode]=(validCounts[r.eircode]||0)+1}); const byDayMap={}; validRows.forEach(r=>{const d=new Date(r.createdAt||r.submittedAtIreland); const key=isNaN(d)?String(r.submittedAtIreland).slice(0,10)||'Unknown':d.toISOString().slice(0,10); byDayMap[key]=byDayMap[key]||{date:key,total:0,agree:0,doNotAgree:0,unknown:0}; byDayMap[key].total++; if(r.vote==='Agree')byDayMap[key].agree++; else if(r.vote==='Do Not Agree')byDayMap[key].doNotAgree++; else byDayMap[key].unknown++;}); return {ok:true,isAdmin:true,authorisedDirector:ADMIN_EMAIL,totalResidences:227,generatedAtIreland:new Date().toLocaleString('en-IE',{timeZone:'Europe/Dublin',dateStyle:'medium',timeStyle:'short'}),summary:{totalResidences:227,totalVotes,recordedSubmissions:rows.length,excludedDuplicateVotes:excludedDuplicateRows.length,outstandingResidences:Math.max(227-totalVotes,0),participationRate:pct(totalVotes,227),agree,doNotAgree,unknown,agreePercent:pct(agree,totalVotes),doNotAgreePercent:pct(doNotAgree,totalVotes),unknownPercent:pct(unknown,totalVotes),uniqueEircodes:Object.keys(validCounts).length,duplicateEircodesCount:duplicateEircodes.length,lastSubmission:rows[rows.length-1]||null},duplicateEircodes,excludedDuplicateRows,byDay:Object.values(byDayMap).sort((a,b)=>a.date.localeCompare(b.date)),rows}}
 async function importCsv(){if(!isAdminEmail())return; const f=$('csvFile').files[0]; if(!f)return alert('Choose a CSV file first.'); const text=await f.text(); render(buildFromRows(parseCsv(text)))}
-function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.excludedDuplicateVotes?`${s.excludedDuplicateVotes} duplicate vote(s) excluded`:(s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'); $('lastUpdated').textContent=data.generatedAtIreland||'—'; const b=data.officialBaseline||{}; if($('baselineStatus')) $('baselineStatus').textContent=b.status||'Confirmed'; if($('baselineSubmissions')) $('baselineSubmissions').textContent=String(b.startingSubmissions??0); if($('baselineTime')) $('baselineTime').textContent=b.establishedAtIreland||'01 Jun 2026, 15:31'; if($('baselineNote')) $('baselineNote').textContent=b.note||'System cleared before official launch. Voting started from zero recorded submissions.'; $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderStreetBreakdown(data.streetBreakdown||null); renderSiteSatisfaction(data.siteSatisfaction||null, data.siteSatisfactionConfigured!==false, data.siteSatisfactionError||''); renderDup(data.duplicateEircodes||[]); renderDownloadAudit(data.downloadAudit||{}, data.downloadAuditConfigured!==false, data.downloadAuditError||''); renderTable(currentRows)}}
+function render(data){currentReport=data; currentRows=data.rows||[]; const s=data.summary||{}; const admin=!!data.isAdmin; openDashboardShell(admin); $('generatedAt').textContent=`Generated ${data.generatedAtIreland||''}`; $('totalResidences').textContent=s.totalResidences||data.totalResidences||227; $('totalVotes').textContent=s.totalVotes||0; $('participationRate').textContent=(s.participationRate||0)+'%'; $('outstandingResidences').textContent=(s.outstandingResidences||0)+' outstanding residences'; $('agreeVotes').textContent=s.agree||0; $('disagreeVotes').textContent=s.doNotAgree||0; $('uniqueEircodes').textContent=s.uniqueEircodes||0; $('agreePercent').textContent=(s.agreePercent||0)+'% of recorded votes'; $('disagreePercent').textContent=(s.doNotAgreePercent||0)+'% of recorded votes'; $('duplicateNote').textContent=s.excludedDuplicateVotes?`${s.excludedDuplicateVotes} duplicate vote(s) excluded`:(s.duplicateEircodesCount?`${s.duplicateEircodesCount} duplicate Eircode(s) to review`:'No duplicate Eircodes'); $('lastUpdated').textContent=data.generatedAtIreland||'—'; const b=data.officialBaseline||{}; if($('baselineStatus')) $('baselineStatus').textContent=b.status||'Confirmed'; if($('baselineSubmissions')) $('baselineSubmissions').textContent=String(b.startingSubmissions??0); if($('baselineTime')) $('baselineTime').textContent=b.establishedAtIreland||'01 Jun 2026, 15:31'; if($('baselineNote')) $('baselineNote').textContent=b.note||'System cleared before official launch. Voting started from zero recorded submissions.'; const vs=data.votingSettings||{}; if(vs.votingCloseAtIso){VOTING_CLOSE_AT=new Date(vs.votingCloseAtIso); VOTING_CLOSE_LABEL='Closes '+(vs.votingCloseLabel||vs.votingCloseAtIso); updateVotingCountdown();} $('participationBar').style.width=(s.participationRate||0)+'%'; $('outstandingBar').style.width=Math.max(0,100-(s.participationRate||0))+'%'; drawPie(s); drawTimeline(data.byDay||[]); if(admin){renderStreetBreakdown(data.streetBreakdown||null); renderSiteSatisfaction(data.siteSatisfaction||null, data.siteSatisfactionConfigured!==false, data.siteSatisfactionError||''); renderDup(data.duplicateEircodes||[]); renderDownloadAudit(data.downloadAudit||{}, data.downloadAuditConfigured!==false, data.downloadAuditError||''); renderAdminTools(data); renderTable(currentRows)}}
 function renderDup(list){if(!list.length){$('duplicatesBox').classList.add('hidden');return}$('duplicatesBox').classList.remove('hidden');$('duplicatesList').innerHTML=list.map(x=>`<span class="pill warn">${esc(x.eircode)} — ${x.count} submissions</span>`).join(' ')}
-function renderTable(rows){if(!isAdminEmail())return; const q=($('search').value||'').toLowerCase(); rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q)); $('tbody').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.submittedAtIreland||r.createdAt)}</td><td><span class="pill ${r.vote==='Agree'?'good':r.vote==='Do Not Agree'?'bad':'warn'}">${esc(r.vote)}</span></td><td>${esc(r.eircode)}</td><td>${esc(r.email)}</td><td>${esc(r.referenceId)}</td><td>${esc(r.confirmed)}</td></tr>`).join('')}
+function renderTable(rows){if(!isAdminEmail())return; const q=($('search').value||'').toLowerCase(); rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q)); $('tbody').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.submittedAtIreland||r.createdAt)}</td><td><span class="pill ${r.vote==='Agree'?'good':r.vote==='Do Not Agree'?'bad':'warn'}">${esc(r.vote)}</span></td><td>${esc(r.eircode)}</td><td>${esc(r.email)}</td><td>${esc(r.referenceId)}</td><td>${esc(r.confirmed)}</td><td><button class="dangerBtn" data-remove-vote="${esc(r.id||r.referenceId||r.eircode)}">Remove</button></td></tr>`).join(''); document.querySelectorAll('[data-remove-vote]').forEach((btn,idx)=>{btn.onclick=()=>removeVote(rows[idx]);});}
+
+
+function isoParts(value){
+  const text=String(value||'');
+  const m=text.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+  if(m) return {date:m[1], time:m[2]};
+  const d=new Date(text);
+  if(isNaN(d.getTime())) return {date:'', time:''};
+  return {date:d.toISOString().slice(0,10), time:d.toISOString().slice(11,16)};
+}
+function makeIrelandIso(date,time){
+  if(!date||!time)return '';
+  return `${date}T${time}:00+01:00`;
+}
+function renderAdminTools(data){
+  if(!isAdminEmail())return;
+  const settings=data.votingSettings||{};
+  const close=isoParts(settings.votingCloseAtIso||'2026-06-08T23:59:00+01:00');
+  const reset=isoParts((settings.baseline||{}).establishedAtIso||'2026-06-04T17:43:00+01:00');
+  if($('votingEndDate')) $('votingEndDate').value=close.date;
+  if($('votingEndTime')) $('votingEndTime').value=close.time;
+  if($('resetDate')) $('resetDate').value=reset.date;
+  if($('resetTime')) $('resetTime').value=reset.time;
+  const removed=data.removedVotes||[];
+  if($('removedVotesSummary')) $('removedVotesSummary').textContent=`Removed Votes Log (${removed.length})`;
+  if($('removedVotesBody')) $('removedVotesBody').innerHTML=removed.length?removed.map(r=>`<tr><td>${esc(r.removedAtIreland||r.removedAtIso||'')}</td><td>${esc(r.referenceId||r.submissionId||'')}</td><td>${esc(r.eircode||'')}</td><td>${esc(r.reason||'')}</td></tr>`).join(''):`<tr><td colspan="4">No removed votes recorded.</td></tr>`;
+}
+async function saveVotingSettings(){
+  if(!isAdminEmail())return;
+  const msg=$('votingSettingsMessage');
+  if(msg) msg.textContent='Saving...';
+  const votingCloseAtIso=makeIrelandIso($('votingEndDate').value,$('votingEndTime').value);
+  const resetAtIso=makeIrelandIso($('resetDate').value,$('resetTime').value);
+  try{
+    const res=await fetch('/.netlify/functions/update-voting-settings',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Director-Email':currentDirector,'X-Admin-Pin':currentAdminPin},
+      body:JSON.stringify({votingCloseAtIso,resetAtIso})
+    });
+    const data=await res.json();
+    if(!res.ok||!data.ok) throw new Error(data.message||'Unable to save settings.');
+    if(msg) msg.textContent='Settings saved.';
+    await loadLive();
+  }catch(e){
+    if(msg) msg.textContent=e.message||'Unable to save settings.';
+  }
+}
+async function removeVote(row){
+  if(!isAdminEmail()||!row)return;
+  const reason=prompt(`Reason for removing vote ${row.referenceId||row.eircode||''}:`);
+  if(reason===null)return;
+  if(String(reason).trim().length<5){alert('Please provide a clear reason with at least 5 characters.');return;}
+  try{
+    const res=await fetch('/.netlify/functions/remove-vote',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Director-Email':currentDirector,'X-Admin-Pin':currentAdminPin},
+      body:JSON.stringify({submissionId:row.id,referenceId:row.referenceId,eircode:row.eircode,email:row.email,vote:row.vote,submittedAtIreland:row.submittedAtIreland,createdAt:row.createdAt,reason})
+    });
+    const data=await res.json();
+    if(!res.ok||!data.ok) throw new Error(data.message||'Unable to remove vote.');
+    await loadLive();
+  }catch(e){
+    alert(e.message||'Unable to remove vote.');
+  }
+}
+
 
 function visitorLabel(key){
   const clean=String(key||'').replace(/^visitor-/,'').slice(0,10);
@@ -833,12 +952,12 @@ function drawTimeline(days){
 }
 function downloadCsv(){if(!isAdminEmail())return; const h=['submittedAtIreland','vote','eircode','email','referenceId','confirmed']; const rows=currentRows.map(r=>h.map(k=>'"'+String(r[k]??'').replace(/"/g,'""')+'"').join(',')); const blob=new Blob([h.join(',')+'\n'+rows.join('\n')],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-full-database.csv';a.click();URL.revokeObjectURL(a.href)}
 function downloadSummary(){if(!isAdminEmail()||!currentReport)return; const s=currentReport.summary||{}; const lines=[['Metric','Value'],['Total residences',s.totalResidences||227],['Votes received',s.totalVotes||0],['Outstanding residences',s.outstandingResidences||0],['Participation rate',(s.participationRate||0)+'%'],['Agree',s.agree||0],['Agree %',(s.agreePercent||0)+'%'],['Do Not Agree',s.doNotAgree||0],['Do Not Agree %',(s.doNotAgreePercent||0)+'%'],['Unique Eircodes',s.uniqueEircodes||0],['Duplicate Eircodes',s.duplicateEircodesCount||0],['Excluded duplicate votes',s.excludedDuplicateVotes||0],['Official baseline status',(currentReport.officialBaseline||{}).status||'Confirmed'],['Starting submissions',(currentReport.officialBaseline||{}).startingSubmissions??0],['Baseline established',(currentReport.officialBaseline||{}).establishedAtIreland||'01 Jun 2026, 15:31'],['Policy download clicks',((currentReport.downloadAudit||{}).totalDownloadClicks)||0],['Policy unique download visitors',((currentReport.downloadAudit||{}).uniqueVisitors)||0],['Anonymous download visitors',((currentReport.downloadAudit||{}).anonymousVisitors)||0],['Identified download visitors',((currentReport.downloadAudit||{}).identifiedVisitors)||0],['Identified download visitors who voted',((currentReport.downloadAudit||{}).votedAfterDownload)||0]]; const csv=lines.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='resident-parking-vote-summary.csv';a.click();URL.revokeObjectURL(a.href)}
-const VOTING_CLOSE_AT=new Date('2026-06-08T23:59:00+01:00');
+let VOTING_CLOSE_AT=new Date('2026-06-08T23:59:00+01:00'); let VOTING_CLOSE_LABEL='Closes 08 June 2026, 23:59 · Ireland time';
 function updateVotingCountdown(){
   const el=$('votingCountdown');
   const dateEl=$('votingCloseDate');
   if(!el||!dateEl)return;
-  dateEl.textContent='Closes 08 June 2026, 23:59 · Ireland time';
+  dateEl.textContent=VOTING_CLOSE_LABEL;
   const diff=VOTING_CLOSE_AT.getTime()-Date.now();
   if(diff<=0){el.textContent='Voting closed';return}
   const totalSeconds=Math.floor(diff/1000);
@@ -850,7 +969,7 @@ function updateVotingCountdown(){
 }
 setInterval(updateVotingCountdown,1000);
 updateVotingCountdown();
-$('loadBtn').onclick=loadLive; $('refreshBtn').onclick=loadLive; $('csvBtn').onclick=importCsv; $('downloadBtn').onclick=downloadCsv; $('downloadSummaryBtn').onclick=downloadSummary; $('search').oninput=()=>renderTable(currentRows); if($('streetTableBtn')) $('streetTableBtn').onclick=()=>{streetShowAll=!streetShowAll; if(currentReport)renderStreetBreakdown(currentReport.streetBreakdown||null);}; ['directorEmail','pin'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()}));
+if($('saveVotingSettingsBtn')) $('saveVotingSettingsBtn').onclick=saveVotingSettings; $('loadBtn').onclick=loadLive; $('refreshBtn').onclick=loadLive; $('csvBtn').onclick=importCsv; $('downloadBtn').onclick=downloadCsv; $('downloadSummaryBtn').onclick=downloadSummary; $('search').oninput=()=>renderTable(currentRows); if($('streetTableBtn')) $('streetTableBtn').onclick=()=>{streetShowAll=!streetShowAll; if(currentReport)renderStreetBreakdown(currentReport.streetBreakdown||null);}; ['directorEmail','pin'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')loadLive()}));
 
 </script>
 </body>
