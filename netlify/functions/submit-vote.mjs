@@ -5,8 +5,11 @@ import {
   makeReferenceId
 } from './_utils.mjs';
 import { backupVoteRecord } from './_github-backup.mjs';
+import { getStore } from '@netlify/blobs';
 
 const NETLIFY_API_BASE = 'https://api.netlify.com/api/v1';
+const REMOVED_PREFIX = 'removed-votes/';
+const settingsStore = () => getStore({ name: 'aderrig-parking-settings', consistency: 'strong' });
 const INELIGIBLE_EIRCODE_MESSAGE = 'This consultation is restricted to residents within the Aderrig Green area. The Eircode provided could not be verified as belonging to an eligible residence. Please check your Eircode and try again.';
 const DUPLICATE_EIRCODE_MESSAGE = 'This residence has already voted. One vote per Eircode is permitted.';
 const INVALID_EIRCODE_MESSAGE = 'This Eircode does not appear to be a valid residential Eircode. Please check the Eircode and try again.';
@@ -112,6 +115,38 @@ async function fetchAllSubmissions(formId, token) {
   return all;
 }
 
+async function readRemovedVoteTokens() {
+  const tokens = new Set();
+  try {
+    const store = settingsStore();
+    let cursor;
+    do {
+      const result = await store.list({ prefix: REMOVED_PREFIX, cursor });
+      for (const blob of result.blobs || []) {
+        const item = await store.get(blob.key, { type: 'json', consistency: 'strong' });
+        if (!item) continue;
+        [item.submissionId, item.referenceId, item.eircode, item.email, item.submittedAtIreland, item.createdAt]
+          .map(v => String(v || '').trim().toLowerCase())
+          .filter(Boolean)
+          .forEach(v => tokens.add(v));
+      }
+      cursor = result.cursor;
+    } while (cursor);
+  } catch {}
+  return tokens;
+}
+
+function submissionTokens(submission) {
+  return [
+    submission?.id,
+    getFieldValue(submission, 'referenceId'),
+    getFieldValue(submission, 'reference_id'),
+    getFieldValue(submission, 'eircode'),
+    getFieldValue(submission, 'email'),
+    submission?.created_at
+  ].map(v => String(v || '').trim().toLowerCase()).filter(Boolean);
+}
+
 async function eircodeAlreadyVoted(eircode) {
   const formId = process.env.NETLIFY_FORM_ID;
   const token = process.env.NETLIFY_AUTH_TOKEN;
@@ -121,8 +156,10 @@ async function eircodeAlreadyVoted(eircode) {
   }
 
   const submissions = await fetchAllSubmissions(formId, token);
+  const removedTokens = await readRemovedVoteTokens();
 
   return submissions.some((submission) => {
+    if (submissionTokens(submission).some(token => removedTokens.has(token))) return false;
     const submittedEircode = normalizeEircode(getFieldValue(submission, 'eircode') || '');
     return submittedEircode === eircode;
   });
