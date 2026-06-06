@@ -28,7 +28,11 @@ const settingsStore = () => getStore({ name: 'aderrig-parking-settings', consist
 
 async function readVotingSettings() {
   try {
-    const existing = await settingsStore().get(SETTINGS_KEY, { type: 'json', consistency: 'strong' });
+    let existing = await settingsStore().get(SETTINGS_KEY, { type: 'json', consistency: 'strong' });
+    if (!existing) {
+      const text = await settingsStore().get(SETTINGS_KEY, { type: 'text', consistency: 'strong' });
+      existing = text ? JSON.parse(text) : null;
+    }
     if (existing && typeof existing === 'object') {
       return {
         ...DEFAULT_VOTING_SETTINGS,
