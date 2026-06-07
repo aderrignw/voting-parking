@@ -15,6 +15,10 @@ const voteEmail = $('voteEmail');
 const voteEircode = $('voteEircode');
 const voteSubmittedAtIreland = $('voteSubmittedAtIreland');
 const voteReferenceId = $('voteReferenceId');
+const votingClosedNotice = $('votingClosedNotice');
+const votingClosedText = $('votingClosedText');
+const votingClosedDate = $('votingClosedDate');
+let votingClosed = false;
 let resident = { email: '', eircode: '', eircodeStatus: 'verified', confirmUnlistedEircode: false };
 let pendingUnlistedEircode = null;
 let proposalLoaded = false;
@@ -130,6 +134,43 @@ function makePublicReferenceId(){
   let out = '';
   for (const b of bytes) out += alphabet[b % alphabet.length];
   return `AG-2026-${out.slice(0,4)}-${out.slice(4,8)}`;
+}
+
+
+function formatClosedDateFromStatus(status = {}){
+  const label = String(status.votingCloseLabel || status.closeLabel || '').trim();
+  if (label) return `Closed on ${label}.`;
+  const iso = String(status.votingCloseAtIso || status.closeAtIso || '').trim();
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const date = d.toLocaleDateString('en-IE', { timeZone:'Europe/Dublin', day:'2-digit', month:'long', year:'numeric' });
+  const time = d.toLocaleTimeString('en-IE', { timeZone:'Europe/Dublin', hour:'2-digit', minute:'2-digit', hour12:false });
+  return `Closed on ${date}, ${time} · Ireland time.`;
+}
+function disableVotingPage(status = {}){
+  votingClosed = true;
+  document.body.classList.add('votingClosed');
+  if (votingClosedNotice) votingClosedNotice.classList.remove('hidden');
+  if (votingClosedText) {
+    votingClosedText.textContent = 'The voting period for the Aderrig Green Car Parking Policy consultation has now closed. No further submissions can be accepted.';
+  }
+  if (votingClosedDate) votingClosedDate.textContent = formatClosedDateFromStatus(status);
+  [verifyForm, voteForm].filter(Boolean).forEach(form => {
+    form.querySelectorAll('input, button, textarea, select').forEach(el => { el.disabled = true; });
+  });
+  setMessage(verifyMessage, 'Voting has now closed. No further submissions can be accepted.');
+  setMessage(voteMessage, 'Voting has now closed. No further submissions can be accepted.');
+}
+async function checkVotingStatus(){
+  if (location.protocol === 'file:') return;
+  try{
+    const res = await fetch('/.netlify/functions/voting-status', { headers:{'accept':'application/json'}, cache:'no-store' });
+    const status = await res.json().catch(() => ({}));
+    if (res.ok && status.closed) disableVotingPage(status);
+  }catch(e){
+    console.warn('Voting status check failed.', e);
+  }
 }
 
 function getPolicyDownloadVisitorKey(){
@@ -275,6 +316,7 @@ function unlockProposal(email, eircode, reviewRequired=false){
 reviewDone.addEventListener('click', unlockVoteStep);
 verifyForm.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (votingClosed) return setMessage(verifyMessage, 'Voting has now closed. No further submissions can be accepted.');
   setMessage(verifyMessage, '');
   hideEircodeReviewBox();
   const email = $('email').value.trim().toLowerCase();
@@ -300,6 +342,7 @@ verifyForm.addEventListener('submit', async (event) => {
 });
 voteForm.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (votingClosed) return setMessage(voteMessage, 'Voting has now closed. No further submissions can be accepted.');
   setMessage(voteMessage, '');
   const selected = new FormData(voteForm).get('vote');
   const confirmed = $('confirmed').checked;
@@ -325,4 +368,5 @@ voteForm.addEventListener('submit', async (event) => {
   finally{ btn.disabled = false; btn.textContent = 'Submit Vote'; }
 });
 
+checkVotingStatus();
 setupDraftPolicyDownload();
