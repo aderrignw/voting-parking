@@ -20,8 +20,8 @@ const OFFICIAL_BASELINE = {
 const SETTINGS_KEY = 'settings/voting-settings.json';
 const REMOVED_PREFIX = 'removed-votes/';
 const DEFAULT_VOTING_SETTINGS = {
-  votingCloseAtIso: '2026-06-08T23:59:00+01:00',
-  votingCloseLabel: '08 June 2026, 23:59 · Ireland time',
+  votingCloseAtIso: '',
+  votingCloseLabel: '',
   baseline: OFFICIAL_BASELINE
 };
 const settingsStore = () => getBlobStore('aderrig-parking-settings');
