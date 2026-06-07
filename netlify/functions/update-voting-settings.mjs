@@ -11,8 +11,8 @@ const corsHeaders = {
 const ADMIN_EMAIL = 'claudiosantos1968@gmail.com';
 const SETTINGS_KEY = 'settings/voting-settings.json';
 const DEFAULT_SETTINGS = {
-  votingCloseAtIso: '2026-06-08T23:59:00+01:00',
-  votingCloseLabel: '08 June 2026, 23:59 · Ireland time',
+  votingCloseAtIso: '',
+  votingCloseLabel: '',
   baseline: {
     confirmed: true,
     status: 'Confirmed',
