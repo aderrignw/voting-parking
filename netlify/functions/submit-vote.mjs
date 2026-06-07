@@ -2,14 +2,39 @@ import {
   json,
   normalizeEircode,
   validEircode,
-  makeReferenceId
+  makeReferenceId,
+  getBlobStore
 } from './_utils.mjs';
 import { backupVoteRecord } from './_github-backup.mjs';
-import { getStore } from '@netlify/blobs';
-
 const NETLIFY_API_BASE = 'https://api.netlify.com/api/v1';
 const REMOVED_PREFIX = 'removed-votes/';
-const settingsStore = () => getStore({ name: 'aderrig-parking-settings', consistency: 'strong' });
+const settingsStore = () => getBlobStore('aderrig-parking-settings');
+const SETTINGS_KEY = 'settings/voting-settings.json';
+const VOTING_CLOSED_MESSAGE = 'Voting for this consultation has now closed. No further votes can be submitted.';
+
+async function readVotingSettings() {
+  const store = settingsStore();
+  try {
+    const item = await store.get(SETTINGS_KEY, { type: 'json', consistency: 'strong' });
+    if (item && typeof item === 'object') return item;
+  } catch {}
+  try {
+    const text = await store.get(SETTINGS_KEY, { type: 'text', consistency: 'strong' });
+    return text ? JSON.parse(text) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function votingIsClosed() {
+  const settings = await readVotingSettings();
+  const closeAtIso = String(settings?.votingCloseAtIso || '').trim();
+  if (!closeAtIso) return { closed: false, closeAtIso: '' };
+  const closeAt = new Date(closeAtIso);
+  if (Number.isNaN(closeAt.getTime())) return { closed: false, closeAtIso: '' };
+  return { closed: Date.now() >= closeAt.getTime(), closeAtIso, closeLabel: settings?.votingCloseLabel || '' };
+}
+
 const INELIGIBLE_EIRCODE_MESSAGE = 'This consultation is restricted to residents within the Aderrig Green area. The Eircode provided could not be verified as belonging to an eligible residence. Please check your Eircode and try again.';
 const DUPLICATE_EIRCODE_MESSAGE = 'This residence has already voted. One vote per Eircode is permitted.';
 const INVALID_EIRCODE_MESSAGE = 'This Eircode does not appear to be a valid residential Eircode. Please check the Eircode and try again.';
@@ -179,6 +204,17 @@ export const handler = async (event) => {
     const confirmed = body.confirmed === true || body.confirmed === 'true';
     const submittedReferenceId = String(body.referenceId || body.reference_id || body.reference || '').trim().toUpperCase();
     const confirmUnlistedEircode = body.confirmUnlistedEircode === true || body.confirmUnlistedEircode === 'true';
+
+    const closure = await votingIsClosed();
+    if (closure.closed) {
+      return json(403, {
+        ok: false,
+        closed: true,
+        message: VOTING_CLOSED_MESSAGE,
+        votingCloseAtIso: closure.closeAtIso,
+        votingCloseLabel: closure.closeLabel
+      });
+    }
 
     if (!validResidentEmail(email)) {
       return json(400, { ok: false, message: 'Please enter a valid email address.' });
