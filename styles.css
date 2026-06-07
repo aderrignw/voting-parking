@@ -304,3 +304,47 @@
 .eircodeReviewActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 .eircodeReviewActions .btn{min-width:190px;height:46px}
 @media(max-width:760px){.eircodeReviewActions .btn{width:100%}}
+
+
+.votingClosedNotice{
+  display:flex;
+  gap:18px;
+  align-items:flex-start;
+  border-top:5px solid var(--danger);
+  background:linear-gradient(135deg,#fff,#fff8f8);
+}
+.votingClosedNotice .closedIcon{
+  width:48px;
+  height:48px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  background:#f9eaea;
+  color:var(--danger);
+  border:1px solid #efcaca;
+  font-size:26px;
+  font-weight:900;
+  flex:0 0 auto;
+}
+.votingClosedNotice h2{color:var(--danger)}
+.votingClosedNotice p{margin:6px 0}
+.closedThanks{font-weight:800;color:var(--green)}
+body.votingClosed .verifyCard,
+body.votingClosed #proposalSection,
+body.votingClosed #voteSection{
+  opacity:.45;
+  pointer-events:none;
+}
+body.votingClosed .verifyCard::after,
+body.votingClosed #proposalSection::after,
+body.votingClosed #voteSection::after{
+  content:'Voting closed';
+  display:inline-block;
+  margin-top:12px;
+  color:var(--danger);
+  font-weight:900;
+}
+@media(max-width:760px){
+  .votingClosedNotice{display:block}
+  .votingClosedNotice .closedIcon{margin-bottom:14px}
+}
