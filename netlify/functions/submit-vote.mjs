@@ -150,7 +150,10 @@ async function readRemovedVoteTokens() {
       for (const blob of result.blobs || []) {
         const item = await store.get(blob.key, { type: 'json', consistency: 'strong' });
         if (!item) continue;
-        [item.submissionId, item.referenceId, item.eircode, item.email, item.submittedAtIreland, item.createdAt]
+        const removalTokens = Array.isArray(item.removalTokens) && item.removalTokens.length
+          ? item.removalTokens
+          : [item.submissionId, item.referenceId, item.submittedAtIreland, item.createdAt];
+        removalTokens
           .map(v => String(v || '').trim().toLowerCase())
           .filter(Boolean)
           .forEach(v => tokens.add(v));
