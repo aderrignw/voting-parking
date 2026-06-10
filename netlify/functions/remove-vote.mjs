@@ -1,4 +1,4 @@
-import { getStore } from '@netlify/blobs';
+import { getBlobStore } from './_utils.mjs';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +11,7 @@ const corsHeaders = {
 const ADMIN_EMAIL = 'claudiosantos1968@gmail.com';
 const REMOVED_PREFIX = 'removed-votes/';
 const json = (statusCode, body) => ({ statusCode, headers: corsHeaders, body: JSON.stringify(body) });
-const store = () => getStore({ name: 'aderrig-parking-settings', consistency: 'strong' });
+const store = () => getBlobStore('aderrig-parking-settings');
 
 function safeId(value = '') {
   return String(value || 'vote').trim().replace(/[^A-Za-z0-9._-]/g, '-').replace(/-+/g, '-').slice(0, 120) || 'vote';
@@ -58,13 +58,14 @@ export const handler = async (event) => {
       reason,
       removedAtIreland: irelandTimestamp(),
       removedAtIso,
-      removedBy: email
+      removedBy: email,
+      removalTokens: [submissionId, referenceId, String(body.createdAt || '').trim(), String(body.submittedAtIreland || '').trim()].filter(Boolean)
     };
 
     const keySeed = submissionId || referenceId || `${eircode}-${emailValue}` || String(Date.now());
     await store().set(`${REMOVED_PREFIX}${safeId(keySeed)}.json`, JSON.stringify(record), { contentType: 'application/json' });
     return json(200, { ok: true, removed: record });
   } catch (error) {
-    return json(500, { ok: false, message: 'Unable to remove vote.' });
+    return json(500, { ok: false, message: 'Unable to remove vote.', detail: String(error?.message || error || '') });
   }
 };
