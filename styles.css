@@ -409,3 +409,40 @@ body.votingClosed #voteSection::after{
 .faqNotice{margin:18px 0 0;padding:14px 16px;border-radius:14px;background:rgba(6,69,31,.06);color:#43534b;font-size:.92rem;line-height:1.5}
 @media(max-width:620px){.faqModal{padding:12px}.faqPanelHead,.faqSearchWrap,.faqBody{padding-left:18px;padding-right:18px}.faqAction{margin-top:14px}}
 
+
+
+/* Countdown layout final refinement - matches approved visual direction */
+.heroCountdown{
+  border-left:1px solid rgba(6,69,31,.14);
+  padding-left:32px;
+  min-height:245px;
+  display:flex;
+  align-items:center;
+}
+.heroCountdownInner{width:100%;max-width:240px}
+.heroCountdownTop{
+  display:grid;
+  grid-template-columns:38px 1fr;
+  gap:14px;
+  align-items:center;
+  color:#06451f;
+  margin-bottom:24px;
+}
+.heroCountdownIcon{
+  width:38px;
+  height:38px;
+  border:3px solid #0b6b31;
+  border-radius:50%;
+  display:inline-grid;
+  place-items:center;
+  flex:0 0 auto;
+  color:#0b6b31;
+}
+.heroCountdownIcon svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.heroCountdownLabel{font-size:.86rem;font-weight:900;letter-spacing:.12em;color:#06451f;line-height:1.1}
+.heroCountdownTime{margin-top:6px;font-size:1.45rem;font-weight:900;color:#06451f;letter-spacing:-.01em;white-space:nowrap;line-height:1.12}
+.heroCountdownDivider{height:1px;background:rgba(6,69,31,.13);margin:0 0 28px}
+.heroCountdownDate{display:grid;grid-template-columns:38px 1fr;gap:14px;align-items:start;color:#1c2d24;font-size:1rem;line-height:1.32}
+.heroCountdownCalendar{width:38px;height:38px;display:inline-grid;place-items:center;color:#06451f}
+.heroCountdownCalendar svg{width:31px;height:31px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:820px){.heroCountdown{min-height:0;align-items:flex-start}.heroCountdownInner{max-width:none}}
