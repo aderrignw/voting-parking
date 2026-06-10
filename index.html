@@ -13,6 +13,123 @@
     .draftDownloadLink:hover{text-decoration:underline}
     .draftDownloadIcon{font-size:1.05rem;line-height:1}
     .draftDownloadNote{display:block;margin-top:5px;color:#607169;font-size:.86rem;font-weight:400}
+
+    /* Public countdown refinement */
+    .heroCountdownLayout{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 285px;
+      gap:34px;
+      align-items:center;
+    }
+    .heroMainContent{min-width:0}
+    .heroCountdown{
+      border-left:1px solid rgba(6,69,31,.14);
+      padding-left:32px;
+      min-height:190px;
+      display:flex;
+      align-items:center;
+    }
+    .heroCountdownInner{width:100%}
+    .heroCountdownTop{
+      display:flex;
+      align-items:center;
+      gap:13px;
+      color:#06451f;
+      margin-bottom:16px;
+    }
+    .heroCountdownIcon{
+      width:26px;
+      height:26px;
+      border:2px solid #06451f;
+      border-radius:50%;
+      display:inline-grid;
+      place-items:center;
+      font-size:14px;
+      line-height:1;
+      flex:0 0 auto;
+    }
+    .heroCountdownLabel{
+      font-size:.82rem;
+      font-weight:900;
+      letter-spacing:.12em;
+      color:#06451f;
+    }
+    .heroCountdownTime{
+      margin-top:3px;
+      font-size:1.18rem;
+      font-weight:900;
+      color:#06451f;
+      letter-spacing:.01em;
+      white-space:nowrap;
+    }
+    .heroCountdownDivider{
+      height:1px;
+      background:rgba(6,69,31,.13);
+      margin:18px 0;
+    }
+    .heroCountdownDate{
+      display:grid;
+      grid-template-columns:26px 1fr;
+      gap:13px;
+      align-items:start;
+      color:#607169;
+      font-size:.94rem;
+      line-height:1.45;
+    }
+    .heroCountdownCalendar{
+      color:#06451f;
+      font-size:1.05rem;
+      line-height:1.2;
+      text-align:center;
+    }
+    @media(max-width:820px){
+      .heroCountdownLayout{grid-template-columns:1fr;gap:22px}
+      .heroCountdown{
+        border-left:0;
+        border-top:1px solid rgba(6,69,31,.14);
+        padding-left:0;
+        padding-top:20px;
+        min-height:0;
+      }
+    }
+
+
+    /* FAQ link and on-page viewer */
+    .draftDocumentActions{margin-top:18px;padding-top:14px;border-top:1px solid rgba(6,69,31,.12);font-size:.96rem;line-height:1.4}
+    .draftLinksRow{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+    .faqInlineButton{border:0;background:transparent;font-family:inherit;cursor:pointer;padding:0}
+    .draftDownloadLink:focus-visible,.faqInlineButton:focus-visible{outline:3px solid rgba(6,69,31,.22);outline-offset:4px;border-radius:8px}
+    .faqInlineButton:hover,.faqInlineButton:focus{color:#043719;text-decoration:underline}
+    .faqInlineButton:hover .draftDownloadIcon,.faqInlineButton:focus .draftDownloadIcon{transform:scale(1.08)}
+    .faqHoverTip{display:inline-block;margin-left:8px;color:#607169;font-size:.84rem;font-weight:500}
+    .faqModal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(2,22,11,.48)}
+    .faqModal.open{display:flex}
+    .faqPanel{width:min(920px,100%);max-height:min(86vh,820px);overflow:hidden;background:#fff;border-radius:22px;box-shadow:0 28px 70px rgba(0,0,0,.25);border:1px solid rgba(6,69,31,.16);display:flex;flex-direction:column}
+    .faqPanelHead{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:24px 26px 16px;border-bottom:1px solid rgba(6,69,31,.12)}
+    .faqPanelHead h2{margin:3px 0 5px;color:#06451f;font-size:1.55rem;line-height:1.15}
+    .faqIntro{margin:0;color:#607169;font-size:.95rem}
+    .faqCount{display:inline-flex;align-items:center;margin-top:10px;padding:5px 10px;border-radius:999px;background:rgba(6,69,31,.08);color:#06451f;font-size:.82rem;font-weight:800}
+    .faqClose{border:0;background:rgba(6,69,31,.08);color:#06451f;border-radius:50%;width:38px;height:38px;font-size:1.45rem;line-height:1;cursor:pointer;flex:0 0 auto}
+    .faqClose:hover{background:rgba(6,69,31,.14)}
+    .faqSearchWrap{padding:16px 26px;border-bottom:1px solid rgba(6,69,31,.1)}
+    .faqSearch{width:100%;border:1px solid rgba(6,69,31,.18);border-radius:14px;padding:12px 14px;font:inherit;color:#1f3029;background:#fbfdfc}
+    .faqBody{overflow:auto;padding:10px 26px 24px}
+    .faqItem{border-bottom:1px solid rgba(6,69,31,.1)}
+    .faqQuestion{width:100%;display:flex;justify-content:space-between;gap:18px;text-align:left;background:transparent;border:0;padding:16px 0;cursor:pointer;color:#06451f;font:inherit;font-weight:800;line-height:1.35}
+    .faqQuestion:hover{text-decoration:underline}
+    .faqAnswer{display:none;color:#43534b;line-height:1.58;padding:0 0 17px;margin:0;font-size:.96rem}
+    .faqItem.open .faqAnswer{display:block}
+    .faqEmpty{color:#607169;margin:16px 0}
+    .faqNotice{margin:18px 0 0;padding:14px 16px;border-radius:14px;background:rgba(6,69,31,.06);color:#43534b;font-size:.92rem;line-height:1.5}
+    @media(max-width:620px){.draftLinksRow{display:grid;gap:10px}.faqHoverTip{display:block;margin:6px 0 0 0}.faqModal{padding:12px}.faqPanelHead,.faqSearchWrap,.faqBody{padding-left:18px;padding-right:18px}}
+
+
+    /* Final FAQ placement refinement */
+    .draftDocumentActions{margin-top:18px;padding-top:14px;border-top:1px solid rgba(6,69,31,.12);font-size:.96rem;line-height:1.4}
+    .faqAction{margin-top:15px}
+    .faqActionNote{margin-top:5px}
+    .faqQuestionIcon{font-size:1.08rem}
+
   </style>
 </head>
 <body>
@@ -31,21 +148,48 @@
 
   <main class="wrap page">
     <section class="hero card">
-      <p class="eyebrow">Car Parking Policy Proposal</p>
-      <h1>Aderrig Green Car Parking Policy</h1>
-      <div class="shortText">
-        <p>The Directors of Aderrig Green present the proposed Car Parking Policy for resident approval.</p>
-        <p>Please review the proposal and submit your vote.</p>
-        <p><strong>One vote per residence (Eircode).</strong></p>
-        <p><strong>Your vote matters.</strong></p>
-      </div>
-        <div class="draftDownloadLine">
-          <a id="draftPolicyDownload" class="draftDownloadLink" href="assets/proposal-draft.pdf" target="_blank" rel="noopener" download>
-            <span class="draftDownloadIcon" aria-hidden="true">⧉</span>
-            <span>Download Draft Policy for Review</span>
-          </a>
-          <span class="draftDownloadNote">Draft version for consultation purposes only. This is not an officially approved policy.</span>
+      <div class="heroCountdownLayout">
+        <div class="heroMainContent">
+          <p class="eyebrow">Car Parking Policy Proposal</p>
+          <h1>Aderrig Green Car Parking Policy</h1>
+          <div class="shortText">
+            <p>The Directors of Aderrig Green present the proposed Car Parking Policy for resident approval.</p>
+            <p>Please review the proposal and submit your vote.</p>
+            <p><strong>One vote per residence (Eircode).</strong></p>
+            <p><strong>Your vote matters.</strong></p>
+          </div>
+          <div class="draftDocumentActions" aria-label="Policy documents and resident information">
+            <a id="draftPolicyDownload" class="draftDownloadLink" href="assets/proposal-draft.pdf" target="_blank" rel="noopener" download title="Download the draft policy PDF">
+              <span class="draftDownloadIcon" aria-hidden="true">⧉</span>
+              <span>Download Draft Policy for Review</span>
+            </a>
+            <span class="draftDownloadNote">Draft version for consultation purposes only. This is not an officially approved policy.</span>
+
+            <button type="button" id="openFaqPanel" class="draftDownloadLink faqInlineButton faqAction" title="Click to view Frequently Asked Questions">
+              <span class="draftDownloadIcon faqQuestionIcon" aria-hidden="true">❓</span>
+              <span>Frequently Asked Questions (FAQ)</span>
+            </button>
+            <span class="draftDownloadNote faqActionNote">View answers to common questions about the proposed policy.</span>
+          </div>
         </div>
+
+        <aside class="heroCountdown" id="heroCountdown" aria-label="Voting closing countdown">
+          <div class="heroCountdownInner">
+            <div class="heroCountdownTop">
+              <span class="heroCountdownIcon" aria-hidden="true">◷</span>
+              <div>
+                <div class="heroCountdownLabel" id="publicCountdownLabel">VOTING CLOSES IN</div>
+                <div class="heroCountdownTime" id="publicCountdown">Loading...</div>
+              </div>
+            </div>
+            <div class="heroCountdownDivider"></div>
+            <div class="heroCountdownDate">
+              <span class="heroCountdownCalendar" aria-hidden="true">▣</span>
+              <span id="publicCountdownDate">Loading closing date...</span>
+            </div>
+          </div>
+        </aside>
+      </div>
     </section>
 
     <section class="card votingClosedNotice hidden" id="votingClosedNotice" aria-labelledby="votingClosedTitle">
@@ -146,7 +290,172 @@
     <input type="hidden" name="status" value="Downloaded Draft Policy">
   </form>
 
+
+  <section class="faqModal" id="faqPanelModal" aria-hidden="true" aria-labelledby="faqPanelTitle" role="dialog">
+    <div class="faqPanel" role="document">
+      <div class="faqPanelHead">
+        <div>
+          <p class="eyebrow">Resident Information</p>
+          <h2 id="faqPanelTitle">Frequently Asked Questions (FAQ)</h2>
+          <p class="faqIntro">Read the full FAQ on this page. No download is required.</p>
+          <span class="faqCount">60 questions included</span>
+        </div>
+        <button type="button" class="faqClose" id="closeFaqPanel" aria-label="Close FAQ">×</button>
+      </div>
+      <div class="faqSearchWrap">
+        <input id="faqSearchInput" class="faqSearch" type="search" placeholder="Search the FAQ" aria-label="Search the FAQ">
+      </div>
+      <div class="faqBody">
+        <div id="faqItems"></div>
+        <p id="faqEmptyMessage" class="faqEmpty" hidden>No FAQ items matched your search.</p>
+        <div class="faqNotice"><strong>Important Notice:</strong> This FAQ document is provided for explanatory purposes only and is intended to assist residents in understanding the Parking Policy. In the event of any inconsistency between this FAQ and the Parking Policy, the Parking Policy shall prevail. Operational procedures, implementation timelines, monitoring arrangements and associated costs may be amended from time to time by the Owners' Management Company or the appointed parking management company, subject to applicable legal requirements and governance procedures.</div>
+      </div>
+    </div>
+  </section>
+
   <footer class="wrap footer">Created by the Directors of Aderrig Green Management Company.</footer>
   <script src="script.js"></script>
+
+  <script>
+    (function(){
+      const box = document.getElementById('heroCountdown');
+      const label = document.getElementById('publicCountdownLabel');
+      const timeEl = document.getElementById('publicCountdown');
+      const dateEl = document.getElementById('publicCountdownDate');
+      if (!box || !timeEl || !dateEl) return;
+
+      function pad(value){ return String(value).padStart(2, '0'); }
+
+      function formatRemaining(ms){
+        const total = Math.max(0, Math.floor(ms / 1000));
+        const days = Math.floor(total / 86400);
+        const hours = Math.floor((total % 86400) / 3600);
+        const minutes = Math.floor((total % 3600) / 60);
+        const seconds = total % 60;
+        return `${pad(days)}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+      }
+
+      function formatClosingDate(value, labelText){
+        if (labelText) return `Closes ${labelText.replace(' · ', '\\n')}`;
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return '';
+        const date = d.toLocaleDateString('en-IE', { timeZone:'Europe/Dublin', day:'2-digit', month:'long', year:'numeric' });
+        const time = d.toLocaleTimeString('en-IE', { timeZone:'Europe/Dublin', hour:'2-digit', minute:'2-digit', hour12:false });
+        return `Closes ${date}, ${time}\nIreland time`;
+      }
+
+      function applyDateLine(text){
+        dateEl.textContent = '';
+        String(text || '').split('\n').forEach((part, index) => {
+          if (index) dateEl.appendChild(document.createElement('br'));
+          dateEl.appendChild(document.createTextNode(part));
+        });
+      }
+
+      async function startCountdown(){
+        try{
+          const response = await fetch('/.netlify/functions/voting-status', { headers:{ accept:'application/json' }, cache:'no-store' });
+          const status = await response.json();
+          let closeIso = String(status.votingCloseAtIso || status.closeAtIso || '').trim();
+
+          if (!response.ok || !closeIso) {
+            closeIso = '2026-06-14T23:59:00+01:00';
+          }
+
+          const closeAt = new Date(closeIso);
+          if (Number.isNaN(closeAt.getTime())) {
+            box.style.display = 'none';
+            return;
+          }
+
+          applyDateLine(formatClosingDate(closeIso, status.votingCloseLabel || status.closeLabel || ''));
+
+          function tick(){
+            const remaining = closeAt.getTime() - Date.now();
+            if (remaining <= 0 || status.closed) {
+              if (label) label.textContent = 'VOTING CLOSED';
+              timeEl.textContent = 'Closed';
+              return;
+            }
+            if (label) label.textContent = 'VOTING CLOSES IN';
+            timeEl.textContent = formatRemaining(remaining);
+          }
+
+          tick();
+          setInterval(tick, 1000);
+        }catch(error){
+          box.style.display = 'none';
+        }
+      }
+
+      startCountdown();
+    })();
+  </script>
+
+
+  <script>
+    (function(){
+      const faqItems = [{"number": 1, "question": "Why is a Parking Policy being introduced?", "answer": "The purpose of the Parking Policy is to ensure fair, safe and consistent use of parking throughout the development. It supports existing House Rules and provides a clear framework for the management of allocated, visitor and common parking spaces."}, {"number": 2, "question": "Does this Policy take away my allocated parking space?", "answer": "No. The Policy expressly recognises and protects the exclusive rights attached to allocated parking spaces under the Sales Deed."}, {"number": 3, "question": "Can I allow somebody else to use my allocated parking space?", "answer": "Yes. Residents may authorise visitors, guests, family members, carers, tenants or other persons of their choosing to use their allocated space. The resident remains responsible for ensuring compliance with the Parking Policy."}, {"number": 4, "question": "Do I need Management Company approval to allow someone to use my space?", "answer": "No. Residents may authorise the use of their allocated space without seeking Management Company approval."}, {"number": 5, "question": "Can I park in any empty space within the development?", "answer": "No. Residents must use their allocated space where one has been assigned. Visitor and common-use spaces are subject to separate rules."}, {"number": 6, "question": "Why can't visitor spaces be used permanently?", "answer": "Visitor spaces are intended for genuine short-term use and must remain available for visitors, contractors, carers and temporary users."}, {"number": 7, "question": "What happens if someone parks in my allocated space?", "answer": "Unauthorised parking in an allocated space may be subject to enforcement under the procedures operated by the appointed parking management company."}, {"number": 8, "question": "Will the Management Company issue parking charges?", "answer": "No. Parking enforcement will be administered by the appointed parking management company in accordance with applicable legislation and operating procedures."}, {"number": 9, "question": "Who will monitor parking?", "answer": "Parking monitoring and enforcement will be carried out by the appointed parking management company responsible for the development and not by the Owners' Management Company (OMC). The OMC is responsible for establishing and maintaining the Parking Policy. Day-to-day parking monitoring, administration and enforcement activities will be managed by the appointed parking management company."}, {"number": 10, "question": "Why is a parking management company needed?", "answer": "A parking management company provides an independent and consistent system for protecting allocated spaces, managing visitor parking and ensuring fair application of parking rules."}, {"number": 11, "question": "Will parking be monitored 24 hours a day?", "answer": "The exact monitoring arrangements will depend on the appointed parking management company and may vary over time. It may include patrols, registration systems, digital monitoring or other enforcement methods."}, {"number": 12, "question": "Why do vehicles need to be registered?", "answer": "Vehicle registration helps identify authorised users, protect allocated spaces and support fair and consistent parking management. Registration may also be necessary to associate a vehicle with a particular parking space or residential unit where required by the parking management system."}, {"number": 13, "question": "Will my personal information be protected?", "answer": "Yes. All personal information will be processed in accordance with GDPR and Irish Data Protection legislation."}, {"number": 14, "question": "Can I reserve a parking space with cones, barriers or other objects?", "answer": "No. Reserving parking spaces through cones, barriers, signage or other objects is prohibited."}, {"number": 15, "question": "Can I park on the footpath?", "answer": "No. Parking on footpaths, internal roads and circulation routes is prohibited."}, {"number": 16, "question": "Can I park in front of another parking space?", "answer": "No. Parking in a manner that obstructs another parking space is prohibited."}, {"number": 17, "question": "Can I park a van, trailer, caravan, bus or boat within the estate?", "answer": "No. Heavy commercial vehicles, vans, buses, boats, caravans, trailers and oversized vehicles are not permitted within common areas, visitor spaces or estate thoroughfares unless authorised as part of approved works, deliveries, removals or maintenance activities within the development."}, {"number": 18, "question": "What happens before enforcement begins?", "answer": "No clamping or parking charges can be introduced until the required statutory signage has been installed in accordance with Irish legislation."}, {"number": 19, "question": "Can I appeal a parking charge or clamp?", "answer": "Yes. A formal appeals process will be available in accordance with Irish legislation. The appointed parking management company will be responsible for administering and managing the appeals process."}, {"number": 20, "question": "Will vehicles be clamped immediately?", "answer": "Implementation will occur in stages and may include parking space identification, installation of signage, resident communications, registration procedures and appointment of a parking management company where applicable. A familiarisation and transition period will apply before active enforcement begins. The duration of this period will be communicated to residents prior to implementation."}, {"number": 21, "question": "Will there be any cost associated with implementing the Parking Policy?", "answer": "Yes. In order to clearly identify and manage parking spaces throughout the development, all parking spaces will require road marking and identification. The estimated one-off cost is expected to be approximately €40–€60 per household and will be included within the Owners' Management Company budget, subject to approval through the normal budgeting process. This cost relates to the initial marking and identification of parking spaces and is not expected to form part of the annual recurring budget. Future expenditure would only arise if replacement, refurbishment or re-marking works become necessary due to wear, damage or other operational requirements. The lifespan of the markings will depend on the contractor and materials used, but a minimum service life of approximately five years is anticipated, with some systems offering warranties or expected lifespans of up to ten years."}, {"number": 22, "question": "Why do all parking spaces need to be marked?", "answer": "Clear identification of all parking spaces is necessary to ensure that allocated, visitor, EV charging and accessible spaces can be easily distinguished and managed. Space identification also provides the foundation required for any future parking monitoring or enforcement system and helps minimise disputes regarding parking allocation and usage."}, {"number": 23, "question": "Will there be any ongoing parking management costs?", "answer": "If an external parking management company is appointed in the future, there may be an annual monitoring and administration fee. Based on current market information, this cost is expected to be approximately €5–€10 per household per year. Actual costs will depend on the provider selected and the scope of services agreed."}, {"number": 24, "question": "Why do vehicles need to be linked to parking spaces?", "answer": "All parking management providers require a method of associating a vehicle with the parking space or residential unit to which it relates. This may be achieved through digital registration systems, permits, stickers, vehicle registration databases or other identification methods operated by the appointed parking management company. The purpose is to protect residents' parking rights, verify authorised users and support fair and consistent enforcement."}, {"number": 25, "question": "Is there a cost for vehicle registration or identification?", "answer": "Depending on the system selected, there may be a one-off administration or identification cost. Current industry costs are typically in the region of €8–€10 per vehicle or parking space. Where physical permits, stickers or identification devices are used, replacement costs may apply if they are lost, damaged or require reissue."}, {"number": 26, "question": "Why might the first year cost more than future years?", "answer": "The initial implementation year may involve additional setup costs, including statutory signage, parking space identification, registration systems and other infrastructure required by the appointed parking management company. Once these initial measures have been installed, annual operating costs are expected to reduce and generally consist of monitoring, administration and enforcement services only."}, {"number": 27, "question": "Does this vote also approve the budget?", "answer": "No. This vote is for the proposed Parking Policy only. Any implementation costs referred to in this FAQ are indicative estimates only and are provided for information purposes. Any future budget, expenditure or implementation costs will be presented and considered separately through a future budget approval process."}, {"number": 28, "question": "How will clamping or enforcement operate?", "answer": "The precise enforcement methodology will depend on the parking management company appointed. Different operators may use different monitoring systems, registration platforms, inspection procedures and enforcement methods. Full operational details will be communicated to residents before any enforcement measures become active."}, {"number": 29, "question": "How will the Parking Policy be introduced?", "answer": "Implementation is expected to occur in stages. These stages may include: Approval of the Parking Policy; Identification and marking of parking spaces; Installation of required signage; Appointment of a parking management company, if applicable; Resident communication and registration period; Familiarisation and trial period; Commencement of active monitoring and enforcement. Residents will be informed throughout the process and provided with reasonable notice before any active enforcement measures commence."}, {"number": 30, "question": "Will parking spaces be clearly marked?", "answer": "Yes. All parking spaces within the development will be clearly identified and marked. This includes allocated spaces, identified by unique sequential numbers in accordance with the Evara Development Parking Allocation Plan; Visitor spaces (V); EV charging spaces (E); and Accessible/Disability spaces, already designated and signed. Allocated spaces will be separately identified by unique sequential numbers as defined in the Evara Development Parking Allocation Plan. This will allow residents, visitors and the appointed parking management company to easily identify the correct use of each parking space."}, {"number": 31, "question": "How will I know which space belongs to my property?", "answer": "Each allocated parking space will be individually identified and linked to the relevant residential unit."}, {"number": 32, "question": "Will residents be expected to guess which spaces are Visitor or EV spaces?", "answer": "No. Visitor spaces and EV charging spaces will be clearly identified on site."}, {"number": 33, "question": "Can I use an Accessible/Disability parking space for a few minutes if I do not have a disability parking permit?", "answer": "No. Accessible/Disability parking spaces are reserved exclusively for vehicles displaying a valid disability parking permit. Unauthorised use is not permitted, regardless of the duration of stay, and may result in enforcement action."}, {"number": 34, "question": "Can I park more than one vehicle in a single parking space?", "answer": "No. All parking spaces within the development have been designed and allocated for the parking of a single vehicle only. This applies to allocated spaces, Visitor (V) spaces, EV charging spaces (E) and Accessible/Disability spaces. Even where a parking space may appear larger, it remains intended for a single vehicle. The dimensions of certain spaces are determined by design, safety, accessibility and operational requirements and should not be interpreted as permission to accommodate multiple vehicles within a single parking space. In particular, Accessible/Disability spaces are intentionally designed with additional clearance to facilitate the safe movement of wheelchair users, mobility aids and specially adapted vehicles. The additional space is provided to support accessibility requirements and is not intended for the parking of a second vehicle. Parking more than one vehicle within a single space is not permitted and may result in enforcement action."}, {"number": 35, "question": "Why is space identification important?", "answer": "Clear identification helps protect allocated parking rights, prevent unauthorised parking, improve visitor parking availability, reduce disputes and support fair and consistent enforcement."}, {"number": 36, "question": "Are Visitor (V) and EV (E) spaces private spaces?", "answer": "No. Visitor and EV spaces are common-use facilities available for shared use in accordance with the Parking Policy and the procedures operated by the appointed parking management company."}, {"number": 37, "question": "Who decides how Visitor and EV spaces are managed?", "answer": "The operation, monitoring and enforcement of Visitor and EV spaces will be administered by the appointed parking management company."}, {"number": 38, "question": "Will Visitor and EV spaces be subject to registration requirements?", "answer": "The operational procedures for Visitor and EV spaces will be determined by the appointed parking management company and may include registration requirements."}, {"number": 39, "question": "Will Visitor and EV spaces be subject to time limits?", "answer": "Yes, where applicable. Visitor and EV spaces may be subject to reasonable time limits designed to ensure fair access, availability and turnover for all users. Such arrangements are commonly applied in residential developments that provide shared Visitor and EV parking facilities and help prevent the long-term occupation of spaces intended for temporary use. The specific operational procedures applicable to Visitor and EV spaces will be communicated and administered by the appointed parking management company."}, {"number": 40, "question": "Will there be a charge for using Visitor or EV spaces?", "answer": "The Owners' Management Company does not currently intend to introduce charges for the normal use of Visitor or EV spaces. However, operational arrangements may include registration requirements, time limits or enforcement measures administered by the appointed parking management company. Any future arrangements will be communicated before implementation."}, {"number": 41, "question": "Why are Visitor and EV spaces managed differently from allocated spaces?", "answer": "Allocated spaces are linked to specific residential units and protected under the Sales Deed. Visitor and EV spaces are shared community facilities and therefore require separate management arrangements to ensure fair access and availability for all users."}, {"number": 42, "question": "What happens if I change my vehicle?", "answer": "Residents will be able to update their vehicle details in accordance with the procedures operated by the appointed parking management company."}, {"number": 43, "question": "What happens if I buy a new car?", "answer": "Residents should ensure that their vehicle information is updated in accordance with the procedures provided by the parking management company."}, {"number": 44, "question": "Can I register more than one vehicle?", "answer": "Vehicle registration arrangements will be determined by the appointed parking management company and communicated prior to implementation. Registration of multiple vehicles does not create any entitlement to additional parking spaces."}, {"number": 45, "question": "Can visitors use visitor spaces?", "answer": "Yes. Visitor spaces are intended specifically for genuine visitor and short-term use."}, {"number": 46, "question": "Can residents use visitor spaces?", "answer": "Visitor spaces are not intended to provide additional permanent parking for residents and may not be used as a recurring or alternative parking arrangement."}, {"number": 47, "question": "What happens if all visitor spaces are occupied?", "answer": "Visitor spaces operate on an availability basis and cannot be reserved or guaranteed."}, {"number": 48, "question": "Can I reserve a Visitor parking space for my guests?", "answer": "No. Visitor parking spaces operate on an availability basis and cannot be reserved, blocked or guaranteed for any individual resident or visitor."}, {"number": 49, "question": "Can I park in a Visitor space if my allocated space is temporarily unavailable?", "answer": "No. Visitor spaces are intended for visitor use and are not intended to provide alternative or overflow parking for residents. Residents should use their allocated space or other lawful parking options available to them."}, {"number": 50, "question": "My property does not have an allocated parking space. Where should I park?", "answer": "Residents without an allocated parking space should use the public parking spaces available on public roads throughout the estate, subject to applicable road traffic regulations and local parking restrictions. Visitor and EV spaces are intended for their designated purpose and may not be used as a permanent, recurring or alternative parking arrangement."}, {"number": 51, "question": "Why are EV charging spaces treated differently?", "answer": "EV charging spaces are dual-purpose facilities intended to support both EV charging and visitor parking."}, {"number": 52, "question": "Can I leave my EV parked in an EV charging space after charging has finished?", "answer": "No. Once charging has been completed, the vehicle should be removed promptly to allow access for other users."}, {"number": 53, "question": "What should I do if I see an abandoned vehicle?", "answer": "Concerns regarding potentially abandoned vehicles should be reported to the appointed parking management operator."}, {"number": 54, "question": "What if an abandoned vehicle is parked in an allocated space?", "answer": "Vehicles parked within allocated spaces remain the responsibility of the relevant unit owner or occupier. However, where a vehicle presents a safety risk, environmental concern, nuisance or potential breach of applicable legislation, appropriate action may be taken."}, {"number": 55, "question": "Is this Policy intended to generate revenue?", "answer": "No. The purpose of the Policy is to improve safety, fairness, accessibility and parking management throughout the development. The objective is compliance, not revenue generation."}, {"number": 56, "question": "Why is enforcement necessary?", "answer": "Parking rules are only effective when applied consistently. Enforcement helps protect allocated spaces, improve visitor parking availability, maintain safe access routes and ensure fair treatment for all residents."}, {"number": 57, "question": "Will all residents be treated equally?", "answer": "Yes. The Parking Policy will be applied consistently and without exception. The same rules, procedures and enforcement measures will apply to all residents, visitors, contractors and other users of parking facilities within the development."}, {"number": 58, "question": "Does this Policy replace the House Rules?", "answer": "No. The Parking Policy complements and supports the existing House Rules relating to parking and the use of common areas."}, {"number": 59, "question": "Does this Policy affect rights granted under the Sales Deed?", "answer": "No. The Policy expressly recognises and protects the exclusive parking rights granted under the Sales Deed while providing a framework for the fair management of parking throughout the development."}, {"number": 60, "question": "What is the overall objective of the Policy?", "answer": "To create a fair, safe, transparent and consistently managed parking environment where residents' allocated parking rights are respected and common parking facilities remain available for their intended use."}];
+      const openBtn = document.getElementById('openFaqPanel');
+      const modal = document.getElementById('faqPanelModal');
+      const closeBtn = document.getElementById('closeFaqPanel');
+      const list = document.getElementById('faqItems');
+      const search = document.getElementById('faqSearchInput');
+      const empty = document.getElementById('faqEmptyMessage');
+      if (!openBtn || !modal || !list) return;
+
+      function escapeHtml(value){
+        return String(value).replace(/[&<>"']/g, function(ch){
+          return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+        });
+      }
+
+      function render(term){
+        const q = String(term || '').trim().toLowerCase();
+        const filtered = faqItems.filter(function(item){
+          return !q || item.question.toLowerCase().includes(q) || item.answer.toLowerCase().includes(q);
+        });
+        list.innerHTML = filtered.map(function(item, index){
+          const openClass = index === 0 && !q ? ' open' : '';
+          const sign = index === 0 && !q ? '−' : '+';
+          return '<div class="faqItem'+openClass+'">' +
+            '<button type="button" class="faqQuestion" aria-expanded="'+(openClass ? 'true' : 'false')+'">' +
+            '<span>'+item.number+'. '+escapeHtml(item.question)+'</span><span aria-hidden="true">'+sign+'</span></button>' +
+            '<p class="faqAnswer">'+escapeHtml(item.answer)+'</p></div>';
+        }).join('');
+        if (empty) empty.hidden = filtered.length !== 0;
+      }
+
+      function openModal(){
+        render(search ? search.value : '');
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+        setTimeout(function(){ if (search) search.focus(); }, 40);
+      }
+      function closeModal(){
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden','true');
+        document.body.style.overflow = '';
+        openBtn.focus();
+      }
+
+      openBtn.addEventListener('click', openModal);
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', function(event){ if (event.target === modal) closeModal(); });
+      document.addEventListener('keydown', function(event){ if (event.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+      if (search) search.addEventListener('input', function(){ render(search.value); });
+      list.addEventListener('click', function(event){
+        const btn = event.target.closest('.faqQuestion');
+        if (!btn) return;
+        const item = btn.closest('.faqItem');
+        const isOpen = item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        const icon = btn.querySelector('span[aria-hidden="true"]');
+        if (icon) icon.textContent = isOpen ? '−' : '+';
+      });
+    })();
+  </script>
+
 </body>
 </html>
