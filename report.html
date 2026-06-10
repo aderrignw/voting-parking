@@ -667,7 +667,7 @@ async function removeVote(row){
       body:JSON.stringify({submissionId:row.id,referenceId:row.referenceId,eircode:row.eircode,email:row.email,vote:row.vote,submittedAtIreland:row.submittedAtIreland,createdAt:row.createdAt,reason})
     });
     const data=await res.json();
-    if(!res.ok||!data.ok) throw new Error(data.message||'Unable to remove vote.');
+    if(!res.ok||!data.ok) throw new Error((data.message||'Unable to remove vote.')+(data.detail?' Detail: '+data.detail:''));
     await loadLive();
   }catch(e){
     alert(e.message||'Unable to remove vote.');
