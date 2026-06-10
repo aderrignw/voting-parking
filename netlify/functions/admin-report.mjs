@@ -64,7 +64,10 @@ async function readRemovedVotes() {
 function removedTokens(removedVotes = []) {
   const set = new Set();
   for (const item of removedVotes) {
-    [item.submissionId, item.referenceId, item.eircode, item.email, item.submittedAtIreland, item.createdAt]
+    const tokens = Array.isArray(item.removalTokens) && item.removalTokens.length
+      ? item.removalTokens
+      : [item.submissionId, item.referenceId, item.submittedAtIreland, item.createdAt];
+    tokens
       .map(v => String(v || '').trim().toLowerCase())
       .filter(Boolean)
       .forEach(v => set.add(v));
