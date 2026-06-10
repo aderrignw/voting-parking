@@ -140,8 +140,8 @@ async function fetchAllSubmissions(formId, token) {
   return all;
 }
 
-async function readRemovedVoteTokens() {
-  const tokens = new Set();
+async function readRemovedVotes() {
+  const removed = [];
   try {
     const store = settingsStore();
     let cursor;
@@ -149,19 +149,36 @@ async function readRemovedVoteTokens() {
       const result = await store.list({ prefix: REMOVED_PREFIX, cursor });
       for (const blob of result.blobs || []) {
         const item = await store.get(blob.key, { type: 'json', consistency: 'strong' });
-        if (!item) continue;
-        const removalTokens = Array.isArray(item.removalTokens) && item.removalTokens.length
-          ? item.removalTokens
-          : [item.submissionId, item.referenceId, item.submittedAtIreland, item.createdAt];
-        removalTokens
-          .map(v => String(v || '').trim().toLowerCase())
-          .filter(Boolean)
-          .forEach(v => tokens.add(v));
+        if (item) removed.push(item);
       }
       cursor = result.cursor;
     } while (cursor);
   } catch {}
-  return tokens;
+  return removed;
+}
+
+function compactEircode(value) {
+  return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+function compactText(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function parseDateValue(value) {
+  if (!value) return 0;
+  const direct = new Date(value).getTime();
+  if (!Number.isNaN(direct)) return direct;
+  const ireland = String(value || '').replace(/(\d{1,2}) (\w{3}) (\d{4}), (\d{2}):(\d{2})/, '$1 $2 $3 $4:$5:00 GMT');
+  const fallback = new Date(ireland).getTime();
+  return Number.isNaN(fallback) ? 0 : fallback;
+}
+
+function removedVoteTokens(item = {}) {
+  const tokens = Array.isArray(item.removalTokens) && item.removalTokens.length
+    ? item.removalTokens
+    : [item.submissionId, item.referenceId, item.submittedAtIreland, item.createdAt];
+  return tokens.map(compactText).filter(Boolean);
 }
 
 function submissionTokens(submission) {
@@ -169,10 +186,34 @@ function submissionTokens(submission) {
     submission?.id,
     getFieldValue(submission, 'referenceId'),
     getFieldValue(submission, 'reference_id'),
-    getFieldValue(submission, 'eircode'),
-    getFieldValue(submission, 'email'),
-    submission?.created_at
-  ].map(v => String(v || '').trim().toLowerCase()).filter(Boolean);
+    getFieldValue(submission, 'reference'),
+    submission?.created_at,
+    getFieldValue(submission, 'submitted_at_ireland'),
+    getFieldValue(submission, 'submittedAtIreland')
+  ].map(compactText).filter(Boolean);
+}
+
+function submissionWasRemoved(submission, removedVotes = []) {
+  const tokens = new Set(submissionTokens(submission));
+  const submittedEircodeKey = compactEircode(getFieldValue(submission, 'eircode') || '');
+  const submittedEmail = compactText(getFieldValue(submission, 'email') || '');
+  const submittedAt = parseDateValue(submission?.created_at || getFieldValue(submission, 'submitted_at_ireland') || getFieldValue(submission, 'submittedAtIreland'));
+
+  return removedVotes.some((removed) => {
+    if (removedVoteTokens(removed).some(token => tokens.has(token))) return true;
+
+    const removedEircodeKey = compactEircode(removed.eircode || '');
+    if (!removedEircodeKey || removedEircodeKey !== submittedEircodeKey) return false;
+
+    const removedEmail = compactText(removed.email || '');
+    const sameEmailOrUnknown = !removedEmail || !submittedEmail || removedEmail === submittedEmail;
+    if (!sameEmailOrUnknown) return false;
+
+    const removedAt = parseDateValue(removed.removedAtIso || removed.removedAtIreland);
+    if (!removedAt || !submittedAt) return true;
+
+    return submittedAt <= removedAt + (2 * 60 * 1000);
+  });
 }
 
 async function eircodeAlreadyVoted(eircode) {
@@ -184,12 +225,13 @@ async function eircodeAlreadyVoted(eircode) {
   }
 
   const submissions = await fetchAllSubmissions(formId, token);
-  const removedTokens = await readRemovedVoteTokens();
+  const removedVotes = await readRemovedVotes();
+  const requestedEircodeKey = compactEircode(eircode);
 
   return submissions.some((submission) => {
-    if (submissionTokens(submission).some(token => removedTokens.has(token))) return false;
-    const submittedEircode = normalizeEircode(getFieldValue(submission, 'eircode') || '');
-    return submittedEircode === eircode;
+    const submittedEircodeKey = compactEircode(getFieldValue(submission, 'eircode') || '');
+    if (submittedEircodeKey !== requestedEircodeKey) return false;
+    return !submissionWasRemoved(submission, removedVotes);
   });
 }
 
