@@ -29,6 +29,49 @@ const INELIGIBLE_EIRCODE_MESSAGE = 'This consultation is restricted to residents
 const UNLISTED_EIRCODE_MESSAGE = 'We could not match this Eircode to the Aderrig Green residence register. Please check it carefully. If it is correct, you may confirm it and it will be marked for administrator review.';
 const EMAIL_MESSAGE = 'Please enter a valid email address, e.g. name@example.com.';
 
+const CLUID_EIRCODE_EMAIL_MAP = new Map([
+  ['K78T2N5', 'tbreen@cluid.ie'],
+  ['K78T9P8', 'tbreen@cluid.ie'],
+  ['K78T1W9', 'tbreen@cluid.ie'],
+  ['K78E9R2', 'tbreen@cluid.ie'],
+  ['K78K2T0', 'tbreen@cluid.ie'],
+  ['K78E7Y0', 'tbreen@cluid.ie'],
+  ['K78A8P3', 'sculhane@cluid.ie'],
+  ['K78N9P3', 'tbreen@cluid.ie'],
+  ['K78Y0E0', 'tbreen@cluid.ie'],
+  ['K78C2H9', 'tbreen@cluid.ie'],
+  ['K78R6P2', 'tbreen@cluid.ie'],
+  ['K78X2R5', 'tbreen@cluid.ie'],
+  ['K78P8W6', 'tbreen@cluid.ie'],
+  ['K78E6H9', 'tbreen@cluid.ie'],
+  ['K78X6W2', 'omc@cluid.ie'],
+  ['K78K5P1', 'omc@cluid.ie'],
+  ['K78E4P9', 'omc@cluid.ie'],
+  ['K78R1X7', 'omc@cluid.ie'],
+  ['K78A3P8', 'omc@cluid.ie'],
+  ['K78P6Y2', 'omc@cluid.ie'],
+  ['K78X2W8', 'omc@cluid.ie'],
+  ['K78V0Y8', 'omc@cluid.ie'],
+  ['K78X8N9', 'omc@cluid.ie']
+]);
+
+const CLUID_ONLY_MESSAGE = 'This email is not authorised to vote for this Clúid property. Please use the registered Clúid email address for this property. (Clúid only)';
+
+function eircodeKey(value){
+  return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+function cluidAuthorisedEmailForEircode(eircode){
+  return CLUID_EIRCODE_EMAIL_MAP.get(eircodeKey(eircode)) || '';
+}
+
+function isAuthorisedCluidVote(eircode, email){
+  const authorisedEmail = cluidAuthorisedEmailForEircode(eircode);
+  if (!authorisedEmail) return true;
+  return String(email || '').trim().toLowerCase() === authorisedEmail;
+}
+
+
 function normalizeEircode(value){
   return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/^(.{3})(.{4})$/, '$1 $2');
 }
@@ -325,6 +368,7 @@ verifyForm.addEventListener('submit', async (event) => {
   if (!/^[A-Z0-9]{3}\s[A-Z0-9]{4}$/.test(eircode)) return setMessage(verifyMessage, 'Please enter a valid Eircode, e.g. K78 XXXX.');
   if (!eligibleAderrigGreenEircode(eircode)) return setMessage(verifyMessage, INELIGIBLE_EIRCODE_MESSAGE);
   if (clearlyInvalidEircode(eircode)) return setMessage(verifyMessage, INVALID_EIRCODE_MESSAGE);
+  if (!isAuthorisedCluidVote(eircode, email)) return setMessage(verifyMessage, CLUID_ONLY_MESSAGE);
   const btn = verifyForm.querySelector('button');
   btn.disabled = true; btn.textContent = 'Checking...';
   try{
@@ -348,6 +392,7 @@ voteForm.addEventListener('submit', async (event) => {
   const confirmed = $('confirmed').checked;
   if (!resident.email || !resident.eircode) return setMessage(voteMessage, 'Please complete resident verification first.');
   if (clearlyInvalidEircode(resident.eircode)) return setMessage(voteMessage, INVALID_EIRCODE_MESSAGE);
+  if (!isAuthorisedCluidVote(resident.eircode, resident.email)) return setMessage(voteMessage, CLUID_ONLY_MESSAGE);
   if (!reviewUnlocked) return setMessage(voteMessage, 'Please review the proposal before submitting your vote.');
   if (!selected) return setMessage(voteMessage, 'Please select your vote.');
   if (!confirmed) return setMessage(voteMessage, 'Please confirm one vote per residence.');
