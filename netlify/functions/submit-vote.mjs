@@ -45,6 +45,45 @@ function eircodeKey(eircode) {
   return String(eircode || '').toUpperCase().replace(/\s+/g, '');
 }
 
+
+const CLUID_EIRCODE_EMAIL_MAP = new Map([
+  ['K78T2N5', 'tbreen@cluid.ie'],
+  ['K78T9P8', 'tbreen@cluid.ie'],
+  ['K78T1W9', 'tbreen@cluid.ie'],
+  ['K78E9R2', 'tbreen@cluid.ie'],
+  ['K78K2T0', 'tbreen@cluid.ie'],
+  ['K78E7Y0', 'tbreen@cluid.ie'],
+  ['K78A8P3', 'sculhane@cluid.ie'],
+  ['K78N9P3', 'tbreen@cluid.ie'],
+  ['K78Y0E0', 'tbreen@cluid.ie'],
+  ['K78C2H9', 'tbreen@cluid.ie'],
+  ['K78R6P2', 'tbreen@cluid.ie'],
+  ['K78X2R5', 'tbreen@cluid.ie'],
+  ['K78P8W6', 'tbreen@cluid.ie'],
+  ['K78E6H9', 'tbreen@cluid.ie'],
+  ['K78X6W2', 'omc@cluid.ie'],
+  ['K78K5P1', 'omc@cluid.ie'],
+  ['K78E4P9', 'omc@cluid.ie'],
+  ['K78R1X7', 'omc@cluid.ie'],
+  ['K78A3P8', 'omc@cluid.ie'],
+  ['K78P6Y2', 'omc@cluid.ie'],
+  ['K78X2W8', 'omc@cluid.ie'],
+  ['K78V0Y8', 'omc@cluid.ie'],
+  ['K78X8N9', 'omc@cluid.ie']
+]);
+
+const CLUID_ONLY_MESSAGE = 'This email is not authorised to vote for this Clúid property. Please use the registered Clúid email address for this property. (Clúid only)';
+
+function cluidAuthorisedEmailForEircode(eircode) {
+  return CLUID_EIRCODE_EMAIL_MAP.get(eircodeKey(eircode)) || '';
+}
+
+function isAuthorisedCluidVote(eircode, email) {
+  const authorisedEmail = cluidAuthorisedEmailForEircode(eircode);
+  if (!authorisedEmail) return true;
+  return String(email || '').trim().toLowerCase() === authorisedEmail;
+}
+
 function isOfficialAderrigEircode(eircode) {
   return OFFICIAL_EIRCODE_KEYS.has(eircodeKey(eircode));
 }
@@ -282,6 +321,15 @@ export const handler = async (event) => {
         ok: false,
         eligible: false,
         message: INVALID_EIRCODE_MESSAGE
+      });
+    }
+
+    if (!isAuthorisedCluidVote(eircode, email)) {
+      return json(403, {
+        ok: false,
+        eligible: true,
+        cluidOnly: true,
+        message: CLUID_ONLY_MESSAGE
       });
     }
 
