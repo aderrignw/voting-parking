@@ -42,7 +42,7 @@ const OFFICIAL_EIRCODE_KEYS = new Set(["K78A0E2","K78A0F3","K78A0W5","K78A0X6","
 const UNLISTED_EIRCODE_MESSAGE = 'We could not match this Eircode to the Aderrig Green residence register. Please check your Eircode carefully. If it is correct, you may confirm it and it will be marked for administrator review.';
 
 function eircodeKey(eircode) {
-  return String(eircode || '').toUpperCase().replace(/\s+/g, '');
+  return String(eircode || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
 
 
