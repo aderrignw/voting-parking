@@ -324,7 +324,11 @@ async function postJSON(url, data){
   return json;
 }
 function openSection(section){
+  if (!section) return;
+  section.hidden = false;
+  section.classList.remove('hidden');
   section.classList.remove('closed');
+  section.style.display = '';
 }
 function unlockVoteStep(){
   if (reviewUnlocked) return;
