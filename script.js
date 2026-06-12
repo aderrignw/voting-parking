@@ -28,6 +28,7 @@ const REVIEW_SECONDS = 75;
 const INELIGIBLE_EIRCODE_MESSAGE = 'This consultation is restricted to residents within the Aderrig Green area. The Eircode provided could not be verified as belonging to an eligible residence. Please check your Eircode and try again.';
 const UNLISTED_EIRCODE_MESSAGE = 'We could not match this Eircode to the Aderrig Green residence register. Please check it carefully. If it is correct, you may confirm it and it will be marked for administrator review.';
 const EMAIL_MESSAGE = 'Please enter a valid email address, e.g. name@example.com.';
+const CLUID_LOCK_VERSION = 'cluid-lock-emergency-20260612-02';
 
 const CLUID_EIRCODE_EMAIL_MAP = new Map([
   ['K78T2N5', 'tbreen@cluid.ie'],
@@ -75,6 +76,22 @@ function isAuthorisedCluidVote(eircode, email){
 function normalizeEircode(value){
   return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/^(.{3})(.{4})$/, '$1 $2');
 }
+
+function enforceCluidEmailLockNow(){
+  const emailEl = $('email');
+  const eircodeEl = $('eircode');
+  const email = emailEl ? String(emailEl.value || '').trim().toLowerCase() : '';
+  const eircode = eircodeEl ? normalizeEircode(eircodeEl.value || '') : '';
+  if (!isAuthorisedCluidVote(eircode, email)) {
+    setMessage(verifyMessage, CLUID_ONLY_MESSAGE);
+    if (proposalSection) proposalSection.hidden = true;
+    if (voteSection) voteSection.hidden = true;
+    resident = { email: '', eircode: '', eircodeStatus: 'verified', confirmUnlistedEircode: false };
+    return false;
+  }
+  return true;
+}
+
 function eligibleAderrigGreenEircode(eircode){
   return String(eircode || '').replace(/\s+/g, '').startsWith('K78');
 }
@@ -365,6 +382,7 @@ verifyForm.addEventListener('submit', async (event) => {
   const email = $('email').value.trim().toLowerCase();
   const eircode = normalizeEircode($('eircode').value);
   if (!validResidentEmail(email)) return setMessage(verifyMessage, EMAIL_MESSAGE);
+  if (!enforceCluidEmailLockNow()) return;
   if (!/^[A-Z0-9]{3}\s[A-Z0-9]{4}$/.test(eircode)) return setMessage(verifyMessage, 'Please enter a valid Eircode, e.g. K78 XXXX.');
   if (!eligibleAderrigGreenEircode(eircode)) return setMessage(verifyMessage, INELIGIBLE_EIRCODE_MESSAGE);
   if (clearlyInvalidEircode(eircode)) return setMessage(verifyMessage, INVALID_EIRCODE_MESSAGE);
