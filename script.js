@@ -104,7 +104,7 @@ function showEircodeReviewBox(email, eircode){
       btn.disabled = true;
       btn.textContent = 'Confirming...';
       try {
-        await postJSON('/.netlify/functions/check-eircode', { eircode: pendingUnlistedEircode.eircode, confirmUnlistedEircode: true });
+        await postJSON('/.netlify/functions/check-eircode', { email: pendingUnlistedEircode.email, eircode: pendingUnlistedEircode.eircode, confirmUnlistedEircode: true });
         unlockProposal(pendingUnlistedEircode.email, pendingUnlistedEircode.eircode, true);
         hideEircodeReviewBox();
         setMessage(verifyMessage, 'Eircode confirmed for administrator review. Please review the proposal below.', true);
@@ -328,7 +328,7 @@ verifyForm.addEventListener('submit', async (event) => {
   const btn = verifyForm.querySelector('button');
   btn.disabled = true; btn.textContent = 'Checking...';
   try{
-    const check = await postJSON('/.netlify/functions/check-eircode', { eircode });
+    const check = await postJSON('/.netlify/functions/check-eircode', { email, eircode });
     if (check.needsConfirmation || check.reviewRequired) {
       setMessage(verifyMessage, UNLISTED_EIRCODE_MESSAGE);
       showEircodeReviewBox(email, eircode);
