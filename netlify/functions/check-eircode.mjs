@@ -47,7 +47,7 @@ function isAuthorisedCluidVote(eircode, email) {
 
 
 function eircodeKey(eircode) {
-  return String(eircode || '').toUpperCase().replace(/\s+/g, '');
+  return String(eircode || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
 
 function isOfficialAderrigEircode(eircode) {
