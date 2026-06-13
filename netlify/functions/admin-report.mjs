@@ -532,7 +532,7 @@ function buildReport(submissions, includeRows = false, votingSettings = DEFAULT_
       lastSubmission: includeRows ? lastSubmission : null
     },
     byDay: Object.values(byDayMap).sort((a, b) => a.date.localeCompare(b.date)),
-    streetBreakdown: includeRows ? buildStreetBreakdown(validRows) : null
+    streetBreakdown: buildStreetBreakdown(validRows)
   };
 
   if (includeRows) {
@@ -624,6 +624,13 @@ export const handler = async (event) => {
       report.siteSatisfactionConfigured = false;
       report.siteSatisfactionError = String(error.message || '').slice(0, 500);
     }
+  }
+
+  if (!isAdmin && report.streetBreakdown) {
+    report.streetBreakdown = {
+      ...report.streetBreakdown,
+      unknownEircodes: []
+    };
   }
 
   return json(200, {
